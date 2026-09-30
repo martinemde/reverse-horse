@@ -1,5 +1,6 @@
 const KEY = 'meat-jev.openrouter.key';
 const LOGIN = 'meat-jev.openrouter.login';
+const COMPARISON = 'meat-jev.openrouter.compare';
 const CALLBACK = '/auth/openrouter/callback';
 const base64url = bytes => btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 const random = () => base64url(crypto.getRandomValues(new Uint8Array(32)));
@@ -9,6 +10,14 @@ export async function challenge(verifier) {
 }
 
 export function getKey(storage = localStorage) { return storage.getItem(KEY) || undefined; }
+
+export function comparisonEnabled(storage = localStorage) {
+  return Boolean(getKey(storage)) && storage.getItem(COMPARISON) !== 'false';
+}
+
+export function setComparisonEnabled(enabled, storage = localStorage) {
+  storage.setItem(COMPARISON, String(enabled));
+}
 
 export function disconnect(storage = localStorage, session = sessionStorage) {
   storage.removeItem(KEY);

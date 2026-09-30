@@ -1,4 +1,4 @@
-import { getKey, disconnect, loginURL, completeLogin } from './auth.js';
+import { getKey, disconnect, loginURL, completeLogin, comparisonEnabled, setComparisonEnabled } from './auth.js';
 import { compareWithJev } from './compare.js';
 
 const $ = selector => document.querySelector(selector);
@@ -22,7 +22,7 @@ function refreshAuth() {
   $('#auth').textContent = connected ? 'Disconnect' : 'Connect OpenRouter';
   $('#auth-status').textContent = connected ? 'OpenRouter connected · comparisons use your credits.' : 'Connect your OpenRouter account to compare with JEV.';
   $('#compare').disabled = !connected;
-  if (!connected) $('#compare').checked = false;
+  $('#compare').checked = comparisonEnabled();
 }
 function range(label, max, value, changed) {
   const input = node('input');
@@ -187,8 +187,12 @@ $('#auth').addEventListener('click', async () => {
   } catch (e) { showError(e.message); }
   finally { $('#auth').disabled = false; }
 });
-$('#compare').addEventListener('change', () => { if (!$('#compare').checked) for (const controller of comparisons.values()) controller.abort(); });
-window.addEventListener('storage', () => { try { if (!getKey()) for (const controller of comparisons.values()) controller.abort(); refreshAuth(); } catch { /* Storage may be disabled. */ } });
+$('#compare').addEventListener('change', () => {
+  if (!$('#compare').checked) for (const controller of comparisons.values()) controller.abort();
+  try { setComparisonEnabled($('#compare').checked); }
+  catch { showError('Could not save your comparison preference in browser storage.'); }
+});
+window.addEventListener('storage', () => { try { refreshAuth(); if (!$('#compare').checked) for (const controller of comparisons.values()) controller.abort(); } catch { /* Storage may be disabled. */ } });
 async function initialize() {
   const callback = new URL(location.href);
   if (callback.pathname === '/auth/openrouter/callback') {

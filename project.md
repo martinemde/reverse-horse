@@ -19,9 +19,10 @@ bun start
 Open http://127.0.0.1:3000. Set `PORT` to change the port. No dependencies to install.
 `bun dev` restarts on server changes; refresh the page after UI edits.
 
-Click **Connect OpenRouter** to authorize your own key, then enable **Compare
-with JEV**. Comparison defaults to off on each page load; connecting alone never
-enables it. The OAuth flow follows the blog's browser-side PKCE implementation:
+Click **Connect OpenRouter** to authorize your own key. **Compare with JEV** is
+enabled on your first connection. Turn it off whenever you like; your choice is
+saved in this browser and survives refreshes and reconnects. Without a connection,
+comparison stays off. The OAuth flow follows the blog's browser-side PKCE implementation:
 a random verifier and state are kept in session storage, the callback exchanges
 the code directly with OpenRouter, and the key stays in this origin's local
 storage. Callbacks expire after ten minutes and must match the initiating tab.
