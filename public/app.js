@@ -27,19 +27,22 @@ const exampleRequest = {
 function emptyState(auto) {
   const empty = node('div', undefined, 'empty');
   const command = `curl '${location.origin}/api/v1/systemone' \\\n  -H 'Content-Type: application/json' \\\n  --data-binary @- <<'JSON'\n${JSON.stringify(exampleRequest, null, 2)}\nJSON`;
-  const pre = node('pre', undefined, 'curl-example');
-  const copy = node('button', 'Copy request', 'secondary');
+  const input = node('textarea', undefined, 'curl-example');
+  input.value = command;
+  input.rows = 16;
+  input.spellcheck = false;
+  input.setAttribute('aria-label', 'Editable curl request');
+  const copy = node('button', 'Copy', 'secondary');
   copy.type = 'button';
   const copyStatus = node('span', '', 'copy-status');
   copyStatus.setAttribute('role', 'status');
   copy.addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(command); copyStatus.textContent = 'Copied. Paste it into your terminal and edit it.'; }
+    try { await navigator.clipboard.writeText(input.value); copyStatus.textContent = 'Copied. Paste it into your terminal and edit it.'; }
     catch { copyStatus.textContent = 'Could not copy. Select the command below and copy it manually.'; }
   });
   const controls = node('div', undefined, 'curl-controls');
   controls.append(copy, copyStatus);
-  pre.append(node('code', command));
-  empty.append(node('div', '?', 'waiting-mark'), node('h2', 'No questions yet'), node('p', auto ? 'Next example coming up…' : 'Waiting for a request, or turn on auto mode.'), controls, pre);
+  empty.append(node('div', '?', 'waiting-mark'), node('h2', 'No questions yet'), node('p', auto ? 'Next example coming up…' : 'Waiting for a request, or turn on auto mode.'), controls, input);
   return empty;
 }
 function send(message) { if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message)); }
