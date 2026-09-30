@@ -5,3 +5,7 @@ credentials.json
 *.key
 *.pem
 .DS_Store
+.wrangler/
+.dev.vars
+.dev.vars.*
+dist/

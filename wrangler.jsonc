@@ -1,0 +1,10 @@
+{
+  "name": "meat-jev",
+  "account_id": "9c275e0c035e53370143e8cf240dfb3f",
+  "main": "worker.js",
+  "compatibility_date": "2026-09-30",
+  "workers_dev": true,
+  "assets": { "directory": "./public", "binding": "ASSETS", "run_worker_first": true },
+  "durable_objects": { "bindings": [{ "name": "ROOM", "class_name": "MeatJevRoom" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["MeatJevRoom"] }]
+}

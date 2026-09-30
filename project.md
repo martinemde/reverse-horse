@@ -5,7 +5,7 @@ status: active
 
 # meat-jev
 
-Be Jev: a local Bun web server accepts TypeSafe System One requests, shows their
+Be Jev: a Bun server or Cloudflare Worker accepts TypeSafe System One requests, shows their
 state and questions live over a WebSocket, and holds the HTTP connection while
 you answer. Each API call has 30 seconds from arrival, including time in the queue.
 After that the caller receives 504, but the questions and your draft remain on
@@ -82,6 +82,27 @@ The queue and latest 20 results live in memory. Reconnecting gets a fresh snapsh
 draft slider values survive a connection interruption while the page stays open,
 but not a page refresh. Multiple tabs see the same queue; the first valid submission
 wins. Restarting the server clears requests and results.
+
+## Cloudflare
+
+`bun run dev:cloudflare` runs the Worker locally at http://127.0.0.1:8787.
+`bun run build` previews deployment with Wrangler's dry run; `bun run deploy`
+publishes the `meat-jev` Worker to the Cloudflare account used by martinemde.com.
+Wrangler is pinned through mise. Static assets and the OpenRouter callback route
+are served by the Worker; WebSockets and API calls go to one `MeatJevRoom`
+Durable Object named `shared`. The Bun and Cloudflare adapters use the same
+queue implementation in `room.js`.
+
+This is one shared room: every connected browser sees the same requests and
+results, and the first valid answer wins. Standard WebSockets keep that object
+active while browsers are connected (no hibernation). The queue is still in
+memory, not persisted; object restarts and deployments can clear it and interrupt
+waiting API calls. OpenRouter keys remain exclusively in each browser.
+
+Run `bun scripts/check-worker.js http://127.0.0.1:8787` against the local Worker,
+or pass the deployed HTTPS origin after publishing. It sends two labeled test
+requests, checks two sockets racing to answer, and waits the actual 30 seconds
+to verify a 504 followed by a saved late answer. It does not call OpenRouter.
 
 ## Verify
 
