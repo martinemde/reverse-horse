@@ -69,16 +69,25 @@ test('holds the API connection, accepts all primitives, and skips JEV without cr
   expect((await reconnected.next(m => m.type === 'error')).message).toBe('This request is no longer waiting');
 });
 
-test('expires requests and rejects late answers', async () => {
+test('expires the API call but retains questions for late answers and comparison', async () => {
   const base = app({ timeoutMs: 100 }); const client = connect(base);
   await client.next(m => m.type === 'queue');
   const response = post(base, request, '/v1/systemone');
   const item = (await client.next(m => m.requests?.length)).requests[0];
   expect((await response).status).toBe(504);
-  const expired = await client.next(m => m.results?.[0]?.status === 'Time’s up');
-  expect(expired.requests).toEqual([]);
-  client.send({ type: 'submit', id: item.id, values: {} });
-  expect((await client.next(m => m.type === 'error')).message).toBe('This request is no longer waiting');
+  const expired = await client.next(m => m.requests?.[0]?.timedOut);
+  expect(expired.requests[0].id).toBe(item.id);
+  const reconnected = connect(base);
+  expect((await reconnected.next(m => m.requests?.[0]?.timedOut)).requests[0].request).toEqual(request);
+  client.send({ type: 'submit', id: item.id, compare: true, values: { urgent: 0.75, department: { billing: 1, support: 0 }, mood: 1.5 } });
+  const completed = await client.next(m => m.results?.[0]?.human);
+  expect(completed.requests).toEqual([]);
+  expect(completed.results[0].late).toBe(true);
+  expect(completed.results[0].human.answers.mood.score).toBe(1.5);
+  expect((await client.next(m => m.type === 'compare')).id).toBe(item.id);
+  client.send({ type: 'comparison', id: item.id, error: 'Comparison skipped in local test' });
+  reconnected.send({ type: 'submit', id: item.id, values: {} });
+  expect((await reconnected.next(m => m.type === 'error')).message).toBe('This request is no longer waiting');
 });
 
 test('invalid requests and invalid answers do not consume a waiting request', async () => {

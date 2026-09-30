@@ -7,7 +7,11 @@ status: active
 
 Be Jev: a local Bun web server accepts TypeSafe System One requests, shows their
 state and questions live over a WebSocket, and holds the HTTP connection while
-you answer. Each request has 30 seconds from arrival, including time in the queue.
+you answer. Each API call has 30 seconds from arrival, including time in the queue.
+After that the caller receives 504, but the questions and your draft remain on
+the page. You can save late answers and optionally compare them with JEV; late
+answers cannot reach the expired caller. Auto mode waits for your answer before
+dealing the next round, even after its timer expires.
 
 ## Run
 
@@ -59,7 +63,8 @@ curl http://127.0.0.1:3000/api/v1/systemone \
 `/v1/systemone` is also supported for SDK clients. The local endpoint needs no API
 key and binds to loopback. Invalid requests return 400; unanswered requests return
 504 after 30 seconds. Callers need an HTTP timeout longer than 30 seconds. Client
-disconnects remove their request. A maximum of 100 pending requests is accepted.
+disconnects before the deadline remove their request. A maximum of 100 unanswered
+requests (including timed-out ones) is accepted.
 
 Noul maps to 0–1. Choice radio buttons select one option outright; sliders set
 relative weights that normalize to probabilities (all-zero weights are rejected).

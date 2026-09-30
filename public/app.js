@@ -124,7 +124,10 @@ function makeForm(item) {
   let submitting = false;
   function validity() {
     const invalidChoice = Object.values(values).some(v => typeof v === 'object' && !Object.values(v).some(n => n > 0));
-    button.disabled = submitting || socket?.readyState !== WebSocket.OPEN || Date.now() + offset >= item.deadline || invalidChoice;
+    const late = Date.now() + offset >= item.deadline;
+    button.textContent = late ? 'Save late answers' : 'Submit answers';
+    hint.textContent = late ? 'The deadline passed. You can still save your answers and compare with JEV; the API caller already timed out.' : 'Your answers go back to the caller. JEV comparison is optional.';
+    button.disabled = submitting || socket?.readyState !== WebSocket.OPEN || invalidChoice;
   }
   card.addEventListener('submit', event => {
     event.preventDefault(); validity(); if (button.disabled) return;
@@ -139,7 +142,7 @@ function makeForm(item) {
 function resultCard(result) {
   const card = node('article', undefined, 'result');
   const head = node('div', undefined, 'result-head');
-  const heading = node('div'); heading.append(node('h2', result.title), node('p', result.status)); head.append(heading);
+  const heading = node('div'); heading.append(node('h2', result.title), node('p', result.late ? `Answered after timeout · ${result.status}` : result.status)); head.append(heading);
   if (result.source) { const link = node('a', 'Doc example', 'source'); link.href = result.source; link.target = '_blank'; link.rel = 'noreferrer'; head.append(link); }
   card.append(head);
   const details = node('details'); details.append(node('summary', 'State & questions'), node('pre', text({ state: result.request.state, questions: result.request.questions }))); card.append(details);
@@ -186,7 +189,7 @@ function update(message) {
   if (signature !== resultSignature) { resultSignature = signature; $('#results').hidden = !message.results.length; $('#history').replaceChildren(...message.results.map(resultCard)); }
   tick();
 }
-function tick() { for (const item of current) { const form = forms.get(item.id); const seconds = Math.max(0, (item.deadline - Date.now() - offset) / 1000); form.clock.textContent = `${seconds.toFixed(1)}s`; form.clock.classList.toggle('urgent', seconds < 10); form.validity(); } }
+function tick() { for (const item of current) { const form = forms.get(item.id); const seconds = Math.max(0, (item.deadline - Date.now() - offset) / 1000); form.clock.textContent = seconds > 0 ? `${seconds.toFixed(1)}s` : 'Timed out'; form.clock.classList.toggle('urgent', seconds < 10); form.validity(); } }
 async function compareInBrowser(message) {
   const connection = socket;
   const controller = new AbortController();

@@ -12,7 +12,7 @@ export function startServer({ port = Number(process.env.PORT || 3000), hostname 
   let exampleIndex = Math.floor(Math.random() * examples.length);
   const json = (body, status = 200) => Response.json(body, { status });
   const error = (message, status) => json({ error: { message } }, status);
-  const snapshot = () => JSON.stringify({ type: 'queue', serverTime: Date.now(), auto, results, requests: [...pending.values()].map(({ id, request, createdAt, deadline, source, title }) => ({ id, request, createdAt, deadline, source, title })) });
+  const snapshot = () => JSON.stringify({ type: 'queue', serverTime: Date.now(), auto, results, requests: [...pending.values()].map(({ id, request, createdAt, deadline, source, title, timedOut }) => ({ id, request, createdAt, deadline, source, title, timedOut })) });
   const broadcast = () => { const message = snapshot(); for (const ws of clients) ws.send(message); };
   function scheduleExample() {
     clearTimeout(autoTimer);
@@ -40,13 +40,23 @@ export function startServer({ port = Number(process.env.PORT || 3000), hostname 
       scheduleExample();
     };
     const abort = () => finish(error('Caller disconnected', 499), 'Caller disconnected');
-    const timer = setTimeout(() => finish(error('Timed out waiting for a human answer', 504), 'Time’s up'), timeoutMs);
-    pending.set(id, { id, request, createdAt, deadline: createdAt + timeoutMs, title: example?.title || 'API request', source: example?.source, timer, finish });
+    const expire = () => {
+      const entry = pending.get(id);
+      if (!entry || entry.timedOut) return;
+      entry.timedOut = true;
+      clearTimeout(entry.timer);
+      // Resolving the HTTP call must not discard the human's unfinished work.
+      signal?.removeEventListener('abort', abort);
+      resolve(error('Timed out waiting for a human answer', 504));
+      broadcast();
+    };
+    const timer = setTimeout(expire, timeoutMs);
+    pending.set(id, { id, request, createdAt, deadline: createdAt + timeoutMs, title: example?.title || 'API request', source: example?.source, timedOut: false, timer, finish, expire });
     signal?.addEventListener('abort', abort, { once: true });
     if (signal?.aborted) abort(); else broadcast();
   }
   function compare(entry, human, ws, enabled) {
-    const result = { id: entry.id, request: entry.request, title: entry.title, source: entry.source, human, status: enabled ? 'Asking JEV via OpenRouter…' : 'Answered · comparison off' };
+    const result = { id: entry.id, request: entry.request, title: entry.title, source: entry.source, human, late: entry.timedOut, status: enabled ? 'Asking JEV via OpenRouter…' : 'Answered · comparison off' };
     results.unshift(result);
     results.splice(20);
     broadcast();
@@ -119,7 +129,7 @@ export function startServer({ port = Number(process.env.PORT || 3000), hostname 
           if (message.type !== 'submit') throw new Error('Unknown message type');
           const entry = pending.get(message.id);
           if (!entry) throw new Error('This request is no longer waiting');
-          if (Date.now() >= entry.deadline) { entry.finish(error('Timed out waiting for a human answer', 504), 'Time’s up'); throw new Error('Time’s up'); }
+          if (Date.now() >= entry.deadline) entry.expire();
           if (message.compare !== undefined && typeof message.compare !== 'boolean') throw new Error('Invalid comparison setting');
           const response = answerRequest(entry.request, message.values);
           ws.send(JSON.stringify({ type: 'submitted', id: message.id }));
