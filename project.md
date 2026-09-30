@@ -1,6 +1,7 @@
 ---
 name: meat-jev
 status: active
+url: https://meat-jev.poblonko.workers.dev
 ---
 
 # meat-jev
@@ -84,6 +85,9 @@ but not a page refresh. Multiple tabs see the same queue; the first valid submis
 wins. Restarting the server clears requests and results.
 
 ## Cloudflare
+
+Live site: https://meat-jev.poblonko.workers.dev. The API is available at
+`https://meat-jev.poblonko.workers.dev/api/v1/systemone`.
 
 `bun run dev:cloudflare` runs the Worker locally at http://127.0.0.1:8787.
 `bun run build` previews deployment with Wrangler's dry run; `bun run deploy`
