@@ -15,6 +15,33 @@ let offset = 0;
 let current = [];
 const forms = new Map();
 let resultSignature = '';
+const exampleRequest = {
+  "model": "jev-latest",
+  "state": "My package arrived two days late, but everything inside looks great.",
+  "questions": {
+    "damaged": { "type": "noul", "instructions": "Did anything arrive damaged?" },
+    "topic": { "type": "choice", "instructions": "What is this message about?", "criteria": { "shipping": "Delivery and packages", "billing": "Charges and payments", "support": "Technical help" } },
+    "mood": { "type": "score", "instructions": "How does the customer feel overall?", "criteria": ["Unhappy", "Mixed or neutral", "Happy"] }
+  }
+};
+function emptyState(auto) {
+  const empty = node('div', undefined, 'empty');
+  const command = `curl '${location.origin}/api/v1/systemone' \\\n  -H 'Content-Type: application/json' \\\n  --data-binary @- <<'JSON'\n${JSON.stringify(exampleRequest, null, 2)}\nJSON`;
+  const pre = node('pre', undefined, 'curl-example');
+  const copy = node('button', 'Copy request', 'secondary');
+  copy.type = 'button';
+  const copyStatus = node('span', '', 'copy-status');
+  copyStatus.setAttribute('role', 'status');
+  copy.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(command); copyStatus.textContent = 'Copied. Paste it into your terminal and edit it.'; }
+    catch { copyStatus.textContent = 'Could not copy. Select the command below and copy it manually.'; }
+  });
+  const controls = node('div', undefined, 'curl-controls');
+  controls.append(copy, copyStatus);
+  pre.append(node('code', command));
+  empty.append(node('div', '?', 'waiting-mark'), node('h2', 'No questions yet'), node('p', auto ? 'Next example coming up…' : 'Waiting for a request, or turn on auto mode.'), controls, pre);
+  return empty;
+}
 function send(message) { if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message)); }
 function showError(message) { $('#error').textContent = message; $('#error').hidden = !message; }
 function refreshAuth() {
@@ -153,7 +180,7 @@ function update(message) {
     $('#requests .empty')?.remove();
     for (const item of current) if (!forms.has(item.id)) { const form = makeForm(item); forms.set(item.id, form); $('#requests').append(form.card); }
   } else if (!$('#requests .empty')) {
-    const empty = node('div', undefined, 'empty'); empty.append(node('div', '?', 'waiting-mark'), node('h2', 'No questions yet'), node('p', message.auto ? 'Next example coming up…' : 'Waiting for a request, or turn on auto mode.'), node('code', 'POST /api/v1/systemone')); $('#requests').append(empty);
+    $('#requests').append(emptyState(message.auto));
   } else $('#requests .empty p').textContent = message.auto ? 'Next example coming up…' : 'Waiting for a request, or turn on auto mode.';
   const signature = JSON.stringify(message.results);
   if (signature !== resultSignature) { resultSignature = signature; $('#results').hidden = !message.results.length; $('#history').replaceChildren(...message.results.map(resultCard)); }
@@ -209,4 +236,5 @@ async function initialize() {
 }
 setInterval(tick, 100);
 setInterval(() => send({ type: 'ping' }), 20_000);
+$('#requests').replaceChildren(emptyState(false));
 void initialize();
