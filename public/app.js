@@ -1,3 +1,6 @@
+import { getKey, disconnect, loginURL, completeLogin } from './auth.js';
+import { compareWithJev } from './compare.js';
+
 const $ = selector => document.querySelector(selector);
 const text = value => typeof value === 'string' ? value : JSON.stringify(value, null, 2);
 function node(tag, content, className) {
@@ -7,12 +10,20 @@ function node(tag, content, className) {
   return el;
 }
 let socket;
+const comparisons = new Map();
 let offset = 0;
 let current = [];
 const forms = new Map();
 let resultSignature = '';
 function send(message) { if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message)); }
 function showError(message) { $('#error').textContent = message; $('#error').hidden = !message; }
+function refreshAuth() {
+  const connected = Boolean(getKey());
+  $('#auth').textContent = connected ? 'Disconnect' : 'Connect OpenRouter';
+  $('#auth-status').textContent = connected ? 'OpenRouter connected · comparisons use your credits.' : 'Connect your OpenRouter account to compare with JEV.';
+  $('#compare').disabled = !connected;
+  if (!connected) $('#compare').checked = false;
+}
 function range(label, max, value, changed) {
   const input = node('input');
   input.type = 'range'; input.min = '0'; input.max = String(max); input.step = '0.001'; input.value = String(value);
@@ -81,14 +92,21 @@ function makeForm(item) {
   }
   const actions = node('div', undefined, 'actions');
   const button = node('button', 'Submit answers'); button.type = 'submit';
-  const hint = node('p', 'Your answers go back to the caller. Then JEV takes a turn.');
+  const hint = node('p', 'Your answers go back to the caller. JEV comparison is optional.');
   actions.append(hint, button); card.append(head, state, questions, actions);
   let submitting = false;
   function validity() {
     const invalidChoice = Object.values(values).some(v => typeof v === 'object' && !Object.values(v).some(n => n > 0));
     button.disabled = submitting || socket?.readyState !== WebSocket.OPEN || Date.now() + offset >= item.deadline || invalidChoice;
   }
-  card.addEventListener('submit', event => { event.preventDefault(); validity(); if (button.disabled) return; submitting = true; validity(); showError(''); send({ type: 'submit', id: item.id, values }); });
+  card.addEventListener('submit', event => {
+    event.preventDefault(); validity(); if (button.disabled) return;
+    try {
+      const compare = $('#compare').checked && Boolean(getKey());
+      submitting = true; validity(); showError('');
+      send({ type: 'submit', id: item.id, values, compare });
+    } catch { showError('Browser storage is unavailable. Allow site storage to submit answers.'); }
+  });
   return { card, clock, validity, reset() { submitting = false; validity(); } };
 }
 function resultCard(result) {
@@ -128,7 +146,7 @@ function resultCard(result) {
 }
 function update(message) {
   offset = message.serverTime - Date.now(); current = message.requests;
-  $('#auto').checked = message.auto; $('#configuration').hidden = message.configured;
+  $('#auto').checked = message.auto;
   const ids = new Set(current.map(item => item.id));
   for (const [id, form] of forms) if (!ids.has(id)) { form.card.remove(); forms.delete(id); }
   if (current.length) {
@@ -142,13 +160,49 @@ function update(message) {
   tick();
 }
 function tick() { for (const item of current) { const form = forms.get(item.id); const seconds = Math.max(0, (item.deadline - Date.now() - offset) / 1000); form.clock.textContent = `${seconds.toFixed(1)}s`; form.clock.classList.toggle('urgent', seconds < 10); form.validity(); } }
+async function compareInBrowser(message) {
+  const connection = socket;
+  const controller = new AbortController();
+  comparisons.set(message.id, controller);
+  const timer = setTimeout(() => controller.abort(), 30_000);
+  let result;
+  try { result = $('#compare').checked ? await compareWithJev(message.request, getKey(), controller.signal) : { error: 'Comparison skipped · comparison off' }; }
+  catch (e) { result = { error: e.name === 'AbortError' ? 'Comparison stopped or timed out' : `Comparison failed: ${e.message}` }; }
+  finally { clearTimeout(timer); comparisons.delete(message.id); }
+  if (connection.readyState === WebSocket.OPEN) connection.send(JSON.stringify({ type: 'comparison', id: message.id, ...result }));
+}
 function connect() {
   socket = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/ws`);
   socket.addEventListener('open', () => { $('#connection').textContent = 'Connected'; $('#auto').disabled = false; for (const form of forms.values()) form.reset(); });
-  socket.addEventListener('close', () => { $('#connection').textContent = 'Disconnected · reconnecting…'; $('#auto').disabled = true; tick(); setTimeout(connect, 1000); });
-  socket.addEventListener('message', event => { const message = JSON.parse(event.data); if (message.type === 'queue') update(message); if (message.type === 'error') { showError(message.message); for (const form of forms.values()) form.reset(); } });
+  socket.addEventListener('close', () => { for (const controller of comparisons.values()) controller.abort(); $('#connection').textContent = 'Disconnected · reconnecting…'; $('#auto').disabled = true; tick(); setTimeout(connect, 1000); });
+  socket.addEventListener('message', event => { const message = JSON.parse(event.data); if (message.type === 'queue') update(message); if (message.type === 'compare') void compareInBrowser(message); if (message.type === 'error') { showError(message.message); for (const form of forms.values()) form.reset(); } });
 }
 $('#auto').addEventListener('change', event => send({ type: 'auto', enabled: event.target.checked }));
+$('#auth').addEventListener('click', async () => {
+  $('#auth').disabled = true;
+  try {
+    showError('');
+    if (getKey()) { disconnect(); for (const controller of comparisons.values()) controller.abort(); refreshAuth(); }
+    else location.assign(await loginURL(location.origin));
+  } catch (e) { showError(e.message); }
+  finally { $('#auth').disabled = false; }
+});
+$('#compare').addEventListener('change', () => { if (!$('#compare').checked) for (const controller of comparisons.values()) controller.abort(); });
+window.addEventListener('storage', () => { try { if (!getKey()) for (const controller of comparisons.values()) controller.abort(); refreshAuth(); } catch { /* Storage may be disabled. */ } });
+async function initialize() {
+  const callback = new URL(location.href);
+  if (callback.pathname === '/auth/openrouter/callback') {
+    // Remove the authorization code from history before loading any other state.
+    history.replaceState(null, '', '/');
+    $('#auth').disabled = true;
+    $('#auth-status').textContent = 'Connecting to OpenRouter…';
+    try { await completeLogin(callback); }
+    catch (e) { showError(e.name === 'TimeoutError' ? 'OpenRouter login timed out. Try connecting again.' : e.message); }
+    finally { $('#auth').disabled = false; }
+  }
+  try { refreshAuth(); } catch { showError('Browser storage is unavailable. Allow site storage to connect OpenRouter.'); }
+  connect();
+}
 setInterval(tick, 100);
 setInterval(() => send({ type: 'ping' }), 20_000);
-connect();
+void initialize();

@@ -19,12 +19,27 @@ bun start
 Open http://127.0.0.1:3000. Set `PORT` to change the port. No dependencies to install.
 `bun dev` restarts on server changes; refresh the page after UI edits.
 
-Set `TYPESAFE_API_KEY` in your environment or a local ignored `.env` to enable
-comparison. After you submit, the caller immediately receives your answers;
-the server then sends the original request directly to
-`https://api.typesafe.ai/v1/systemone`. The page shows both answers, probabilities,
-and their difference. Without a key, no second lookup happens. The key stays on
-the server. A failed or timed-out JEV comparison does not undo your answer.
+Click **Connect OpenRouter** to authorize your own key, then enable **Compare
+with JEV**. Comparison defaults to off on each page load; connecting alone never
+enables it. The OAuth flow follows the blog's browser-side PKCE implementation:
+a random verifier and state are kept in session storage, the callback exchanges
+the code directly with OpenRouter, and the key stays in this origin's local
+storage. Callbacks expire after ten minutes and must match the initiating tab.
+
+After submission, the caller immediately receives your answers. If comparison is
+enabled, that browser sends the original request directly to
+`https://openrouter.ai/api/v1/systemone`. Only the comparison result returns to
+the local server for display and reconnects; the key is never sent to it or to
+another browser. Requests use the submitter's OpenRouter credits. No connection
+or an unchecked toggle means no JEV lookup. Disconnect removes the stored key;
+disconnecting or turning comparison off aborts outstanding browser lookups.
+Already sent requests may still incur usage. Disconnect does not revoke the key
+at OpenRouter. A failed comparison does not undo your human answer.
+
+The server no longer reads `TYPESAFE_API_KEY`. A live comparison requires the
+page to stay connected. OAuth and inference use the documented
+[PKCE flow](https://openrouter.ai/docs/guides/overview/auth/oauth) and
+[System One endpoint](https://openrouter.ai/docs/api/api-reference/systemone/submit-a-system-one-request).
 
 Auto mode cycles through three examples adapted from the TypeSafe docs. It starts
 a round immediately, then waits four seconds after completion/comparison before
@@ -66,7 +81,9 @@ wins. Restarting the server clears requests and results.
 
 `bun test` exercises real local HTTP/WebSocket connections, all three answer types,
 reconnection, duplicate submission, validation, expiration, auto mode, and static
-assets. It explicitly disables the optional JEV lookup; there is no fake JEV.
-For a live comparison, set the key, run the server, enable auto mode, answer a
-round, and check the You & JEV panel. For UI verification, also check a narrow
+assets. Auth tests check PKCE, callback rejection, and browser key removal.
+Tests never call a model; there is no fake JEV. For a live comparison, connect
+OpenRouter in the page, check Compare with JEV, enable auto mode, answer a round,
+and check the You & JEV panel. Also submit with comparison off to verify it skips
+the lookup, and disconnect to forget the key. For UI verification, check a narrow
 viewport, keyboard sliders, and expiration without submitting.

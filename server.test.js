@@ -4,7 +4,7 @@ import { startServer } from './server.js';
 const resources = [];
 afterEach(async () => { for (const close of resources.reverse()) await close(); resources.length = 0; });
 function app(options = {}) {
-  const running = startServer({ port: 0, apiKey: '', ...options });
+  const running = startServer({ port: 0, ...options });
   resources.push(() => running.stop());
   return running.server.url;
 }
@@ -62,7 +62,7 @@ test('holds the API connection, accepts all primitives, and skips JEV without cr
   expect(result.answers.mood.legend).toEqual({ 0: 'Sad', 1: 'Neutral', 2: { label: 'Happy' } });
   expect(result.answers.department.confidence).toBeCloseTo(0.1887218755);
   const completed = await client.next(m => m.results?.[0]?.human);
-  expect(completed.configured).toBe(false);
+  expect(completed.results[0].status).toBe('Answered · comparison off');
   expect(completed.results[0].jev).toBeUndefined();
   expect(completed.requests).toEqual([]);
   reconnected.send({ type: 'submit', id: item.id, values: {} });
@@ -105,9 +105,26 @@ test('auto mode deals a sourced example and can be turned off', async () => {
 
 test('serves the page and assets and blocks cross-origin requests', async () => {
   const base = app();
-  for (const path of ['/', '/app.js', '/style.css']) expect((await fetch(new URL(path, base))).status).toBe(200);
+  for (const path of ['/', '/auth/openrouter/callback?code=example', '/app.js', '/auth.js', '/compare.js', '/style.css']) expect((await fetch(new URL(path, base))).status).toBe(200);
   expect((await fetch(new URL('/ws', base), { headers: { Origin: 'https://elsewhere.example' } })).status).toBe(403);
   expect((await fetch(new URL('/api/v1/systemone', base), { method: 'POST', headers: { Origin: 'https://elsewhere.example', 'Content-Type': 'application/json' }, body: JSON.stringify(request) })).status).toBe(403);
+});
+
+test('opted-in comparison is delegated only to the submitting browser, after answering the caller', async () => {
+  const base = app(); const client = connect(base); const observer = connect(base);
+  await client.next(m => m.type === 'queue'); await observer.next(m => m.type === 'queue');
+  const response = post(base);
+  const item = (await client.next(m => m.requests?.length)).requests[0];
+  client.send({ type: 'submit', id: item.id, compare: true, values: { urgent: 1, department: { billing: 1, support: 0 }, mood: 1 } });
+  expect((await response).status).toBe(200);
+  const comparison = await client.next(m => m.type === 'compare');
+  expect(comparison).toEqual({ type: 'compare', id: item.id, request });
+  observer.send({ type: 'comparison', id: item.id, error: 'Must not overwrite another browser’s result' });
+  expect((await observer.next(m => m.type === 'error')).message).toBe('This comparison is no longer waiting');
+  client.send({ type: 'comparison', id: item.id, error: 'Comparison stopped or timed out' });
+  const finished = await client.next(m => m.results?.[0]?.status === 'Comparison stopped or timed out');
+  expect(finished.results[0].human.answers.urgent.noul).toBe(1);
+  expect(finished.results[0].jev).toBeUndefined();
 });
 
 test('concurrent requests remain isolated and disconnecting a caller removes its request', async () => {
