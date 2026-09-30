@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#131718">
+  <title>meat-jev</title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header><a class="brand" href="/">meat-jev<span> HUMAN INFERENCE</span></a><span id="connection" role="status">Connecting…</span></header>
+  <main>
+    <div class="toolbar"><div><h1>You are the model.</h1><p>Read the state. Make the call.</p></div><label class="auto"><input id="auto" type="checkbox" disabled> Auto mode <small>Deal me examples</small></label></div>
+    <p id="configuration" class="notice" hidden>Set TYPESAFE_API_KEY on the server to compare your answers with JEV.</p>
+    <p id="error" role="alert" hidden></p>
+    <section id="requests" aria-label="Waiting requests"><div class="empty"><div class="waiting-mark">?</div><h2>No questions yet</h2><p>Waiting for a request, or turn on auto mode.</p><code>POST /api/v1/systemone</code></div></section>
+    <section id="results" aria-label="Your results" hidden><h2 class="section-title">You & JEV</h2><div id="history"></div></section>
+  </main>
+  <footer>meat-jev <span>30 seconds. One human. Your judgment.</span></footer>
+</body>
+</html>
