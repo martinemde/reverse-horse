@@ -34,3 +34,10 @@ export async function compareWithJev(request, apiKey, signal) {
   if (!response.ok) throw new Error(`OpenRouter returned HTTP ${response.status}${response.status === 401 ? ' · reconnect your account' : response.status === 402 ? ' · check your OpenRouter credits' : ''}`);
   return { jev: validateJevResponse(request, await response.json()) };
 }
+
+export function matchesJev(human, jev) {
+  if (human.type !== jev.type) return false;
+  if (human.type === 'choice') return human.choice === jev.choice;
+  if (human.type === 'noul') return (human.noul >= 0.5) === (jev.noul >= 0.5);
+  return Math.round(human.score) === Math.round(jev.score);
+}

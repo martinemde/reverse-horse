@@ -11,8 +11,8 @@ export async function challenge(verifier) {
 
 export function getKey(storage = localStorage) { return storage.getItem(KEY) || undefined; }
 
-export function comparisonEnabled(storage = localStorage) {
-  return Boolean(getKey(storage)) && storage.getItem(COMPARISON) !== 'false';
+export function comparisonEnabled(storage = localStorage, savedAvailable = false) {
+  return (savedAvailable || Boolean(getKey(storage))) && storage.getItem(COMPARISON) !== 'false';
 }
 
 export function setComparisonEnabled(enabled, storage = localStorage) {

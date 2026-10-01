@@ -1,5 +1,5 @@
 import { getKey, disconnect, loginURL, completeLogin, comparisonEnabled, setComparisonEnabled } from './auth.js';
-import { compareWithJev } from './compare.js';
+import { compareWithJev, validateJevResponse, matchesJev } from './compare.js';
 import { answerRequest } from './protocol.js';
 import { examples } from './examples.js';
 
@@ -20,6 +20,10 @@ let resultSignature = '';
 let serverQueue = { requests: [], results: [] };
 let practice;
 const practiceResults = [];
+let savedExamples = [];
+function savedExample(request) {
+  return savedExamples.find(run => JSON.stringify(run.request) === JSON.stringify(request));
+}
 let auto = false;
 let autoTimer;
 let exampleIndex = Math.floor(Math.random() * examples.length);
@@ -35,12 +39,14 @@ function schedulePractice() {
 }
 function submitPractice(item, values, compare) {
   const human = answerRequest(item.request, values);
-  const result = { ...item, human, late: Date.now() >= item.deadline, status: compare ? 'Asking JEV via OpenRouter…' : 'Answered · comparison off' };
+  const saved = compare && savedExample(item.request);
+  const result = { ...item, human, late: Date.now() >= item.deadline, status: saved ? `Compared with saved JEV run · ${new Date(saved.recordedAt).toLocaleDateString()}` : compare ? 'Asking JEV via OpenRouter…' : 'Answered · comparison off' };
+  if (saved) result.jev = saved.jev;
   practiceResults.unshift(result);
   practiceResults.splice(20);
   practice = undefined;
   render();
-  if (compare) void compareInBrowser(item);
+  if (compare && !saved) void compareInBrowser(item);
   else schedulePractice();
 }
 const exampleRequest = {
@@ -78,9 +84,9 @@ function showError(message) { $('#error').textContent = message; $('#error').hid
 function refreshAuth() {
   const connected = Boolean(getKey());
   $('#auth').textContent = connected ? 'Disconnect' : 'Connect OpenRouter';
-  $('#auth-status').textContent = connected ? 'OpenRouter connected · comparisons use your credits.' : 'Connect your OpenRouter account to compare with JEV.';
-  $('#compare').disabled = !connected;
-  $('#compare').checked = comparisonEnabled();
+  $('#auth-status').textContent = (savedExamples.length ? 'Practice uses saved JEV answers. ' : '') + (connected ? 'OpenRouter connected · live comparisons use your credits.' : 'Connect OpenRouter to compare live requests.');
+  $('#compare').disabled = !connected && !savedExamples.length;
+  $('#compare').checked = comparisonEnabled(localStorage, savedExamples.length > 0);
 }
 function range(label, max, value, changed) {
   const input = node('input');
@@ -163,7 +169,7 @@ function makeForm(item) {
   card.addEventListener('submit', event => {
     event.preventDefault(); validity(); if (button.disabled) return;
     try {
-      const compare = $('#compare').checked && Boolean(getKey());
+      const compare = $('#compare').checked && Boolean((item.local && savedExample(item.request)) || getKey());
       submitting = true; validity(); showError('');
       if (item.local) submitPractice(item, values, compare);
       else send({ type: 'submit', id: item.id, values, compare });
@@ -177,6 +183,14 @@ function resultCard(result) {
   const heading = node('div'); heading.append(node('h2', result.title), node('p', result.late ? `Answered after timeout · ${result.status}` : result.status)); head.append(heading);
   if (result.source) { const link = node('a', 'Example source', 'source'); link.href = result.source; link.target = '_blank'; link.rel = 'noreferrer'; head.append(link); }
   card.append(head);
+  if (result.human && result.jev) {
+    const answers = Object.entries(result.human.answers);
+    const matched = answers.filter(([id, human]) => matchesJev(human, result.jev.answers[id])).length;
+    const verdict = node('div', undefined, 'comparison');
+    verdict.append(node('strong', `Matched JEV on ${matched} of ${answers.length} answers`, 'answer-value'));
+    if (answers.some(([, answer]) => answer.type !== 'choice')) verdict.append(node('p', 'Slider matches use the same yes/no side or nearest score level.'));
+    card.append(verdict);
+  }
   const details = node('details'); details.append(node('summary', 'State & questions'), node('pre', text({ state: result.request.state, questions: result.request.questions }))); card.append(details);
   if (!result.human) return card;
   for (const [id, human] of Object.entries(result.human.answers)) {
@@ -200,7 +214,7 @@ function resultCard(result) {
     block.append(grid);
     if (jev) {
       const difference = human.type === 'choice' ? human.choice === jev.choice ? 'Same choice' : 'Different choices' : human.type === 'noul' ? `${(Math.abs(human.noul - jev.noul) * 100).toFixed(1)} percentage points apart` : `${Math.abs(human.score - jev.score).toFixed(3)} levels apart`;
-      block.append(node('p', difference, 'difference'));
+      block.append(node('p', `${matchesJev(human, jev) ? 'Matched JEV' : 'Different from JEV'} · ${difference}`, 'difference'));
     }
     card.append(block);
   }
@@ -277,6 +291,12 @@ async function initialize() {
     catch (e) { showError(e.name === 'TimeoutError' ? 'OpenRouter login timed out. Try connecting again.' : e.message); }
     finally { $('#auth').disabled = false; }
   }
+  try {
+    const response = await fetch('/example-results.json');
+    if (!response.ok) throw new Error('Saved examples unavailable');
+    const runs = await response.json();
+    savedExamples = runs.map(run => ({ ...run, jev: validateJevResponse(run.request, run.jev) }));
+  } catch { showError('Saved JEV answers could not be loaded. Refresh to try again.'); }
   try { refreshAuth(); } catch { showError('Browser storage is unavailable. Allow site storage to connect OpenRouter.'); }
   connect();
 }

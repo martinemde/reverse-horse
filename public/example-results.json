@@ -1,0 +1,416 @@
+[
+  {
+    "title": "The broken integration",
+    "recordedAt": "2026-10-01T05:11:50.827Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Three days of trying and Stripe still will not connect. Customers cannot pay me. I need someone to fix this today.",
+      "questions": {
+        "department": {
+          "type": "choice",
+          "instructions": "Where would you route this support request?",
+          "criteria": {
+            "billing": "Charges and plans",
+            "technical": "Software failures and connections",
+            "sales": "Buying or expanding service"
+          }
+        },
+        "frustration": {
+          "type": "score",
+          "instructions": "Rate the frustration in this message.",
+          "criteria": [
+            "Matter-of-fact",
+            "Annoyed but polite",
+            "Furious"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "department": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "billing": 0,
+            "technical": 1,
+            "sales": 0
+          },
+          "choice": "technical"
+        },
+        "frustration": {
+          "type": "score",
+          "confidence": 0.53,
+          "probabilities": {
+            "0": 0,
+            "1": 0.31,
+            "2": 0.69
+          },
+          "score": 1.69,
+          "legend": {
+            "0": "Matter-of-fact",
+            "1": "Annoyed but polite",
+            "2": "Furious"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "A browser-specific bug",
+    "recordedAt": "2026-10-01T05:11:51.083Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Exporting takes down the settings screen in Safari. Chrome exports successfully, but some customers rely entirely on Safari.",
+      "questions": {
+        "bug_severity": {
+          "type": "score",
+          "instructions": "Rate the impact of this bug.",
+          "criteria": [
+            "Appearance only; everything works",
+            "Functionality fails, with an alternative available",
+            "Work cannot continue and there is no alternative"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "bug_severity": {
+          "type": "score",
+          "confidence": 0.91,
+          "probabilities": {
+            "0": 0,
+            "1": 0.94,
+            "2": 0.06
+          },
+          "score": 1.05,
+          "legend": {
+            "0": "Appearance only; everything works",
+            "1": "Functionality fails, with an alternative available",
+            "2": "Work cannot continue and there is no alternative"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Can I talk to a person?",
+    "recordedAt": "2026-10-01T05:11:51.342Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "This is my third attempt to get help. Please connect me with an actual person.",
+      "questions": {
+        "is_human_escalation": {
+          "type": "noul",
+          "instructions": "Does this person want to speak with a human?"
+        },
+        "is_repeat_contact": {
+          "type": "noul",
+          "instructions": "Does the message indicate an earlier support attempt?",
+          "criteria": {
+            "true": "Refers to having already tried to get help",
+            "false": "Nothing indicates an earlier attempt"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "is_human_escalation": {
+          "type": "noul",
+          "noul": 0.98
+        },
+        "is_repeat_contact": {
+          "type": "noul",
+          "noul": 0.99
+        }
+      }
+    }
+  },
+  {
+    "title": "An invoice without “invoice”",
+    "recordedAt": "2026-10-01T05:11:51.560Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: September services\nHi Alex, attached is our bill for September: $240, due October 15. Thanks for working with us!",
+      "questions": {
+        "category": {
+          "type": "choice",
+          "instructions": "Which inbox should receive this email?",
+          "criteria": {
+            "invoices": "Bills requesting payment",
+            "general": "Everything else"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "category": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "invoices": 1,
+            "general": 0
+          },
+          "choice": "invoices"
+        }
+      }
+    }
+  },
+  {
+    "title": "Already paid",
+    "recordedAt": "2026-10-01T05:11:51.866Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Your payment went through\nWe received your $24 payment for this month. This receipt is for your records. No action is needed.",
+      "questions": {
+        "payment_needed": {
+          "type": "noul",
+          "instructions": "Is the sender asking you to make a payment?"
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "payment_needed": {
+          "type": "noul",
+          "noul": 0.02
+        }
+      }
+    }
+  },
+  {
+    "title": "The weekly newsletter",
+    "recordedAt": "2026-10-01T05:11:52.072Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: This week in gardening\nThree tips for happier tomatoes, a tour of our greenhouse, and 15% off seeds this weekend. You received this because you subscribed.",
+      "questions": {
+        "category": {
+          "type": "choice",
+          "instructions": "What kind of email is this?",
+          "criteria": {
+            "newsletter": "A recurring update for subscribers",
+            "personal": "A message written specifically to you",
+            "receipt": "Confirmation of a purchase"
+          }
+        },
+        "reply_needed": {
+          "type": "noul",
+          "instructions": "Does this email ask for a personal reply?"
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "category": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "newsletter": 1,
+            "personal": 0,
+            "receipt": 0
+          },
+          "choice": "newsletter"
+        },
+        "reply_needed": {
+          "type": "noul",
+          "noul": 0.03
+        }
+      }
+    }
+  },
+  {
+    "title": "A suspicious account warning",
+    "recordedAt": "2026-10-01T05:11:52.390Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: security@account-check.example\nSubject: Mailbox deletion in 20 minutes\nReply with your email password immediately to keep your account. Do not contact your IT team; they cannot stop this process.",
+      "questions": {
+        "suspicious": {
+          "type": "noul",
+          "instructions": "Does this email show signs of phishing?"
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "suspicious": {
+          "type": "noul",
+          "noul": 0.99
+        }
+      }
+    }
+  },
+  {
+    "title": "A duplicate charge",
+    "recordedAt": "2026-10-01T05:11:52.568Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Charged twice\nHi, I see two $49 charges for the same order. Could you refund the extra charge? The product itself works great.",
+      "questions": {
+        "team": {
+          "type": "choice",
+          "instructions": "Which team should handle this email?",
+          "criteria": {
+            "billing": "Payments and refunds",
+            "technical": "Problems using the product",
+            "sales": "Questions about buying"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "team": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "billing": 1,
+            "technical": 0,
+            "sales": 0
+          },
+          "choice": "billing"
+        }
+      }
+    }
+  },
+  {
+    "title": "Before the meeting",
+    "recordedAt": "2026-10-01T05:11:52.915Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Slides for the 2 pm meeting\nIt is 1:30 pm now. Could you send me the final slides before our client meeting at 2? I cannot present without them.",
+      "questions": {
+        "urgency": {
+          "type": "score",
+          "instructions": "How soon does this email need attention?",
+          "criteria": [
+            "Can wait a few days",
+            "Needs attention today",
+            "Needs attention now"
+          ]
+        },
+        "reply_needed": {
+          "type": "noul",
+          "instructions": "Is the sender asking you to send something back?"
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "urgency": {
+          "type": "score",
+          "confidence": 1,
+          "probabilities": {
+            "0": 0,
+            "1": 0,
+            "2": 1
+          },
+          "score": 2,
+          "legend": {
+            "0": "Can wait a few days",
+            "1": "Needs attention today",
+            "2": "Needs attention now"
+          }
+        },
+        "reply_needed": {
+          "type": "noul",
+          "noul": 0.98
+        }
+      }
+    }
+  },
+  {
+    "title": "A lukewarm thank-you",
+    "recordedAt": "2026-10-01T05:11:53.079Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Re: Replacement delivered\nThanks for sending another one. It works, although waiting three weeks was frustrating. I suppose we can close this now.",
+      "questions": {
+        "tone": {
+          "type": "score",
+          "instructions": "How positive is the sender about the overall experience?",
+          "criteria": [
+            "Negative",
+            "Mixed or neutral",
+            "Positive"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "tone": {
+          "type": "score",
+          "confidence": 0.99,
+          "probabilities": {
+            "0": 0,
+            "1": 1,
+            "2": 0
+          },
+          "score": 1,
+          "legend": {
+            "0": "Negative",
+            "1": "Mixed or neutral",
+            "2": "Positive"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Just keeping you posted",
+    "recordedAt": "2026-10-01T05:11:53.254Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Friday delivery\nQuick update: your replacement keyboard will arrive Friday instead of Thursday. The tracking link will update tonight. No need to reply unless Friday is a problem.",
+      "questions": {
+        "intent": {
+          "type": "choice",
+          "instructions": "What is the main purpose of this email?",
+          "criteria": {
+            "update": "Share information",
+            "request": "Ask you to do something",
+            "promotion": "Encourage a purchase"
+          }
+        },
+        "reply_needed": {
+          "type": "noul",
+          "instructions": "Assuming Friday works for you, does this email require a reply?"
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "intent": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "update": 1,
+            "request": 0,
+            "promotion": 0
+          },
+          "choice": "update"
+        },
+        "reply_needed": {
+          "type": "noul",
+          "noul": 0.07
+        }
+      }
+    }
+  }
+]

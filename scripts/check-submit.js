@@ -13,9 +13,12 @@ const app = startServer({ port: 0, timeoutMs: 100 });
 try {
   const page = await browser.newPage();
   const errors = [];
+  const externalRequests = [];
+  page.on('request', request => { if (new URL(request.url()).origin !== app.server.url.origin) externalRequests.push(request.url()); });
   page.on('pageerror', error => errors.push(error.message));
   await page.goto(app.server.url.href);
   await page.waitForFunction(() => document.querySelector('#connection').textContent === 'Connected');
+  assert.equal(await page.locator('#compare').isChecked(), true);
   await page.locator('#auto').check();
   for (let i = 0; i < examples.length; i++) {
     await page.locator('form.request').waitFor();
@@ -29,8 +32,16 @@ try {
     await page.locator('form.request button').click({ delay: 350 });
     await page.locator('form.request').waitFor({ state: 'detached', timeout: 1500 });
     assert.equal(await page.locator('#history .result').count(), i + 1);
+    assert.match(await page.locator('#history .result').first().textContent(), /Compared with saved JEV run/);
+    assert.match(await page.locator('#history .result').first().textContent(), /Matched JEV on \d+ of [12] answers/);
     if (i + 1 < examples.length) await page.locator('#auto').check();
   }
+  await page.locator('#compare').uncheck();
+  await page.locator('#auto').check();
+  await page.locator('#auto').uncheck();
+  await page.locator('form.request button').click({ delay: 350 });
+  await page.locator('form.request').waitFor({ state: 'detached', timeout: 1500 });
+  assert.match(await page.locator('#history .result').first().textContent(), /Answered · comparison off/);
   const response = fetch(new URL('/api/v1/systemone', app.server.url), {
     method: 'POST', body: JSON.stringify(examples[0].request),
   });
@@ -38,8 +49,9 @@ try {
   assert.equal((await response).status, 504);
   await page.locator('form.request button').click({ delay: 350 });
   await page.locator('form.request').waitFor({ state: 'detached', timeout: 1500 });
-  assert.equal(await page.locator('#history .result').count(), examples.length + 1);
+  assert.equal(await page.locator('#history .result').count(), examples.length + 2);
   assert.deepEqual(errors, []);
+  assert.deepEqual(externalRequests, []);
   console.log(`WebKit: submitted ${examples.length} practice rounds and a timed-out API request using slow clicks.`);
 } finally {
   await browser.close();

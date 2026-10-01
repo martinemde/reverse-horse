@@ -26,8 +26,8 @@ Open http://127.0.0.1:3000. Set `PORT` to change the port. No dependencies to in
 
 Click **Connect OpenRouter** to authorize your own key. **Compare with JEV** is
 enabled on your first connection. Turn it off whenever you like; your choice is
-saved in this browser and survives refreshes and reconnects. Without a connection,
-comparison stays off. The OAuth flow follows the blog's browser-side PKCE implementation:
+saved in this browser and survives refreshes and reconnects. Built-in practice rounds use recorded JEV answers even without a connection;
+the comparison toggle still lets you turn that off. Live comparisons require a connection. The OAuth flow follows the blog's browser-side PKCE implementation:
 a random verifier and state are kept in session storage, the callback exchanges
 the code directly with OpenRouter, and the key stays in this origin's local
 storage. Callbacks expire after ten minutes and must match the initiating tab.
@@ -52,7 +52,11 @@ Auto mode cycles through eleven short examples inspired by the TypeSafe docs and
 including eight email classification scenarios. Each round has at most two questions. It starts
 a round immediately, then waits four seconds after completion/comparison before
 dealing another. Practice requests, answers, and history stay in the current tab;
-optional JEV comparisons go directly from that browser to OpenRouter. Practice
+practice comparisons reuse the real runs in `public/example-results.json` with no
+API call or key required. Results show how many answers match JEV: the same choice,
+yes/no side (0.5 counts as yes), or nearest score level (halfway rounds up). Exact
+values and differences remain visible. Saved runs match the complete request, so
+edited questions never reuse an old answer. Practice
 works without a WebSocket connection and pauses new rounds while live requests or
 comparisons are active. Turning it off stops future rounds; the current round
 remains answerable after its timer ends. Real API requests still use the shared
@@ -133,10 +137,17 @@ the lookup, and disconnect to forget the key. For UI verification, check a narro
 viewport, keyboard sliders, and expiration without submitting.
 
 Submit-button regression: `bun scripts/check-submit.js /path/to/playwright-core/index.mjs`
-runs an isolated WebKit browser against a local server, with comparisons off. Install
+runs an isolated WebKit browser against a local server, checks saved comparisons
+and the off switch, and verifies no external requests occur. Install
 WebKit through that Playwright installation's CLI (`install webkit`) first; set
 `PLAYWRIGHT_BROWSERS_PATH` when using a separate browser cache. The check holds each
 click for 350 ms across several clock ticks and also submits after API timeout.
 Keep the submit button's text stable during clock updates: replacing its text node
 between pointer-down and pointer-up makes WebKit drop the click event even though
 the button remains enabled and the form is valid.
+
+To record built-in examples, set `OPENROUTER_API_KEY` in the ignored `.env` and run
+`bun scripts/save-example-results.js`. It calls real JEV through OpenRouter once
+per missing request, validates each response, and saves the request, answer, and
+recording timestamp. Successful calls are saved immediately so retries resume
+without another charge. Remove the temporary key from `.env` after generation.
