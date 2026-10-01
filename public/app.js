@@ -55,7 +55,7 @@ function schedulePractice() {
 function submitPractice(item, values, compare) {
   const human = answerRequest(item.request, values);
   const saved = compare && savedExample(item.request);
-  const result = { ...item, human, late: Date.now() >= item.deadline, status: saved ? `Compared with saved JEV run · ${new Date(saved.recordedAt).toLocaleDateString()}` : compare ? 'Asking JEV via OpenRouter…' : 'Answered · comparison off' };
+  const result = { ...item, human, late: (item.pausedAt ?? Date.now()) >= item.deadline, status: saved ? `Compared with saved JEV run · ${new Date(saved.recordedAt).toLocaleDateString()}` : compare ? 'Asking JEV via OpenRouter…' : 'Answered · comparison off' };
   if (saved) result.jev = saved.jev;
   practiceResults.unshift(result);
   practiceResults.splice(20);
@@ -95,6 +95,7 @@ function makeForm(item) {
   let outcomeSignature = '';
   const card = node('form', undefined, 'request');
   card.dataset.id = item.id;
+  card.classList.toggle('live-request', !item.local);
   const head = node('div', undefined, 'request-head');
   const label = node('div', item.source ? 'PRACTICE ROUND' : 'LIVE REQUEST', 'eyebrow');
   const clock = node('span', '30.0s', 'clock'); clock.setAttribute('aria-label', 'Time remaining');
@@ -288,7 +289,7 @@ function render() {
     window.scrollTo({ top, behavior: 'instant' });
   }
 }
-function tick() { for (const item of current) { const form = forms.get(item.id); const seconds = Math.max(0, (item.deadline - Date.now() - (item.local ? 0 : offset)) / 1000); form.clock.textContent = seconds > 0 ? `${seconds.toFixed(1)}s` : 'Timed out'; form.clock.classList.toggle('urgent', seconds < 10); form.validity(); } }
+function tick() { for (const item of current) { const form = forms.get(item.id); const seconds = Math.max(0, (item.deadline - (item.pausedAt ?? Date.now()) - (item.local ? 0 : offset)) / 1000); form.clock.textContent = seconds > 0 ? `${seconds.toFixed(1)}s` : 'Timed out'; form.clock.classList.toggle('urgent', seconds < 10); form.validity(); } }
 async function compareInBrowser(message) {
   const connection = socket;
   const controller = new AbortController();
@@ -313,6 +314,12 @@ function connect() {
 }
 $('#play').addEventListener('click', () => {
   playing = !playing;
+  if (practice) {
+    if (playing && practice.pausedAt !== undefined) {
+      practice.deadline += Date.now() - practice.pausedAt;
+      delete practice.pausedAt;
+    } else if (!playing) practice.pausedAt = Date.now();
+  }
   $('#play').setAttribute('aria-pressed', String(playing));
   $('#play').setAttribute('aria-label', playing ? 'Pause practice' : 'Play practice');
   $('#play-icon').textContent = playing ? 'Ⅱ' : '▶';

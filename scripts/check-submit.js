@@ -31,6 +31,17 @@ try {
     assert.ok(Math.abs(cardTop - headerBottom - 16) < 2, `New question scrolls beneath the fixed navigation: ${JSON.stringify({ cardTop, headerBottom, scroll: await page.evaluate(() => ({y: scrollY, height: innerHeight, total: document.documentElement.scrollHeight})) })}`);
     assert.equal(await active.getAttribute('data-id'), await page.locator('#requests > form').first().getAttribute('data-id'));
     await page.getByRole('button', { name: 'Pause practice', exact: true }).click();
+    if (i === 0) {
+      const paused = await active.locator('.clock').textContent();
+      await page.waitForTimeout(900);
+      assert.equal(await active.locator('.clock').textContent(), paused, 'Practice clock freezes while paused');
+      await page.getByRole('button', { name: 'Play practice', exact: true }).click();
+      const resumed = parseFloat(await active.locator('.clock').textContent());
+      assert.ok(Math.abs(resumed - parseFloat(paused)) < 0.3, 'Resume preserves remaining time');
+      await page.waitForTimeout(700);
+      assert.ok(parseFloat(await active.locator('.clock').textContent()) < resumed - 0.4, 'Practice clock resumes counting down');
+      await page.getByRole('button', { name: 'Pause practice', exact: true }).click();
+    }
     assert.equal(await active.locator('fieldset.question').count(), 1);
     assert.equal(await active.locator('h2').count(), 0);
     const state = await active.locator('.state pre').textContent();
@@ -111,7 +122,11 @@ try {
   await active.waitFor();
   const live = await active.elementHandle();
   requestId = await live.getAttribute('data-id');
+  assert.equal(await page.locator('#play').getAttribute('aria-pressed'), 'false');
+  assert.equal(await live.evaluate(el => getComputedStyle(el).borderTopColor), await page.locator('#play').evaluate(el => getComputedStyle(el).color), 'Live request border uses the brand color');
   assert.equal((await response).status, 504);
+  await page.waitForFunction(el => el.querySelector('.clock').textContent === 'Timed out', live);
+
   const values = Object.fromEntries(Object.entries(run.jev.answers).map(([id, answer]) => [id, answer.type === 'choice' ? answer.probabilities : answer.type === 'noul' ? answer.noul : answer.score]));
   peer.send(JSON.stringify({ type: 'submit', id: requestId, values, compare: true }));
   await comparison;

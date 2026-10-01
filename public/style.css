@@ -23,3 +23,5 @@ nav{display:flex;gap:20px;font-size:14px}nav a{text-decoration:none;color:var(--
 #requests{min-height:100vh}
 
 .brand{display:inline-flex;align-items:center;gap:10px;white-space:nowrap;letter-spacing:-.7px}.brand img{flex-shrink:0}.player-header .brand{font-size:23px}@media(max-width:600px){.player-header .brand{font-size:20px;gap:6px}.brand img{width:30px;height:30px}.player-controls{gap:8px}.player-controls button{min-width:86px;padding:12px}.player-header{padding:14px 16px}}
+
+.request.live-request{border-color:var(--accent)}
