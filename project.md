@@ -131,3 +131,12 @@ OpenRouter in the page, check Compare with JEV, enable auto mode, answer a round
 and check the You & JEV panel. Also submit with comparison off to verify it skips
 the lookup, and disconnect to forget the key. For UI verification, check a narrow
 viewport, keyboard sliders, and expiration without submitting.
+
+Submit-button regression: `bun scripts/check-submit.js /path/to/playwright-core/index.mjs`
+runs an isolated WebKit browser against a local server, with comparisons off. Install
+WebKit through that Playwright installation's CLI (`install webkit`) first; set
+`PLAYWRIGHT_BROWSERS_PATH` when using a separate browser cache. The check holds each
+click for 350 ms across several clock ticks and also submits after API timeout.
+Keep the submit button's text stable during clock updates: replacing its text node
+between pointer-down and pointer-up makes WebKit drop the click event even though
+the button remains enabled and the form is valid.

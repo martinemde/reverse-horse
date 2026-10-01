@@ -156,7 +156,7 @@ function makeForm(item) {
   function validity() {
     const invalidChoice = Object.values(values).some(v => typeof v === 'object' && !Object.values(v).some(n => n > 0));
     const late = Date.now() + (item.local ? 0 : offset) >= item.deadline;
-    button.textContent = late ? 'Save late answers' : 'Submit answers';
+    // Keep the button DOM stable: WebKit drops clicks if its text changes mid-press.
     hint.textContent = item.local ? 'Practice stays in this browser. You can answer after the timer ends.' : late ? 'The deadline passed. You can still save your answers and compare with JEV; the API caller already timed out.' : 'Your answers go back to the caller. JEV comparison is optional.';
     button.disabled = submitting || (!item.local && socket?.readyState !== WebSocket.OPEN) || invalidChoice;
   }
