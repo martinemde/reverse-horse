@@ -29,10 +29,12 @@ try {
     assert.equal(await active.getAttribute('data-id'), await page.locator('#requests > form').first().getAttribute('data-id'));
     await page.locator('#auto').uncheck();
     assert.equal(await active.locator('fieldset.question').count(), 1);
-    const title = await active.locator('h2').textContent();
+    assert.equal(await active.locator('h2').count(), 0);
+    const state = await active.locator('.state pre').textContent();
     const id = await active.locator('fieldset').getAttribute('data-question');
-    const run = recordings.find(run => run.title === title && Object.hasOwn(run.request.questions, id));
+    const run = recordings.find(run => run.request.state === state && Object.hasOwn(run.request.questions, id));
     assert.ok(run);
+    const title = run.title;
     const question = run.request.questions[id], jev = run.jev.answers[id];
     dealt.push(JSON.stringify(run.request));
     const choices = active.locator('input[type=radio]');
@@ -83,8 +85,8 @@ try {
   await page.locator('#compare').uncheck();
   await page.locator('#auto').check();
   await page.locator('#auto').uncheck();
-  const nextTitle = await active.locator('h2').textContent(), nextId = await active.locator('fieldset').getAttribute('data-question');
-  const next = recordings.find(run => run.title === nextTitle && Object.hasOwn(run.request.questions, nextId));
+  const nextState = await active.locator('.state pre').textContent(), nextId = await active.locator('fieldset').getAttribute('data-question');
+  const next = recordings.find(run => run.request.state === nextState && Object.hasOwn(run.request.questions, nextId));
   assert.notEqual(JSON.stringify(next.request), dealt.at(-1));
   if (await active.locator('input[type=radio]').count()) await active.locator('input[type=radio]').first().check();
   const off = await active.elementHandle();

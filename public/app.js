@@ -96,9 +96,9 @@ function makeForm(item) {
   const card = node('form', undefined, 'request');
   card.dataset.id = item.id;
   const head = node('div', undefined, 'request-head');
-  const title = node('div'); title.append(node('div', item.source ? 'PRACTICE ROUND' : 'LIVE REQUEST', 'eyebrow'), node('h2', item.title));
+  const label = node('div', item.source ? 'PRACTICE ROUND' : 'LIVE REQUEST', 'eyebrow');
   const clock = node('span', '30.0s', 'clock'); clock.setAttribute('aria-label', 'Time remaining');
-  head.append(title, clock);
+  head.append(label, clock);
   const state = node('div', undefined, 'state'); state.append(node('div', 'STATE', 'eyebrow'), node('pre', text(item.request.state)));
   const questions = node('div', undefined, 'questions');
   function track(slider) {
