@@ -275,9 +275,9 @@ function render() {
   for (const [id, form] of forms) if (!ids.has(id) && (newCards || !form.card.classList.contains('answered'))) { form.card.remove(); forms.delete(id); }
   if (ids.size) {
     $('#requests .empty')?.remove();
-    // Existing cards never move. New requests appear after the cards already here.
+    // Submission updates the same card. New rounds go above the older cards.
     for (const item of [...results].reverse().concat(current)) {
-      if (!forms.has(item.id)) { const form = makeForm(item); forms.set(item.id, form); $('#requests').append(form.card); }
+      if (!forms.has(item.id)) { const form = makeForm(item); forms.set(item.id, form); $('#requests').prepend(form.card); }
     }
     for (const result of results) forms.get(result.id).finish(result);
   } else if (!$('#requests .empty')) {

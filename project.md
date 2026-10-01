@@ -60,7 +60,7 @@ API call or key required. Submitted cards stay in place with their sliders locke
 the same scale, and the human slider and feedback turn green for a match or pink
 for a mismatch. Matching uses the same choice, yes/no side (0.5 counts as yes), or
 nearest score level (halfway rounds up). Exact values remain visible. New rounds
-append after completed cards; results no longer move into a separate history panel. Saved runs match the complete request, so
+appear above completed cards; results no longer move into a separate history panel. Saved runs match the complete request, so
 edited questions never reuse an old answer. Practice
 works without a WebSocket connection and pauses new rounds while live requests or
 comparisons are active. Turning it off stops future rounds; the current round

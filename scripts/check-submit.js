@@ -26,6 +26,7 @@ try {
   await page.locator('#auto').check();
   for (let i = 0; i < examples.length; i++) {
     await active.waitFor();
+    assert.equal(await active.getAttribute('data-id'), await page.locator('#requests > form').first().getAttribute('data-id'));
     await page.locator('#auto').uncheck();
     assert.equal(await active.locator('fieldset.question').count(), 1);
     const title = await active.locator('h2').textContent();
