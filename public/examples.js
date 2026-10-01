@@ -76,6 +76,42 @@ const scenarios = [
     } },
   },
   {
+    title: 'Another castle · Mario', source: 'https://mario.nintendo.com/',
+    request: { model: 'jev-latest', state: 'Mario reaches the end of the castle. Toad tells him the princess is somewhere else.', questions: {
+      another_castle: { type: 'noul', instructions: 'Is the princess in another castle?' },
+    } },
+  },
+  {
+    title: 'Mind the gap · Mario', source: 'https://mario.nintendo.com/',
+    request: { model: 'jev-latest', state: 'Mario is running toward a pit. The next platform is close enough to jump to.', questions: {
+      next_move: { type: 'choice', instructions: 'What should Mario do to cross safely?', criteria: { Jump: null, 'Keep running': null, 'Stand still': null } },
+    } },
+  },
+  {
+    title: 'One heart left · Zelda', source: 'https://www.zelda.com/breath-of-the-wild/features/',
+    request: { model: 'jev-latest', state: 'Link has one heart left. Another hit could defeat him. He has food that restores health.', questions: {
+      healing: { type: 'score', instructions: 'How urgently should Link heal?', criteria: ['No hurry', 'Soon', 'Right now'] },
+    } },
+  },
+  {
+    title: 'Pick an attack · Pokémon', source: 'https://diamondpearl.pokemon.com/en-us/trainersguide/fundamentals/battling/',
+    request: { model: 'jev-latest', state: 'The opponent is weak to water. Your Pokémon can use either Water Gun or a weaker normal attack.', questions: {
+      attack: { type: 'choice', instructions: 'Which attack takes advantage of the weakness?', criteria: { 'Water Gun': null, 'Normal attack': null } },
+    } },
+  },
+  {
+    title: 'That hissing sound · Minecraft', source: 'https://www.minecraft.net/en-us/article/minecraft-mobs',
+    request: { model: 'jev-latest', state: 'A creeper beside you is hissing and about to explode. There is open space behind you.', questions: {
+      retreat: { type: 'noul', instructions: 'Should you move away from the creeper?' },
+    } },
+  },
+  {
+    title: 'The ghosts turned blue · Pac-Man', source: 'https://en.wikipedia.org/wiki/Pac-Man',
+    request: { model: 'jev-latest', state: 'Pac-Man just ate a power pellet. The ghosts are blue and can briefly be eaten for bonus points.', questions: {
+      chase: { type: 'noul', instructions: 'Can Pac-Man safely chase a nearby blue ghost right now?' },
+    } },
+  },
+  {
     title: 'Favorite color · Holy Grail', source: grailDialogue,
     request: { model: 'jev-latest', state: 'You are Sir Lancelot at the Bridge of Death. Answer as he does in Monty Python and the Holy Grail.', questions: {
       color: { type: 'choice', instructions: 'What is your favorite color?', criteria: { blue: 'Blue', yellow: 'Yellow', red: 'Red' } },

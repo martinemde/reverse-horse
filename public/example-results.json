@@ -489,6 +489,180 @@
     }
   },
   {
+    "title": "Another castle · Mario",
+    "recordedAt": "2026-10-01T05:26:04.890Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Mario reaches the end of the castle. Toad tells him the princess is somewhere else.",
+      "questions": {
+        "another_castle": {
+          "type": "noul",
+          "instructions": "Is the princess in another castle?"
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "another_castle": {
+          "type": "noul",
+          "noul": 0.86
+        }
+      }
+    }
+  },
+  {
+    "title": "Mind the gap · Mario",
+    "recordedAt": "2026-10-01T05:26:05.111Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Mario is running toward a pit. The next platform is close enough to jump to.",
+      "questions": {
+        "next_move": {
+          "type": "choice",
+          "instructions": "What should Mario do to cross safely?",
+          "criteria": {
+            "Jump": null,
+            "Keep running": null,
+            "Stand still": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "next_move": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "Jump": 1,
+            "Keep running": 0,
+            "Stand still": 0
+          },
+          "choice": "Jump"
+        }
+      }
+    }
+  },
+  {
+    "title": "One heart left · Zelda",
+    "recordedAt": "2026-10-01T05:26:05.417Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Link has one heart left. Another hit could defeat him. He has food that restores health.",
+      "questions": {
+        "healing": {
+          "type": "score",
+          "instructions": "How urgently should Link heal?",
+          "criteria": [
+            "No hurry",
+            "Soon",
+            "Right now"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "healing": {
+          "type": "score",
+          "confidence": 0.65,
+          "probabilities": {
+            "0": 0.01,
+            "1": 0.22,
+            "2": 0.77
+          },
+          "score": 1.76,
+          "legend": {
+            "0": "No hurry",
+            "1": "Soon",
+            "2": "Right now"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Pick an attack · Pokémon",
+    "recordedAt": "2026-10-01T05:26:05.682Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "The opponent is weak to water. Your Pokémon can use either Water Gun or a weaker normal attack.",
+      "questions": {
+        "attack": {
+          "type": "choice",
+          "instructions": "Which attack takes advantage of the weakness?",
+          "criteria": {
+            "Water Gun": null,
+            "Normal attack": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "attack": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "Water Gun": 1,
+            "Normal attack": 0
+          },
+          "choice": "Water Gun"
+        }
+      }
+    }
+  },
+  {
+    "title": "That hissing sound · Minecraft",
+    "recordedAt": "2026-10-01T05:26:05.940Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "A creeper beside you is hissing and about to explode. There is open space behind you.",
+      "questions": {
+        "retreat": {
+          "type": "noul",
+          "instructions": "Should you move away from the creeper?"
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "retreat": {
+          "type": "noul",
+          "noul": 0.87
+        }
+      }
+    }
+  },
+  {
+    "title": "The ghosts turned blue · Pac-Man",
+    "recordedAt": "2026-10-01T05:26:06.159Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Pac-Man just ate a power pellet. The ghosts are blue and can briefly be eaten for bonus points.",
+      "questions": {
+        "chase": {
+          "type": "noul",
+          "instructions": "Can Pac-Man safely chase a nearby blue ghost right now?"
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "chase": {
+          "type": "noul",
+          "noul": 0.82
+        }
+      }
+    }
+  },
+  {
     "title": "Favorite color · Holy Grail",
     "recordedAt": "2026-10-01T05:23:59.585Z",
     "request": {
