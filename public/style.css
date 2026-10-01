@@ -21,3 +21,5 @@ nav{display:flex;gap:20px;font-size:14px}nav a{text-decoration:none;color:var(--
 @media(max-width:700px){.player-header{gap:12px}.player-header .brand span{display:none}.player-header nav{order:3;width:100%;justify-content:center}.player-controls{gap:10px}.player-controls #connection{font-size:12px}.player-controls button{min-width:96px}}
 
 #requests{min-height:100vh}
+
+.brand{display:inline-flex;align-items:center;gap:10px;white-space:nowrap;letter-spacing:-.7px}.brand img{flex-shrink:0}.player-header .brand{font-size:23px}@media(max-width:600px){.player-header .brand{font-size:20px;gap:6px}.brand img{width:30px;height:30px}.player-controls{gap:8px}.player-controls button{min-width:86px;padding:12px}.player-header{padding:14px 16px}}

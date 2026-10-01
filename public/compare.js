@@ -28,7 +28,7 @@ export async function compareWithJev(request, apiKey, signal) {
   if (!apiKey) return { error: 'Comparison skipped · OpenRouter not connected' };
   const response = await fetch('https://openrouter.ai/api/v1/systemone', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}`, 'X-OpenRouter-Title': 'Meat Jev' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}`, 'X-OpenRouter-Title': 'reverse.horse' },
     body: JSON.stringify(request), signal,
   });
   if (!response.ok) throw new Error(`OpenRouter returned HTTP ${response.status}${response.status === 401 ? ' · reconnect your account' : response.status === 402 ? ' · check your OpenRouter credits' : ''}`);

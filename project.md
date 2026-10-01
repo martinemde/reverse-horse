@@ -118,6 +118,16 @@ Live site: https://meat-jev.poblonko.workers.dev. The API is available at
 `bun run dev:cloudflare` runs the Worker locally at http://127.0.0.1:8787.
 `bun run build` previews deployment with Wrangler's dry run; `bun run deploy`
 publishes the `meat-jev` Worker to the Cloudflare account used by martinemde.com.
+The `reverse.horse` custom domain is configured in `wrangler.jsonc`. It requires
+an active `reverse.horse` zone in the Poblonko account; deployment reports error
+10083 until the zone exists there. After adding the zone and activating its
+nameservers, rerun `bun run deploy` to create the domain binding and certificate.
+The workers.dev address remains available.
+
+The public brand is reverse.horse; the Worker and API model retain `meat-jev`.
+The horse-headed human SVG adapts Lucide Lab’s horse-head; its ISC license is
+served alongside the asset as `horse-human.LICENSE.txt`.
+
 Wrangler is pinned through mise. Static assets and the OpenRouter callback route
 are served by the Worker; WebSockets and API calls go to one `MeatJevRoom`
 Durable Object named `shared`. The Bun and Cloudflare adapters use the same
