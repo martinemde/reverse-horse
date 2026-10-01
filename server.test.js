@@ -53,7 +53,7 @@ test('holds the API connection, accepts all primitives, and skips JEV without cr
   expect((await reconnected.next(m => m.requests?.length === 1)).requests[0].id).toBe(item.id);
   client.send({ type: 'submit', id: item.id, values: { urgent: 0.85, department: { billing: 0.75, support: 0.25 }, mood: 1.25 } });
   const result = await (await response).json();
-  expect(result.model).toBe('meat-jev');
+  expect(result.model).toBe('reverse-horse');
   expect(result.usage).toEqual({ input_tokens: 0, output_tokens: 0 });
   expect(result.answers.urgent).toEqual({ type: 'noul', noul: 0.85 });
   expect(result.answers.department.choice).toBe('billing');

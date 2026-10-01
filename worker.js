@@ -4,7 +4,7 @@ import { assetFiles, assetHeaders } from './http.js';
 
 // A single instance owns the shared queue and every WebSocket connection.
 // Standard WebSockets keep its in-memory state alive while browsers are connected.
-export class MeatJevRoom extends DurableObject {
+export class ReverseHorseRoom extends DurableObject {
   constructor(ctx, env) {
     super(ctx, env);
     this.room = createRoom();

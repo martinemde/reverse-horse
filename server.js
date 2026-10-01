@@ -22,6 +22,6 @@ export function startServer({ port = Number(process.env.PORT || 3000), hostname 
 
 if (import.meta.main) {
   const app = startServer();
-  console.log(`Meat Jev listening at ${app.server.url}`);
+  console.log(`Reverse Horse listening at ${app.server.url}`);
   for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, async () => { await app.stop(); process.exit(0); });
 }

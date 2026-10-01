@@ -50,5 +50,5 @@ export function answerRequest(request, values) {
     const probabilities = Object.fromEntries(q.criteria.map((_, index) => [index, Math.max(0, 1 - Math.abs(index - value))]));
     return [id, { type: 'score', score: value, legend: Object.fromEntries(q.criteria.map((label, index) => [index, label])), probabilities, confidence: confidence(probabilities) }];
   }));
-  return { model: 'meat-jev', answers, usage: { input_tokens: 0, output_tokens: 0 } };
+  return { model: 'reverse-horse', answers, usage: { input_tokens: 0, output_tokens: 0 } };
 }

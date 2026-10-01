@@ -80,7 +80,7 @@ try {
     markers.forEach((marker, index) => { assert.equal(marker.hidden, false); assert.ok(Math.abs(marker.percent - expected[index]) < 0.001); });
     assert.equal(await card.locator('input:enabled').count(), 0);
     assert.equal(await page.locator('#history').count(), 0);
-    if (i < 3) await page.screenshot({ path: `/tmp/meat-jev-inline-${i}.png` });
+    if (i < 3) await page.screenshot({ path: `/tmp/reverse-horse-inline-${i}.png` });
     if (i + 1 < examples.length) await page.getByRole('button', { name: 'Play practice', exact: true }).click();
   }
   assert.equal(new Set(dealt).size, examples.length);

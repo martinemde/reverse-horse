@@ -1,7 +1,20 @@
-const KEY = 'meat-jev.openrouter.key';
-const LOGIN = 'meat-jev.openrouter.login';
-const COMPARISON = 'meat-jev.openrouter.compare';
+const KEY = 'reverse-horse.openrouter.key';
+const LOGIN = 'reverse-horse.openrouter.login';
+const COMPARISON = 'reverse-horse.openrouter.compare';
 const CALLBACK = '/auth/openrouter/callback';
+// Move existing credentials and preferences only within this browser origin.
+export function migrateStorage(storage = localStorage, session = sessionStorage) {
+  for (const [store, suffix] of [[storage, 'key'], [storage, 'compare'], [session, 'login']]) {
+    const old = `meat-jev.openrouter.${suffix}`;
+    const key = `reverse-horse.openrouter.${suffix}`;
+    const value = store.getItem(old);
+    if (value !== null) {
+      if (store.getItem(key) === null) store.setItem(key, value);
+      store.removeItem(old);
+    }
+  }
+}
+
 const base64url = bytes => btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 const random = () => base64url(crypto.getRandomValues(new Uint8Array(32)));
 

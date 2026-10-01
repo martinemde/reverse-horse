@@ -1,10 +1,10 @@
 ---
-name: meat-jev
+name: reverse-horse
 status: active
-url: https://meat-jev.poblonko.workers.dev
+url: https://reverse-horse.poblonko.workers.dev
 ---
 
-# meat-jev
+# reverse-horse
 
 Be Jev: a Bun server or Cloudflare Worker accepts TypeSafe System One requests, shows their
 state and questions live over a WebSocket, and holds the HTTP connection while
@@ -99,7 +99,7 @@ Ties choose the first option. Score sliders permit fractional values with visibl
 integer stops; probabilities interpolate between the two adjacent stops.
 Structured state, instructions, and criteria are displayed as JSON.
 
-Responses identify the human as `model: "meat-jev"` and report zero token usage.
+Responses identify the human as `model: "reverse-horse"` and report zero token usage.
 The answer schema follows the [API reference](https://docs.typesafe.ai/api).
 TypeSafe's [confidence documentation](https://docs.typesafe.ai/confidence) does
 not specify its formula; human Choice/Score confidence uses one minus normalized
@@ -112,24 +112,30 @@ wins. Restarting the server clears requests and results.
 
 ## Cloudflare
 
-Live site: https://meat-jev.poblonko.workers.dev. The API is available at
-`https://meat-jev.poblonko.workers.dev/api/v1/systemone`.
+Verified deployment: https://reverse-horse.poblonko.workers.dev. The API is available at
+`https://reverse-horse.poblonko.workers.dev/api/v1/systemone`.
 
 `bun run dev:cloudflare` runs the Worker locally at http://127.0.0.1:8787.
 `bun run build` previews deployment with Wrangler's dry run; `bun run deploy`
-publishes the `meat-jev` Worker to the Cloudflare account used by martinemde.com.
+publishes the `reverse-horse` Worker to the Cloudflare account used by martinemde.com.
 The `reverse.horse` custom domain is configured in `wrangler.jsonc`. It requires
-an active `reverse.horse` zone in the Poblonko account; deployment reports error
-10083 until the zone exists there. After adding the zone and activating its
-nameservers, rerun `bun run deploy` to create the domain binding and certificate.
-The workers.dev address remains available.
+an active `reverse.horse` zone in the Poblonko account. The custom-domain binding
+was accepted on 2026-10-01; public DNS still returned ENOTFOUND when checked.
+The workers.dev address is verified for assets and WebSockets. If deployment
+reports error 10083, check that the zone exists in the same account.
+`bun run deploy` creates or updates the domain binding and certificate.
 
-The public brand is reverse.horse; the Worker and API model retain `meat-jev`.
+The public brand is reverse.horse; the project, Worker, and API model are
+`reverse-horse`, and the Durable Object class is `ReverseHorseRoom`.
+Renaming the Worker creates a new deployment and room namespace. The old
+`meat-jev` Worker remains until explicitly retired; it is not renamed in place.
+Browser storage keys migrate on the same origin; a different domain requires
+connecting OpenRouter again because credentials never leave browser storage.
 The horse-headed human SVG adapts Lucide Lab’s horse-head; its ISC license is
 served alongside the asset as `horse-human.LICENSE.txt`.
 
 Wrangler is pinned through mise. Static assets and the OpenRouter callback route
-are served by the Worker; WebSockets and API calls go to one `MeatJevRoom`
+are served by the Worker; WebSockets and API calls go to one `ReverseHorseRoom`
 Durable Object named `shared`. The Bun and Cloudflare adapters use the same
 queue implementation in `room.js`.
 

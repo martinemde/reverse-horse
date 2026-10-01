@@ -1,4 +1,4 @@
-import { getKey, disconnect, loginURL, completeLogin, comparisonEnabled, setComparisonEnabled } from './auth.js';
+import { migrateStorage, getKey, disconnect, loginURL, completeLogin, comparisonEnabled, setComparisonEnabled } from './auth.js';
 import { compareWithJev, validateJevResponse, matchesJev } from './compare.js';
 import { answerRequest } from './protocol.js';
 import { examples } from './examples.js';
@@ -338,6 +338,7 @@ $('#compare').addEventListener('change', () => {
 });
 window.addEventListener('storage', () => { try { refreshAuth(); if (!$('#compare').checked) for (const controller of comparisons.values()) controller.abort(); } catch { /* Storage may be disabled. */ } });
 async function initialize() {
+  try { migrateStorage(); } catch { showError("Could not migrate browser storage. Allow site storage to connect OpenRouter."); }
   const callback = new URL(location.href);
   if (callback.pathname === '/auth/openrouter/callback') {
     // Remove the authorization code from history before loading any other state.
