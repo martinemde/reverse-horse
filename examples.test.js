@@ -9,7 +9,7 @@ test('every built-in example has a matching, valid recorded JEV run', () => {
   expect(results).toHaveLength(examples.length);
   for (const example of examples) {
     validateRequest(example.request);
-    expect(Object.keys(example.request.questions).length).toBeLessThanOrEqual(2);
+    expect(Object.keys(example.request.questions).length).toBe(1);
     const matches = results.filter(run => JSON.stringify(run.request) === JSON.stringify(example.request));
     expect(matches).toHaveLength(1);
     const [run] = matches;

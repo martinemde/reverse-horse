@@ -47,10 +47,10 @@ page to stay connected. OAuth and inference use the documented
 [PKCE flow](https://openrouter.ai/docs/guides/overview/auth/oauth) and
 [System One endpoint](https://openrouter.ai/docs/api/api-reference/systemone/submit-a-system-one-request).
 
-Auto mode cycles through twenty-five short examples inspired by the TypeSafe docs and
-[these JEV use cases](https://hackernoon.com/101-real-world-examples-of-how-to-use-jev),
-including eight email scenarios and eight imagined game-character messages grounded
-in linked lore sources, plus six Holy Grail scenarios. Each round has at most two questions. It starts
+Auto mode cycles through twenty-five single-question rounds inspired by TypeSafe,
+[email classification use cases](https://hackernoon.com/101-real-world-examples-of-how-to-use-jev),
+and recognizable Holy Grail scenes. Each judgment is a separate request, including
+questions split from a shared situation. It starts
 a round immediately, then waits four seconds after completion/comparison before
 dealing another. Practice requests, answers, and history stay in the current tab;
 practice comparisons reuse the real runs in `public/example-results.json` with no

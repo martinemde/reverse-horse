@@ -162,7 +162,7 @@ function resultCard(result) {
     const answers = Object.entries(result.human.answers);
     const matched = answers.filter(([id, human]) => matchesJev(human, result.jev.answers[id])).length;
     const verdict = node('div', undefined, 'comparison');
-    verdict.append(node('strong', `Matched JEV on ${matched} of ${answers.length} answers`, 'answer-value'));
+    verdict.append(node('strong', answers.length === 1 ? (matched ? 'Matched JEV' : 'Different from JEV') : `Matched JEV on ${matched} of ${answers.length} answers`, 'answer-value'));
     if (answers.some(([, answer]) => answer.type !== 'choice')) verdict.append(node('p', 'Slider matches use the same yes/no side or nearest score level.'));
     card.append(verdict);
   }

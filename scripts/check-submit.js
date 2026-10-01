@@ -23,6 +23,7 @@ try {
   for (let i = 0; i < examples.length; i++) {
     await page.locator('form.request').waitFor();
     await page.locator('#auto').uncheck();
+    assert.equal(await page.locator('form.request fieldset.question').count(), 1);
     for (const slider of await page.locator('form.request input[type=range]').all()) {
       await slider.focus();
       await page.keyboard.press('ArrowRight');
@@ -33,7 +34,7 @@ try {
     await page.locator('form.request').waitFor({ state: 'detached', timeout: 1500 });
     assert.equal(await page.locator('#history .result').count(), Math.min(i + 1, 20));
     assert.match(await page.locator('#history .result').first().textContent(), /Compared with saved JEV run/);
-    assert.match(await page.locator('#history .result').first().textContent(), /Matched JEV on \d+ of [12] answers/);
+    assert.match(await page.locator('#history .result').first().locator('.comparison .answer-value').first().textContent(), /^(Matched JEV|Different from JEV)$/);
     if (i + 1 < examples.length) await page.locator('#auto').check();
   }
   await page.locator('#compare').uncheck();
