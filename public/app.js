@@ -1,5 +1,7 @@
 import { getKey, disconnect, loginURL, completeLogin, comparisonEnabled, setComparisonEnabled } from './auth.js';
 import { compareWithJev } from './compare.js';
+import { answerRequest } from './protocol.js';
+import { examples } from './examples.js';
 
 const $ = selector => document.querySelector(selector);
 const text = value => typeof value === 'string' ? value : JSON.stringify(value, null, 2);
@@ -15,6 +17,32 @@ let offset = 0;
 let current = [];
 const forms = new Map();
 let resultSignature = '';
+let serverQueue = { requests: [], results: [] };
+let practice;
+const practiceResults = [];
+let auto = false;
+let autoTimer;
+let exampleIndex = Math.floor(Math.random() * examples.length);
+function dealPractice() {
+  if (!auto || practice || serverQueue.requests.length || comparisons.size) return;
+  const example = examples[exampleIndex++ % examples.length];
+  practice = { ...example, id: crypto.randomUUID(), local: true, deadline: Date.now() + 30_000 };
+  render();
+}
+function schedulePractice() {
+  clearTimeout(autoTimer);
+  if (auto && !practice && !serverQueue.requests.length && !comparisons.size) autoTimer = setTimeout(dealPractice, 4000);
+}
+function submitPractice(item, values, compare) {
+  const human = answerRequest(item.request, values);
+  const result = { ...item, human, late: Date.now() >= item.deadline, status: compare ? 'Asking JEV via OpenRouter…' : 'Answered · comparison off' };
+  practiceResults.unshift(result);
+  practiceResults.splice(20);
+  practice = undefined;
+  render();
+  if (compare) void compareInBrowser(item);
+  else schedulePractice();
+}
 const exampleRequest = {
   "model": "jev-latest",
   "state": "My package arrived two days late, but everything inside looks great.",
@@ -114,7 +142,7 @@ function makeForm(item) {
       } else {
         const ticks = node('div', undefined, 'scale');
         const legend = node('div', undefined, 'legend');
-        q.criteria.forEach((label, i) => { ticks.append(node('span')); const stop = node('span'); stop.append(node('b', i), document.createTextNode(text(label))); legend.append(stop); });
+        q.criteria.forEach((label, i) => { const tick = node('span'); tick.append(node('b', i)); ticks.append(tick); legend.append(node('span', text(label))); });
         field.append(ticks, legend);
       }
     }
@@ -127,17 +155,18 @@ function makeForm(item) {
   let submitting = false;
   function validity() {
     const invalidChoice = Object.values(values).some(v => typeof v === 'object' && !Object.values(v).some(n => n > 0));
-    const late = Date.now() + offset >= item.deadline;
+    const late = Date.now() + (item.local ? 0 : offset) >= item.deadline;
     button.textContent = late ? 'Save late answers' : 'Submit answers';
-    hint.textContent = late ? 'The deadline passed. You can still save your answers and compare with JEV; the API caller already timed out.' : 'Your answers go back to the caller. JEV comparison is optional.';
-    button.disabled = submitting || socket?.readyState !== WebSocket.OPEN || invalidChoice;
+    hint.textContent = item.local ? 'Practice stays in this browser. You can answer after the timer ends.' : late ? 'The deadline passed. You can still save your answers and compare with JEV; the API caller already timed out.' : 'Your answers go back to the caller. JEV comparison is optional.';
+    button.disabled = submitting || (!item.local && socket?.readyState !== WebSocket.OPEN) || invalidChoice;
   }
   card.addEventListener('submit', event => {
     event.preventDefault(); validity(); if (button.disabled) return;
     try {
       const compare = $('#compare').checked && Boolean(getKey());
       submitting = true; validity(); showError('');
-      send({ type: 'submit', id: item.id, values, compare });
+      if (item.local) submitPractice(item, values, compare);
+      else send({ type: 'submit', id: item.id, values, compare });
     } catch { showError('Browser storage is unavailable. Allow site storage to submit answers.'); }
   });
   return { card, clock, validity, reset() { submitting = false; validity(); } };
@@ -178,21 +207,27 @@ function resultCard(result) {
   return card;
 }
 function update(message) {
-  offset = message.serverTime - Date.now(); current = message.requests;
-  $('#auto').checked = message.auto;
+  offset = message.serverTime - Date.now();
+  serverQueue = message;
+  render();
+  schedulePractice();
+}
+function render() {
+  current = [...serverQueue.requests, ...(practice ? [practice] : [])];
+  const results = [...practiceResults, ...serverQueue.results];
   const ids = new Set(current.map(item => item.id));
   for (const [id, form] of forms) if (!ids.has(id)) { form.card.remove(); forms.delete(id); }
   if (current.length) {
     $('#requests .empty')?.remove();
     for (const item of current) if (!forms.has(item.id)) { const form = makeForm(item); forms.set(item.id, form); $('#requests').append(form.card); }
   } else if (!$('#requests .empty')) {
-    $('#requests').append(emptyState(message.auto));
-  } else $('#requests .empty p').textContent = message.auto ? 'Next example coming up…' : 'Waiting for a request, or turn on auto mode.';
-  const signature = JSON.stringify(message.results);
-  if (signature !== resultSignature) { resultSignature = signature; $('#results').hidden = !message.results.length; $('#history').replaceChildren(...message.results.map(resultCard)); }
+    $('#requests').append(emptyState(auto));
+  } else $('#requests .empty p').textContent = auto ? 'Next example coming up…' : 'Waiting for a request, or turn on auto mode.';
+  const signature = JSON.stringify(results);
+  if (signature !== resultSignature) { resultSignature = signature; $('#results').hidden = !results.length; $('#history').replaceChildren(...results.map(resultCard)); }
   tick();
 }
-function tick() { for (const item of current) { const form = forms.get(item.id); const seconds = Math.max(0, (item.deadline - Date.now() - offset) / 1000); form.clock.textContent = seconds > 0 ? `${seconds.toFixed(1)}s` : 'Timed out'; form.clock.classList.toggle('urgent', seconds < 10); form.validity(); } }
+function tick() { for (const item of current) { const form = forms.get(item.id); const seconds = Math.max(0, (item.deadline - Date.now() - (item.local ? 0 : offset)) / 1000); form.clock.textContent = seconds > 0 ? `${seconds.toFixed(1)}s` : 'Timed out'; form.clock.classList.toggle('urgent', seconds < 10); form.validity(); } }
 async function compareInBrowser(message) {
   const connection = socket;
   const controller = new AbortController();
@@ -202,15 +237,20 @@ async function compareInBrowser(message) {
   try { result = $('#compare').checked ? await compareWithJev(message.request, getKey(), controller.signal) : { error: 'Comparison skipped · comparison off' }; }
   catch (e) { result = { error: e.name === 'AbortError' ? 'Comparison stopped or timed out' : `Comparison failed: ${e.message}` }; }
   finally { clearTimeout(timer); comparisons.delete(message.id); }
-  if (connection.readyState === WebSocket.OPEN) connection.send(JSON.stringify({ type: 'comparison', id: message.id, ...result }));
+  if (message.local) {
+    const saved = practiceResults.find(result => result.id === message.id);
+    if (saved) { saved.status = result.jev ? 'Compared' : result.error; if (result.jev) saved.jev = result.jev; }
+    render();
+  } else if (connection?.readyState === WebSocket.OPEN) connection.send(JSON.stringify({ type: 'comparison', id: message.id, ...result }));
+  schedulePractice();
 }
 function connect() {
   socket = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/ws`);
-  socket.addEventListener('open', () => { $('#connection').textContent = 'Connected'; $('#auto').disabled = false; for (const form of forms.values()) form.reset(); });
-  socket.addEventListener('close', () => { for (const controller of comparisons.values()) controller.abort(); $('#connection').textContent = 'Disconnected · reconnecting…'; $('#auto').disabled = true; tick(); setTimeout(connect, 1000); });
+  socket.addEventListener('open', () => { $('#connection').textContent = 'Connected'; for (const form of forms.values()) form.reset(); });
+  socket.addEventListener('close', () => { for (const [id, controller] of comparisons) if (!practiceResults.some(result => result.id === id)) controller.abort(); $('#connection').textContent = 'Disconnected · reconnecting…'; tick(); setTimeout(connect, 1000); });
   socket.addEventListener('message', event => { const message = JSON.parse(event.data); if (message.type === 'queue') update(message); if (message.type === 'compare') void compareInBrowser(message); if (message.type === 'error') { showError(message.message); for (const form of forms.values()) form.reset(); } });
 }
-$('#auto').addEventListener('change', event => send({ type: 'auto', enabled: event.target.checked }));
+$('#auto').addEventListener('change', event => { auto = event.target.checked; clearTimeout(autoTimer); if (auto) dealPractice(); render(); schedulePractice(); });
 $('#auth').addEventListener('click', async () => {
   $('#auth').disabled = true;
   try {

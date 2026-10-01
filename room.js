@@ -1,5 +1,4 @@
-import { validateRequest, answerRequest } from './protocol.js';
-import { examples } from './examples.js';
+import { validateRequest, answerRequest } from './public/protocol.js';
 import { validateJevResponse } from './public/compare.js';
 
 
@@ -8,22 +7,11 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
   const clients = new Set();
   const results = [];
   const comparisons = new Map();
-  let auto = false;
-  let autoTimer;
-  let exampleIndex = Math.floor(Math.random() * examples.length);
   const json = (body, status = 200) => Response.json(body, { status });
   const error = (message, status) => json({ error: { message } }, status);
-  const snapshot = () => JSON.stringify({ type: 'queue', serverTime: Date.now(), auto, results, requests: [...pending.values()].map(({ id, request, createdAt, deadline, source, title, timedOut }) => ({ id, request, createdAt, deadline, source, title, timedOut })) });
+  const snapshot = () => JSON.stringify({ type: 'queue', serverTime: Date.now(), results, requests: [...pending.values()].map(({ id, request, createdAt, deadline, source, title, timedOut }) => ({ id, request, createdAt, deadline, source, title, timedOut })) });
   const broadcast = () => { const message = snapshot(); for (const ws of clients) ws.send(message); };
-  function scheduleExample() {
-    clearTimeout(autoTimer);
-    if (auto && clients.size && !pending.size && !comparisons.size) autoTimer = setTimeout(() => {
-      if (!auto || !clients.size || pending.size || comparisons.size) return;
-      const example = examples[exampleIndex++ % examples.length];
-      enqueue(example.request, () => {}, undefined, example);
-    }, 4000);
-  }
-  function enqueue(request, resolve, signal, example) {
+  function enqueue(request, resolve, signal) {
     const id = crypto.randomUUID();
     const createdAt = Date.now();
     const finish = (response, outcome) => {
@@ -38,7 +26,6 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
       }
       resolve(response);
       broadcast();
-      scheduleExample();
     };
     const abort = () => finish(error('Caller disconnected', 499), 'Caller disconnected');
     const expire = () => {
@@ -52,7 +39,7 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
       broadcast();
     };
     const timer = setTimeout(expire, timeoutMs);
-    pending.set(id, { id, request, createdAt, deadline: createdAt + timeoutMs, title: example?.title || 'API request', source: example?.source, timedOut: false, timer, finish, expire });
+    pending.set(id, { id, request, createdAt, deadline: createdAt + timeoutMs, title: 'API request', timedOut: false, timer, finish, expire });
     signal?.addEventListener('abort', abort, { once: true });
     if (signal?.aborted) abort(); else broadcast();
   }
@@ -61,14 +48,13 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
     results.unshift(result);
     results.splice(20);
     broadcast();
-    if (!enabled) { scheduleExample(); return; }
+    if (!enabled) return;
     const finish = (status, jev) => {
       clearTimeout(timer);
       comparisons.delete(entry.id);
       result.status = status;
       if (jev) result.jev = jev;
       broadcast();
-      scheduleExample();
     };
     const timer = setTimeout(() => finish('Comparison failed: JEV timed out'), 30_000);
     comparisons.set(entry.id, { ws, finish, request: entry.request });
@@ -99,11 +85,10 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
       if (pending.size >= 100) return error('Queue is full', 503);
       return new Promise(resolve => enqueue(request, resolve, req.signal));
     },
-      open(ws) { clients.add(ws); ws.send(snapshot()); scheduleExample(); },
+      open(ws) { clients.add(ws); ws.send(snapshot()); },
       close(ws) {
         clients.delete(ws);
         for (const comparison of comparisons.values()) if (comparison.ws === ws) comparison.finish('Comparison interrupted · browser disconnected');
-        scheduleExample();
       },
       message(ws, raw) {
         try {
@@ -119,16 +104,6 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
             else comparison.finish(typeof message.error === 'string' ? message.error.slice(0, 200) : 'Comparison failed');
             return;
           }
-          if (message.type === 'auto') {
-            if (typeof message.enabled !== 'boolean') throw new Error('Invalid auto setting');
-            auto = message.enabled;
-            broadcast();
-            if (auto && !pending.size && !comparisons.size) {
-              const example = examples[exampleIndex++ % examples.length];
-              enqueue(example.request, () => {}, undefined, example);
-            } else scheduleExample();
-            return;
-          }
           if (message.type !== 'submit') throw new Error('Unknown message type');
           const entry = pending.get(message.id);
           if (!entry) throw new Error('This request is no longer waiting');
@@ -140,6 +115,6 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
           compare(entry, response, ws, message.compare === true);
         } catch (e) { ws.send(JSON.stringify({ type: 'error', message: e.message })); }
       },
-    stop() { auto = false; clearTimeout(autoTimer); for (const comparison of comparisons.values()) comparison.finish("Server stopped"); for (const entry of [...pending.values()]) entry.finish(error("Server stopped", 503)); },
+    stop() { for (const comparison of comparisons.values()) comparison.finish("Server stopped"); for (const entry of [...pending.values()]) entry.finish(error("Server stopped", 503)); },
   };
 }

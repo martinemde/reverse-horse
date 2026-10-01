@@ -49,9 +49,12 @@ page to stay connected. OAuth and inference use the documented
 
 Auto mode cycles through three examples adapted from the TypeSafe docs. It starts
 a round immediately, then waits four seconds after completion/comparison before
-dealing another. It pauses while requests or comparisons are active or no page is
-connected. Turning it off stops future rounds; the current round still expires.
-Real API requests are accepted in either mode.
+dealing another. Practice requests, answers, and history stay in the current tab;
+optional JEV comparisons go directly from that browser to OpenRouter. Practice
+works without a WebSocket connection and pauses new rounds while live requests or
+comparisons are active. Turning it off stops future rounds; the current round
+remains answerable after its timer ends. Real API requests still use the shared
+WebSocket queue in either mode. Reloading the page clears local practice.
 
 ## Call it
 

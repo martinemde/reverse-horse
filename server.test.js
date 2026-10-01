@@ -103,19 +103,18 @@ test('invalid requests and invalid answers do not consume a waiting request', as
   expect((await response).status).toBe(200);
 });
 
-test('auto mode deals a sourced example and can be turned off', async () => {
+test('practice is not controlled through the shared websocket', async () => {
   const base = app(); const client = connect(base);
-  await client.next(m => m.type === 'queue');
+  const queue = await client.next(m => m.type === 'queue');
+  expect(queue.requests).toHaveLength(0);
+  expect(queue.auto).toBeUndefined();
   client.send({ type: 'auto', enabled: true });
-  const round = await client.next(m => m.auto && m.requests?.length);
-  expect(round.requests[0].source.startsWith('https://docs.typesafe.ai/')).toBe(true);
-  client.send({ type: 'auto', enabled: false });
-  expect((await client.next(m => m.auto === false)).requests).toHaveLength(1);
+  expect((await client.next(m => m.type === 'error')).message).toBe('Unknown message type');
 });
 
 test('serves the page and assets and blocks cross-origin requests', async () => {
   const base = app();
-  for (const path of ['/', '/request', '/builder.js', '/builder-data.js', '/auth/openrouter/callback?code=example', '/app.js', '/auth.js', '/compare.js', '/style.css']) expect((await fetch(new URL(path, base))).status).toBe(200);
+  for (const path of ['/', '/request', '/builder.js', '/builder-data.js', '/auth/openrouter/callback?code=example', '/app.js', '/examples.js', '/protocol.js', '/auth.js', '/compare.js', '/style.css']) expect((await fetch(new URL(path, base))).status).toBe(200);
   expect((await fetch(new URL('/ws', base), { headers: { Origin: 'https://elsewhere.example' } })).status).toBe(403);
   expect((await fetch(new URL('/api/v1/systemone', base), { method: 'POST', headers: { Origin: 'https://elsewhere.example', 'Content-Type': 'application/json' }, body: JSON.stringify(request) })).status).toBe(403);
 });
