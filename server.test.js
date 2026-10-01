@@ -1,5 +1,6 @@
 import { afterEach, expect, test } from 'bun:test';
 import { startServer } from './server.js';
+import { buildRequest } from './public/builder-data.js';
 
 const resources = [];
 afterEach(async () => { for (const close of resources.reverse()) await close(); resources.length = 0; });
@@ -114,7 +115,7 @@ test('auto mode deals a sourced example and can be turned off', async () => {
 
 test('serves the page and assets and blocks cross-origin requests', async () => {
   const base = app();
-  for (const path of ['/', '/auth/openrouter/callback?code=example', '/app.js', '/auth.js', '/compare.js', '/style.css']) expect((await fetch(new URL(path, base))).status).toBe(200);
+  for (const path of ['/', '/request', '/builder.js', '/builder-data.js', '/auth/openrouter/callback?code=example', '/app.js', '/auth.js', '/compare.js', '/style.css']) expect((await fetch(new URL(path, base))).status).toBe(200);
   expect((await fetch(new URL('/ws', base), { headers: { Origin: 'https://elsewhere.example' } })).status).toBe(403);
   expect((await fetch(new URL('/api/v1/systemone', base), { method: 'POST', headers: { Origin: 'https://elsewhere.example', 'Content-Type': 'application/json' }, body: JSON.stringify(request) })).status).toBe(403);
 });
@@ -151,4 +152,31 @@ test('concurrent requests remain isolated and disconnecting a caller removes its
   expect(remaining.requests[0].request.state).toBe('Still waiting');
   client.send({ type: 'submit', id: second.id, values: { urgent: 1, department: { billing: 0, support: 1 }, mood: 0 } });
   expect((await (await response).json()).answers.department.choice).toBe('support');
+});
+
+test('a request built from form fields travels through the API and returns all three answers', async () => {
+  const base = app(); const client = connect(base);
+  await client.next(m => m.type === 'queue');
+  const built = buildRequest({ state: '{"message":"The delivery was late but intact."}', stateFormat: 'json', questions: [
+    { id: 'damaged', type: 'noul', instructions: 'Was it damaged?', no: 'Intact', yes: 'Damaged' },
+    { id: 'topic', type: 'choice', instructions: 'What is it about?', options: [{ key: 'shipping', description: 'Delivery' }, { key: 'billing', description: '' }] },
+    { id: 'mood', type: 'score', instructions: 'How happy?', levels: ['Sad', 'Mixed', 'Happy'] },
+  ] });
+  const response = post(base, built);
+  const item = (await client.next(m => m.requests?.length)).requests[0];
+  expect(item.request.state).toEqual({ message: 'The delivery was late but intact.' });
+  expect(item.request.questions.topic.criteria).toEqual({ shipping: 'Delivery', billing: null });
+  client.send({ type: 'submit', id: item.id, values: { damaged: 0, topic: { shipping: 1, billing: 0 }, mood: 1.2 } });
+  const result = await (await response).json();
+  expect(result.answers.damaged.noul).toBe(0);
+  expect(result.answers.topic.choice).toBe('shipping');
+  expect(result.answers.mood.score).toBe(1.2);
+});
+
+test('builder rejects malformed JSON, duplicate IDs and incomplete criteria before sending', () => {
+  const q = { id: 'q', type: 'noul', instructions: 'Question?' };
+  expect(() => buildRequest({ state: '{', stateFormat: 'json', questions: [q] })).toThrow('State must be valid JSON');
+  expect(() => buildRequest({ state: 'text', questions: [q, q] })).toThrow('used more than once');
+  expect(() => buildRequest({ state: 'text', questions: [{ ...q, type: 'choice', options: [{ key: 'a', description: '' }, { key: 'a', description: '' }] }] })).toThrow('unique key');
+  expect(() => buildRequest({ state: 'text', questions: [{ ...q, type: 'score', levels: ['Only one'] }] })).toThrow('2–10');
 });

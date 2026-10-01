@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#131718">
+  <title>Make a request · Meat Jev</title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/builder.js"></script>
+</head>
+<body>
+  <header><a class="brand" href="/">Meat Jev<span> HUMAN INFERENCE</span></a><nav aria-label="Main"><a href="/">Answer</a><a href="/request" aria-current="page">Make a request</a></nav></header>
+  <main>
+    <div class="toolbar"><div><h1>Ask a human.</h1><p>Build your request, send it, and get the API response.</p></div><a href="/" target="_blank" rel="noopener" class="source">Open answering screen in another tab</a></div>
+    <div class="builder-layout">
+      <form id="builder">
+        <fieldset id="draft" class="draft">
+          <section class="builder-panel">
+            <label class="field">State format<select id="state-format"><option value="text">Text</option><option value="json">JSON</option></select></label>
+            <label class="field">State<textarea id="state" rows="5" required placeholder="The situation you want someone to evaluate…"></textarea></label>
+          </section>
+          <div id="questions"></div>
+          <button id="add-question" type="button" class="secondary">Add question</button>
+        </fieldset>
+        <p id="builder-error" role="alert" hidden></p>
+        <div class="actions builder-actions"><p>Anyone on the answering screen can reply. The first answer wins.</p><button id="send" type="submit">Send request</button></div>
+      </form>
+      <aside>
+        <section class="builder-panel"><div class="panel-heading"><h2>Request JSON</h2><button id="copy-json" type="button" class="secondary">Copy</button></div><textarea id="preview" rows="17" readonly aria-label="Generated request JSON" spellcheck="false"></textarea><p id="copy-status" role="status"></p></section>
+        <section id="response-panel" class="builder-panel" hidden><h2>Response</h2><p id="response-status" role="status"></p><pre id="response"></pre></section>
+      </aside>
+    </div>
+  </main>
+  <footer>Meat Jev <span>One request. Human judgment.</span></footer>
+</body>
+</html>

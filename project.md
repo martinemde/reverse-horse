@@ -55,6 +55,14 @@ Real API requests are accepted in either mode.
 
 ## Call it
 
+Use **Make a request** (`/request`) to compose the state and add Noul, Choice,
+and Score questions in a form. Choice options have unique keys and optional
+descriptions; Score levels run from lowest to highest. Text and structured JSON
+state are supported. The preview is the exact body posted to `/api/v1/systemone`.
+The screen shows the actual HTTP status and response JSON. Keep it open while
+someone answers, or open the answering screen in another tab. A 504 ends the
+builder's API call even though the answering screen still accepts late answers.
+
 ```sh
 curl http://127.0.0.1:3000/api/v1/systemone \
   -H 'Content-Type: application/json' \

@@ -31,7 +31,7 @@ export default {
     } else {
       const asset = assetFiles.get(url.pathname);
       if (request.method === 'GET' && asset) {
-        url.pathname = asset === 'index.html' ? '/' : `/${asset}`;
+        url.pathname = asset === 'index.html' ? '/' : `/${asset.replace(/\.html$/, '')}`;
         url.search = '';
         const response = await env.ASSETS.fetch(new Request(url, request));
         const headers = new Headers(response.headers);

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { buildRequest } from '../public/builder-data.js';
 
 const base = new URL(process.argv[2] || 'http://127.0.0.1:8787');
 const sockets = [];
@@ -22,18 +23,19 @@ function connect() {
   return { ws, next, send: message => ws.send(JSON.stringify(message)) };
 }
 const marker = `deployment-check-${crypto.randomUUID()}`;
-const request = { model: 'jev-latest', state: marker, questions: {
-  yes: { type: 'noul', instructions: 'Is this a deployment check?' },
-  route: { type: 'choice', instructions: 'Where does this go?', criteria: { testing: null, support: null } },
-  score: { type: 'score', instructions: 'Rate progress.', criteria: ['Starting', 'Working', 'Complete'] },
-} };
+const request = buildRequest({ state: marker, stateFormat: 'text', questions: [
+  { id: 'yes', type: 'noul', instructions: 'Is this a deployment check?' },
+  { id: 'route', type: 'choice', instructions: 'Where does this go?', options: [{ key: 'testing', description: '' }, { key: 'support', description: '' }] },
+  { id: 'score', type: 'score', instructions: 'Rate progress.', levels: ['Starting', 'Working', 'Complete'] },
+] });
 const values = { yes: 1, route: { testing: 1, support: 0 }, score: 1.5 };
 const post = state => fetch(new URL('/api/v1/systemone', base), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...request, state }), signal: abort.signal });
 try {
-  for (const path of ['/', '/auth/openrouter/callback?code=check', '/app.js', '/auth.js', '/compare.js', '/style.css']) {
+  for (const path of ['/', '/request', '/builder.js', '/builder-data.js', '/auth/openrouter/callback?code=check', '/app.js', '/auth.js', '/compare.js', '/style.css']) {
     const response = await fetch(new URL(path, base));
     assert.equal(response.status, 200, path);
     assert.equal(response.headers.get('Referrer-Policy'), 'no-referrer');
+    if (path === '/request') assert.match(await response.text(), /id="builder"/);
   }
   const first = connect(); const second = connect();
   await Promise.all([first.next(m => m.type === 'queue'), second.next(m => m.type === 'queue')]);

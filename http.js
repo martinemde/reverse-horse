@@ -1,6 +1,6 @@
 export const assetFiles = new Map([
-  ['/', 'index.html'], ['/auth/openrouter/callback', 'index.html'],
-  ...['app.js', 'auth.js', 'compare.js', 'style.css'].map(file => [`/${file}`, file]),
+  ['/', 'index.html'], ['/auth/openrouter/callback', 'index.html'], ['/request', 'request.html'],
+  ...['app.js', 'auth.js', 'compare.js', 'builder.js', 'builder-data.js', 'style.css'].map(file => [`/${file}`, file]),
 ]);
 
 export const assetHeaders = {
