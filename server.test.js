@@ -61,7 +61,7 @@ test('holds the API connection, accepts all primitives, and skips JEV without cr
   expect(result.answers.mood.score).toBe(1.25);
   expect(result.answers.mood.probabilities).toEqual({ 0: 0, 1: 0.75, 2: 0.25 });
   expect(result.answers.mood.legend).toEqual({ 0: 'Sad', 1: 'Neutral', 2: { label: 'Happy' } });
-  expect(result.answers.department.confidence).toBeCloseTo(0.1887218755);
+  expect(result.answers.department.confidence).toBe(0.75);
   // The first completion snapshot must contain the result; an empty snapshot
   // would remove the original browser card before the result arrives.
   const completed = await client.next(m => m.type === 'queue');
@@ -71,6 +71,31 @@ test('holds the API connection, accepts all primitives, and skips JEV without cr
   expect(completed.requests).toEqual([]);
   reconnected.send({ type: 'submit', id: item.id, values: {} });
   expect((await reconnected.next(m => m.type === 'error')).message).toBe('This request is no longer waiting');
+});
+
+test('choice normalizes independent bar weights and returns tallest-bar confidence', async () => {
+  const base = app(); const client = connect(base);
+  await client.next(m => m.type === 'queue');
+  const body = { model: 'jev-latest', state: 'Pick an option', questions: {
+    pick: { type: 'choice', instructions: 'Which option?', criteria: { a: null, b: null, c: null } },
+  } };
+  for (const [weights, confidence, probabilities] of [
+    [[1, 0, 0], 1, [1, 0, 0]],
+    [[1, 1, 0], 1, [0.5, 0.5, 0]],
+    [[0.5, 0.5, 0], 0.5, [0.5, 0.5, 0]],
+    [[0.5, 0, 0], 0.5, [1, 0, 0]],
+    [[0.01, 0, 0], 0.01, [1, 0, 0]],
+  ]) {
+    const response = post(base, body);
+    const item = (await client.next(m => m.requests?.length === 1)).requests[0];
+    client.send({ type: 'submit', id: item.id, values: { pick: { a: weights[0], b: weights[1], c: weights[2] } } });
+    const result = await response;
+    expect(result.status).toBe(200);
+    expect((await result.json()).answers.pick).toEqual({
+      type: 'choice', choice: 'a', confidence,
+      probabilities: { a: probabilities[0], b: probabilities[1], c: probabilities[2] },
+    });
+  }
 });
 
 test('expires the API call but retains questions for late answers and comparison', async () => {

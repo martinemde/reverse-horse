@@ -69,7 +69,8 @@ dealing another. Each shuffle uses every round once and avoids an immediate repe
 at the boundary between shuffles. Practice requests, answers, and history stay in the current tab;
 practice comparisons reuse the real runs in `public/example-results.json` with no
 API call or key required. Submitted cards stay in place with their sliders locked. Pink markers show JEV on
-the same scale, and the human slider and feedback turn green for a match or pink
+the same scale (Choice markers reconstruct bar fullness from JEV's distribution
+and confidence), and the human slider and feedback turn green for a match or pink
 for a mismatch. Matching uses the same choice, yes/no side (0.5 counts as yes), or
 nearest score level (halfway rounds up). Exact values remain visible. New rounds
 appear above completed cards; results no longer move into a separate history panel. Saved runs match the complete request, so
@@ -101,21 +102,27 @@ key and binds to loopback. Invalid requests return 400; unanswered requests retu
 disconnects before the deadline remove their request. A maximum of 100 unanswered
 requests (including timed-out ones) is accepted.
 
-Noul maps to 0–1. Choice rounds start with zero weights and no selection.
-Pick an option to give it full weight, then optionally add weight to others.
-Choice radio buttons select one option outright. Sliders show actual probabilities;
-changing one redistributes the remainder among the other weighted options. This
-keeps the human and JEV markers on the same scale without moving sliders on submit
-(all-zero weights are rejected).
-Ties choose the first option. Score sliders permit fractional values with visible
+Noul maps to 0–1. Choice rounds start with empty bars. Fill each independently
+from 0–100%; the fullest bar sets confidence, and each weight divided by the total
+sets its probability. Changing a bar readjusts the probabilities, preserving the
+other bars' fullness. Two full bars give confidence 1 and probabilities 0.5/0.5;
+two half-full bars give confidence 0.5 with the same distribution. One half-full
+bar gives confidence 0.5 and probability 1. All-zero weights are rejected.
+Submitted bars retain their original fullness, including when reconstructed on
+reload: scale each probability by `confidence / max(probabilities)`.
+JEV's pink markers reconstruct equivalent bar fullness using the same procedure;
+their numeric labels still show JEV's actual probabilities. There are no radios.
+Ties choose the first option. Training teaches and uses this same control.
+Score sliders permit fractional values with visible
 integer stops; probabilities interpolate between the two adjacent stops.
 Structured state, instructions, and criteria are displayed as JSON.
 
 Responses identify the human as `model: "reverse-horse"` and report zero token usage.
 The answer schema follows the [API reference](https://docs.typesafe.ai/api).
 TypeSafe's [confidence documentation](https://docs.typesafe.ai/confidence) does
-not specify its formula; human Choice/Score confidence uses one minus normalized
-Shannon entropy. It is not numerically equivalent to JEV's confidence.
+not specify its formula; human Score confidence uses one minus normalized Shannon
+entropy. Human Choice confidence is the maximum submitted bar weight, a loose
+proxy for overall confidence. Neither formula is numerically equivalent to JEV's.
 
 The queue and latest 20 results live in memory. Reconnecting gets a fresh snapshot;
 draft slider values survive a connection interruption while the page stays open,
@@ -167,7 +174,9 @@ to verify a 504 followed by a saved late answer. It does not call OpenRouter.
 `bun scripts/check-training.js /path/to/playwright-core/index.mjs` runs the course
 through Chromium at desktop and phone widths, checks complete response JSON and
 recorded comparisons, and verifies Back, exit at every step, Escape, completion
-across reloads, replay, and blocked storage. It uses only an ephemeral local
+across reloads, replay, and blocked storage. It also verifies the Choice confidence
+examples through both training controls and live API submissions, including
+preserved bar fullness after reload. It uses only an ephemeral local
 server and refuses external network requests. Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE`
 to use an existing Chromium executable; otherwise install the matching browser
 with Playwright's CLI. Screenshots are written to `/tmp/reverse-horse-training-*`.

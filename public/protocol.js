@@ -30,6 +30,12 @@ function confidence(probabilities) {
   return Math.max(0, Math.min(1, 1 + p.reduce((sum, n) => sum + (n ? n * Math.log(n) : 0), 0) / Math.log(p.length)));
 }
 
+// Recover bar fullness from a normalized distribution and its tallest bar.
+export function choiceWeights(answer) {
+  const max = Math.max(...Object.values(answer.probabilities));
+  return Object.fromEntries(Object.entries(answer.probabilities).map(([key, probability]) => [key, max ? probability / max * answer.confidence : 0]));
+}
+
 export function answerRequest(request, values) {
   assert(object(values) && Object.keys(values).length === Object.keys(request.questions).length, 'Answer every question');
   const answers = Object.fromEntries(Object.entries(request.questions).map(([id, q]) => {
@@ -42,7 +48,7 @@ export function answerRequest(request, values) {
       assert(total > 0, `${id}: at least one option needs a positive weight`);
       const probabilities = Object.fromEntries(keys.map(key => [key, value[key] / total]));
       const choice = keys.reduce((best, key) => probabilities[key] > probabilities[best] ? key : best);
-      return [id, { type: q.type, choice, probabilities, confidence: confidence(probabilities) }];
+      return [id, { type: q.type, choice, probabilities, confidence: Math.max(...keys.map(key => value[key])) }];
     }
     const max = q.type === 'noul' ? 1 : q.criteria.length - 1;
     assert(Number.isFinite(value) && value >= 0 && value <= max, `${id}: answer must be between 0 and ${max}`);

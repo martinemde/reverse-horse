@@ -12,6 +12,13 @@ const { chromium } = await import(pathToFileURL(resolve(process.argv[2])).href);
 const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE });
 const app = startServer({ port: 0 });
 const errors = [], externalRequests = [], submissions = [];
+const choiceCases = [
+  [[1, 0, 0], 1, [1, 0, 0]],
+  [[1, 1, 0], 1, [0.5, 0.5, 0]],
+  [[0.5, 0.5, 0], 0.5, [0.5, 0.5, 0]],
+  [[0.5, 0, 0], 0.5, [1, 0, 0]],
+  [[0.01, 0, 0], 0.01, [1, 0, 0]],
+];
 async function pageFor(viewport, init) {
   const context = await browser.newContext({ viewport });
   await context.route('**/*', route => {
@@ -63,9 +70,16 @@ try {
       let values;
       if (id === 'color') {
         assert.equal(await card.getByRole('button').isDisabled(), true, 'Choice needs a selection');
-        await card.getByRole('radio', { name: 'blue', exact: true }).check();
+        assert.equal(await card.getByRole('radio').count(), 0);
+        for (const [weights, confidence, probabilities] of choiceCases) {
+          for (let index = 0; index < weights.length; index++) await setRange(card.locator('input[type=range]').nth(index), weights[index]);
+          assert.equal(parseFloat((await card.locator('.choice-confidence').textContent()).replace('Confidence ', '')), confidence * 100);
+          assert.deepEqual(await card.locator('.choice-probability').evaluateAll(outputs => outputs.map(output => parseFloat(output.textContent))), probabilities.map(p => p * 100));
+          assert.deepEqual(await card.locator('input[type=range]').evaluateAll(inputs => inputs.map(input => Number(input.value))), weights);
+        }
+        await setRange(card.locator('input[type=range]').first(), 0.5);
         await setRange(card.locator('input[type=range]').nth(1), 0.2);
-        values = { blue: 0.8, yellow: 0.2, red: 0 };
+        values = { blue: 0.5, yellow: 0.2, red: 0 };
       } else {
         values = id === 'healing' ? 1.75 : 0.1;
         await setRange(card.locator('input[type=range]'), values);
@@ -109,7 +123,7 @@ try {
     if (exitStep > 0) await dialog.getByRole('button', { name: 'Begin mandatory training' }).click();
     for (let step = 1; step < exitStep; step++) {
       const card = dialog.locator('form');
-      if (await card.getByRole('radio').count()) await card.getByRole('radio').first().check();
+      await setRange(card.locator('input[type=range]').first(), 0.5);
       await card.getByRole('button').click();
       await dialog.locator('.training-actions button').last().click();
     }
@@ -133,8 +147,42 @@ try {
   await context.close();
   assert.deepEqual(submissions, [], 'Training never submits to the shared API queue');
   assert.deepEqual(externalRequests, [], 'Training never calls an external service');
+
+  // Verify the same bars by submitting real live requests, including reload.
+  const entry = await pageFor({ width: 390, height: 844 }, () => localStorage.setItem('reverse-horse.training-completed', '1'));
+  await entry.page.getByRole('button', { name: 'Pause practice', exact: true }).click();
+  await entry.page.locator('#compare').uncheck();
+  const request = { model: 'jev-latest', state: 'Choice confidence calibration', questions: {
+    pick: { type: 'choice', instructions: 'Which option?', criteria: { a: null, b: null, c: null } },
+  } };
+  for (const [weights, confidence, probabilities] of choiceCases) {
+    const response = fetch(new URL('/api/v1/systemone', app.server.url), { method: 'POST', body: JSON.stringify(request) });
+    const card = entry.page.locator('.live-request:not(.answered)');
+    await card.waitFor();
+    assert.equal(await card.getByRole('radio').count(), 0);
+    assert.equal(await card.getByRole('button').isDisabled(), true);
+    for (let index = 0; index < weights.length; index++) await setRange(card.locator('input[type=range]').nth(index), weights[index]);
+    const submitted = await card.elementHandle();
+    await card.getByRole('button').click({ delay: 350 });
+    const result = await response;
+    assert.equal(result.status, 200);
+    assert.deepEqual((await result.json()).answers.pick, {
+      type: 'choice', choice: 'a', confidence,
+      probabilities: { a: probabilities[0], b: probabilities[1], c: probabilities[2] },
+    });
+    await entry.page.waitForFunction(el => el.classList.contains('answered'), submitted);
+    assert.deepEqual(await submitted.$$eval('input[type=range]', inputs => inputs.map(input => Number(input.value))), weights, 'Submission preserves bar fullness');
+  }
+  const latest = await entry.page.locator('.live-request').first().getAttribute('data-id');
+  await entry.page.reload();
+  const restored = entry.page.locator(`form[data-id="${latest}"]`);
+  await restored.waitFor();
+  assert.deepEqual(await restored.locator('input[type=range]').evaluateAll(inputs => inputs.map(input => Number(input.value))), [0.01, 0, 0], 'Reload preserves low confidence');
+  await entry.context.close();
+  assert.equal(submissions.length, choiceCases.length);
+  assert.deepEqual(externalRequests, []);
   assert.deepEqual(errors, []);
-  console.log('Training: desktop and mobile, all three API shapes, recorded JEV responses, back, completion, replay, exit at every stage, Escape, and blocked storage passed.');
+  console.log('Training: desktop/mobile, all API shapes, recorded JEV, back/completion/replay/exit/Escape, blocked storage, and all Choice confidence examples in training and live submissions passed.');
 } finally {
   await browser.close();
   await app.stop();

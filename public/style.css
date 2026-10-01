@@ -26,6 +26,12 @@ nav{display:flex;gap:20px;font-size:14px}nav a{text-decoration:none;color:var(--
 
 .request.live-request{border-color:var(--accent)}
 
+.choice-probabilities{display:flex;align-items:center;justify-content:space-between;gap:12px;font:13px ui-monospace,monospace;color:var(--muted)}
+.choice-confidence{display:block;font:14px ui-monospace,monospace;color:var(--accent)}
+.choice-summary{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.choice-summary p{font-size:13px}
+.human-picked .choice-name{color:var(--accent)}
+
 nav #train{background:transparent;color:var(--muted);padding:0;font:inherit;border-radius:0}
 body.in-training{overflow:hidden}
 #training{width:min(1100px,calc(100% - 48px));max-width:none;max-height:calc(100dvh - 48px);padding:0;border:1px solid var(--line);border-radius:16px;background:#131718;color:#f2f4ef;overscroll-behavior:contain}

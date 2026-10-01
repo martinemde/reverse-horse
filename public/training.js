@@ -13,9 +13,9 @@ const lessons = [
   {
     id: 'color', type: 'choice', title: 'Select your most probable favorite color.',
     brief: 'You are now qualified to choose between things. For this assignment you are Sir Lancelot. Read the state before applying your own favorite color. Personal preferences are not covered by this contract.',
-    controls: 'Click an option to put 100% on it. To spread uncertainty, move another option’s slider; the other weights adjust so the probabilities total 100%. The option with the most weight wins.',
+    controls: 'Fill each bar anywhere from 0% to 100%. You do not have to fill it all the way. The fullest bar sets your confidence; the relative fullness of all bars sets the probability of each choice. Move another bar and the chances readjust. The option with the most weight wins.',
     criteria: 'An object maps option keys to descriptions. The keys are the possible answers; descriptions explain them and may be null. Choice accepts 1–255 options.',
-    response: 'choice is the winning option key. probabilities gives a weight from 0 to 1 for every option, totaling 1. confidence describes certainty in the distribution.',
+    response: 'choice is the winning option key; ties go to the first option. probabilities gives a weight from 0 to 1 for every option, totaling 1. Your confidence is how full you made the fullest bar, from 0 to 1. Even a single slightly filled bar can win with very low confidence.',
     explanation: 'Lancelot answers blue. JEV chooses blue too, but leaves some probability on the alternatives. A choice and its certainty are two different pieces of information.',
   },
   {
@@ -146,6 +146,12 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
       const guide = node('div', undefined, 'training-guide');
       guide.append(node('h2', 'Operating instructions'), node('p', lesson.controls),
         fields([['criteria', lesson.criteria]]));
+      if (lesson.type === 'choice') guide.append(node('h3', 'Approved confidence calibration'), fields([
+        ['100 / 0 / 0', '100% confidence. Probabilities: 100% / 0% / 0%.'],
+        ['100 / 100 / 0', '100% confidence. Probabilities: 50% / 50% / 0%.'],
+        ['50 / 50 / 0', '50% confidence. Probabilities: 50% / 50% / 0%.'],
+        ['50 / 0 / 0', '50% confidence. Probabilities: 100% / 0% / 0%.'],
+      ]));
       const requestJSON = node('details', undefined, 'training-request-json');
       requestJSON.open = true;
       requestJSON.append(node('summary', 'The API request'), node('pre', JSON.stringify(example.request, null, 2)));
@@ -182,7 +188,8 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
         comparison.append(jsonPanel('Your API response', outcome.human));
         if (saved) comparison.append(jsonPanel('JEV’s recorded response', saved.jev, 'training-jev'));
         review.append(comparison);
-        if (lesson.type !== 'noul') review.append(node('p', 'reverse.horse derives confidence from the probability distribution. Its formula is not JEV’s. For score, your slider spreads probability between adjacent levels; JEV can spread it across the whole scale.', 'training-note'));
+        if (lesson.type === 'choice') review.append(node('p', 'Your fullest bar is a loose proxy for overall confidence. JEV calculates its own confidence. Its pink markers reconstruct bar fullness from its recorded probabilities and confidence, so its tallest bar reaches its confidence.', 'training-note'));
+        if (lesson.type === 'score') review.append(node('p', 'For score, reverse.horse derives confidence from the probability distribution. Its formula is not JEV’s. Your slider spreads probability between adjacent levels; JEV can spread it across the whole scale.', 'training-note'));
         review.append(node('p', 'Your response reports zero token usage: human intelligence is apparently unmetered. Different from JEV? You can still proceed. This is training, not a performance review.'));
       }
       if (result) { form.finish(result); showReview(result); }

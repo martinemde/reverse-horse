@@ -1,6 +1,6 @@
 import { migrateStorage, getKey, disconnect, loginURL, completeLogin, comparisonEnabled, setComparisonEnabled } from './auth.js';
 import { compareWithJev, validateJevResponse, matchesJev } from './compare.js';
-import { answerRequest } from './protocol.js';
+import { answerRequest, choiceWeights } from './protocol.js';
 import { examples } from './examples.js';
 import { createTraining } from './training.js';
 
@@ -130,12 +130,15 @@ function makeForm(item, onTrainingSubmit) {
       const keys = Object.keys(q.criteria);
       values[id] = Object.fromEntries(keys.map(key => [key, 0]));
       const controls = [];
+      const certainty = node('output', 'Confidence 0%', 'choice-confidence');
       const refresh = () => {
         const total = Object.values(values[id]).reduce((a, b) => a + b, 0);
         const best = keys.reduce((a, b) => values[id][b] > values[id][a] ? b : a);
+        certainty.textContent = `Confidence ${(100 * Math.max(...Object.values(values[id]))).toFixed(1)}%`;
         for (const c of controls) {
-          c.output.textContent = total ? `${(100 * values[id][c.key] / total).toFixed(1)}%` : '0%';
-          c.radio.checked = total > 0 && c.key === best;
+          c.fullness.textContent = `${(100 * values[id][c.key]).toFixed(1)}% full`;
+          c.output.textContent = total ? `${(100 * values[id][c.key] / total).toFixed(1)}% chance` : '0% chance';
+          c.option.classList.toggle('human-picked', total > 0 && c.key === best);
           c.slider.value = String(values[id][c.key]);
           paintRange(c.slider);
         }
@@ -144,28 +147,25 @@ function makeForm(item, onTrainingSubmit) {
       for (const key of keys) {
         const option = node('div', undefined, 'choice');
         const row = node('div', undefined, 'range-row');
-        const label = node('label', undefined, 'choice-name');
-        const radio = node('input'); radio.type = 'radio'; radio.name = `${item.id}-${id}`;
-        label.append(radio, node('span', key));
-        const output = node('output');
+        const label = node('span', key, 'choice-name');
+        const fullness = node('output');
+        const output = node('output', undefined, 'choice-probability');
         const jev = node('span', 'JEV', 'jev-value pending');
-        const numbers = node('div', undefined, 'range-values'); numbers.append(output, jev);
+        const numbers = node('div', undefined, 'range-values'); numbers.append(fullness);
         const slider = range(`${id}: ${key}`, 1, 0, value => {
-          // A choice slider is a probability, so its position and JEV's marker
-          // share the same scale. Redistribute the remainder among other options.
-          const others = keys.filter(other => other !== key);
-          const total = others.reduce((sum, other) => sum + values[id][other], 0);
-          values[id][key] = total ? value : value > 0 ? 1 : 0;
-          for (const other of others) values[id][other] = total ? values[id][other] * (1 - value) / total : 0;
+          values[id][key] = value;
           refresh();
         });
-        radio.addEventListener('change', () => { for (const other of keys) values[id][other] = other === key ? 1 : 0; refresh(); });
         const scale = track(slider);
-        controls.push({ key, radio, slider, output, jev, option, marker: scale.marker });
+        const probabilities = node('div', undefined, 'choice-probabilities'); probabilities.append(output, jev);
+        controls.push({ key, slider, fullness, output, jev, option, marker: scale.marker });
         row.append(label, numbers); option.append(row);
         if (q.criteria[key] !== null) option.append(node('p', text(q.criteria[key])));
-        option.append(scale.wrapper); field.append(option);
+        option.append(scale.wrapper, probabilities); field.append(option);
       }
+      const summary = node('div', undefined, 'choice-summary');
+      summary.append(certainty, node('p', 'Fill any bars from 0–100%. The tallest bar sets confidence; their relative fullness sets the chances.'));
+      field.append(summary);
       Object.assign(view, { controls, refresh });
       queueMicrotask(refresh);
     } else {
@@ -230,7 +230,7 @@ function makeForm(item, onTrainingSubmit) {
         view.field.disabled = true;
         const human = result.human?.answers[id];
         if (!human) continue;
-        if (human.type === 'choice') { values[id] = { ...human.probabilities }; view.refresh(); }
+        if (human.type === 'choice') { values[id] = choiceWeights(human); view.refresh(); }
         else {
           values[id] = human.type === 'noul' ? human.noul : human.score;
           view.slider.value = String(values[id]); paintRange(view.slider);
@@ -250,8 +250,10 @@ function makeForm(item, onTrainingSubmit) {
       view.feedback.textContent = match ? 'Matched JEV' : 'Different from JEV';
       view.feedback.title = `${rule} counts as a match`;
       if (human.type === 'choice') {
+        const weights = choiceWeights(jev);
         for (const control of view.controls) {
-          mark(control, jev.probabilities[control.key], 1, `${(100 * jev.probabilities[control.key]).toFixed(1)}%`);
+          mark(control, weights[control.key], 1, `${(100 * jev.probabilities[control.key]).toFixed(1)}% chance`);
+          control.jev.title = 'Pink markers scale JEV probabilities so its tallest bar equals its confidence';
           control.option.classList.toggle('human-picked', human.choice === control.key);
           control.option.classList.toggle('jev-picked', jev.choice === control.key);
         }
