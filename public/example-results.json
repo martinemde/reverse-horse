@@ -732,62 +732,23 @@
   },
   {
     "title": "The Black Knight · Holy Grail",
-    "recordedAt": "2026-10-01T05:23:59.959Z",
+    "recordedAt": "2026-10-01T05:29:48.786Z",
     "request": {
       "model": "jev-latest",
-      "state": "The Black Knight has lost both arms but insists he can keep fighting.",
+      "state": "King Arthur has bested the Black Knight. Both of the Black Knight’s arms have been cut off.",
       "questions": {
-        "severity": {
-          "type": "score",
-          "instructions": "How serious are his injuries?",
-          "criteria": [
-            "Minor",
-            "Serious",
-            "Critical"
-          ]
+        "flesh_wound": {
+          "type": "noul",
+          "instructions": "Is this but a flesh wound?"
         }
       }
     },
     "jev": {
       "model": "typesafe/jev-1.13-20260917",
       "answers": {
-        "severity": {
-          "type": "score",
-          "confidence": 0.85,
-          "probabilities": {
-            "0": 0,
-            "1": 0.1,
-            "2": 0.9
-          },
-          "score": 1.9,
-          "legend": {
-            "0": "Minor",
-            "1": "Serious",
-            "2": "Critical"
-          }
-        }
-      }
-    }
-  },
-  {
-    "title": "The Black Knight · Holy Grail",
-    "recordedAt": "2026-10-01T05:24:00.285Z",
-    "request": {
-      "model": "jev-latest",
-      "state": "The Black Knight has lost both arms but insists he can keep fighting.",
-      "questions": {
-        "reliable": {
+        "flesh_wound": {
           "type": "noul",
-          "instructions": "Is he being realistic about his condition?"
-        }
-      }
-    },
-    "jev": {
-      "model": "typesafe/jev-1.13-20260917",
-      "answers": {
-        "reliable": {
-          "type": "noul",
-          "noul": 0.1
+          "noul": 0.07
         }
       }
     }

@@ -125,9 +125,8 @@ const scenarios = [
   },
   {
     title: 'The Black Knight · Holy Grail', source: grailDialogue,
-    request: { model: 'jev-latest', state: 'The Black Knight has lost both arms but insists he can keep fighting.', questions: {
-      severity: { type: 'score', instructions: 'How serious are his injuries?', criteria: ['Minor', 'Serious', 'Critical'] },
-      reliable: { type: 'noul', instructions: 'Is he being realistic about his condition?' },
+    request: { model: 'jev-latest', state: 'King Arthur has bested the Black Knight. Both of the Black Knight’s arms have been cut off.', questions: {
+      flesh_wound: { type: 'noul', instructions: 'Is this but a flesh wound?' },
     } },
   },
   {

@@ -47,7 +47,7 @@ page to stay connected. OAuth and inference use the documented
 [PKCE flow](https://openrouter.ai/docs/guides/overview/auth/oauth) and
 [System One endpoint](https://openrouter.ai/docs/api/api-reference/systemone/submit-a-system-one-request).
 
-Auto mode cycles through thirty-one single-question rounds inspired by TypeSafe,
+Auto mode cycles through thirty single-question rounds inspired by TypeSafe,
 [email classification use cases](https://hackernoon.com/101-real-world-examples-of-how-to-use-jev),
 six simple video game decisions, and recognizable Holy Grail scenes.
 Game rounds include the necessary context rather than testing obscure lore. Each judgment is a separate request, including
