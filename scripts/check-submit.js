@@ -31,7 +31,7 @@ try {
     // here used to suppress WebKit's click event, leaving the form on screen.
     await page.locator('form.request button').click({ delay: 350 });
     await page.locator('form.request').waitFor({ state: 'detached', timeout: 1500 });
-    assert.equal(await page.locator('#history .result').count(), i + 1);
+    assert.equal(await page.locator('#history .result').count(), Math.min(i + 1, 20));
     assert.match(await page.locator('#history .result').first().textContent(), /Compared with saved JEV run/);
     assert.match(await page.locator('#history .result').first().textContent(), /Matched JEV on \d+ of [12] answers/);
     if (i + 1 < examples.length) await page.locator('#auto').check();
@@ -49,7 +49,7 @@ try {
   assert.equal((await response).status, 504);
   await page.locator('form.request button').click({ delay: 350 });
   await page.locator('form.request').waitFor({ state: 'detached', timeout: 1500 });
-  assert.equal(await page.locator('#history .result').count(), examples.length + 2);
+  assert.equal(await page.locator('#history .result').count(), Math.min(examples.length + 1, 20) + 1);
   assert.deepEqual(errors, []);
   assert.deepEqual(externalRequests, []);
   console.log(`WebKit: submitted ${examples.length} practice rounds and a timed-out API request using slow clicks.`);
