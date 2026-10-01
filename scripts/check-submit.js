@@ -15,6 +15,7 @@ const browser = await webkit.launch({ headless: true });
 const app = startServer({ port: 0, timeoutMs: 100 });
 try {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await page.addInitScript(() => localStorage.setItem('reverse-horse.training-completed', '1'));
   const errors = [], externalRequests = [], dealt = [];
   page.on('request', request => { if (new URL(request.url()).origin !== app.server.url.origin) externalRequests.push(request.url()); });
   page.on('pageerror', error => errors.push(error.message));

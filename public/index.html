@@ -10,7 +10,7 @@
   <script type="module" src="/app.js"></script>
 </head>
 <body>
-  <header class="player-header"><a class="brand" href="/"><img src="/horse-human.svg" alt="" width="36" height="36">reverse.horse</a><nav aria-label="Main"><a href="/" aria-current="page">Answer</a><a href="/request">Make a request</a></nav><div class="player-controls"><span id="connection" role="status">Connecting…</span><button id="play" type="button" aria-label="Pause practice" aria-pressed="true"><span id="play-icon" aria-hidden="true">Ⅱ</span> <span id="play-label">Pause</span></button></div></header>
+  <header class="player-header"><a class="brand" href="/"><img src="/horse-human.svg" alt="" width="36" height="36">reverse.horse</a><nav aria-label="Main"><a href="/" aria-current="page">Answer</a><a href="/request">Make a request</a><button id="train" type="button">Training</button></nav><div class="player-controls"><span id="connection" role="status">Connecting…</span><button id="play" type="button" aria-label="Pause practice" aria-pressed="true"><span id="play-icon" aria-hidden="true">Ⅱ</span> <span id="play-label">Pause</span></button></div></header>
   <main>
     <div class="toolbar"><div><h1>The AI outsourced this to you.</h1><p>Human intelligence. Artificial working conditions.</p></div></div>
     <div class="auth-bar"><p id="auth-status" role="status">Connect your OpenRouter account to compare with JEV.</p><label class="compare-toggle"><input id="compare" type="checkbox" disabled> Compare with JEV</label><button id="auth" type="button" class="secondary">Connect OpenRouter</button></div>
@@ -18,5 +18,6 @@
     <section id="requests" aria-label="Requests and answers"><div class="empty"><div class="waiting-mark">?</div><h2>No questions yet</h2><p>Press play to answer questions. Live requests are always welcome.</p></div></section>
   </main>
   <footer>reverse.horse <span>Powered by an actual person.</span></footer>
+  <dialog id="training" aria-labelledby="training-title"></dialog>
 </body>
 </html>

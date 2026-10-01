@@ -24,6 +24,18 @@ bun start
 Open http://127.0.0.1:3000. Set `PORT` to change the port. No dependencies to install.
 `bun dev` restarts on server changes; refresh the page after UI edits.
 
+First-time visitors enter an untimed training walkthrough: induction, Noul,
+Choice, Score, and certification. Each exercise uses the answering screen's
+controls and shows its request JSON, human response, and actual recorded JEV
+response. Training does not submit to the shared queue or call OpenRouter.
+Practice pauses while training is open; exiting restores the previous play state.
+Live requests still arrive and keep their original deadlines.
+**Exit training** and Escape return to the site from any step. Only **Enter the
+site** on the certification step saves `reverse-horse.training-completed = 1`
+in local storage. To verify first-visit behavior again, remove that key and reload.
+**Training** in the navigation reopens the course without clearing certification.
+Blocked storage permits training but cannot remember completion.
+
 Click **Connect OpenRouter** to authorize your own key. **Compare with JEV** is
 enabled on your first connection. Turn it off whenever you like; your choice is
 saved in this browser and survives refreshes and reconnects. Built-in practice rounds use recorded JEV answers even without a connection;
@@ -151,6 +163,14 @@ requests, checks two sockets racing to answer, and waits the actual 30 seconds
 to verify a 504 followed by a saved late answer. It does not call OpenRouter.
 
 ## Verify
+
+`bun scripts/check-training.js /path/to/playwright-core/index.mjs` runs the course
+through Chromium at desktop and phone widths, checks complete response JSON and
+recorded comparisons, and verifies Back, exit at every step, Escape, completion
+across reloads, replay, and blocked storage. It uses only an ephemeral local
+server and refuses external network requests. Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE`
+to use an existing Chromium executable; otherwise install the matching browser
+with Playwright's CLI. Screenshots are written to `/tmp/reverse-horse-training-*`.
 
 `bun test` exercises real local HTTP/WebSocket connections, all three answer types,
 reconnection, duplicate submission, validation, expiration, auto mode, and static

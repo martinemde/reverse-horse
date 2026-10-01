@@ -2,6 +2,7 @@ import { migrateStorage, getKey, disconnect, loginURL, completeLogin, comparison
 import { compareWithJev, validateJevResponse, matchesJev } from './compare.js';
 import { answerRequest } from './protocol.js';
 import { examples } from './examples.js';
+import { createTraining } from './training.js';
 
 const $ = selector => document.querySelector(selector);
 const text = value => typeof value === 'string' ? value : JSON.stringify(value, null, 2);
@@ -43,14 +44,14 @@ function nextExample() {
   return lastExample;
 }
 function dealPractice() {
-  if (!playing || practice || serverQueue.requests.length || comparisons.size) return;
+  if (training.active || !playing || practice || serverQueue.requests.length || comparisons.size) return;
   const example = nextExample();
   practice = { ...example, id: crypto.randomUUID(), local: true, deadline: Date.now() + 30_000 };
   render();
 }
 function schedulePractice() {
   clearTimeout(practiceTimer);
-  if (playing && !practice && !serverQueue.requests.length && !comparisons.size) practiceTimer = setTimeout(dealPractice, 4000);
+  if (!training.active && playing && !practice && !serverQueue.requests.length && !comparisons.size) practiceTimer = setTimeout(dealPractice, 4000);
 }
 function submitPractice(item, values, compare) {
   const human = answerRequest(item.request, values);
@@ -87,7 +88,7 @@ function range(label, max, value, changed) {
   input.addEventListener('input', () => { paintRange(input); changed(Number(input.value)); });
   return input;
 }
-function makeForm(item) {
+function makeForm(item, onTrainingSubmit) {
   const values = Object.create(null);
   const views = new Map();
   let submitting = false;
@@ -97,8 +98,8 @@ function makeForm(item) {
   card.dataset.id = item.id;
   card.classList.toggle('live-request', !item.local);
   const head = node('div', undefined, 'request-head');
-  const label = node('div', item.source ? 'PRACTICE ROUND' : 'LIVE REQUEST', 'eyebrow');
-  const clock = node('span', '30.0s', 'clock'); clock.setAttribute('aria-label', 'Time remaining');
+  const label = node('div', item.training ? 'TRAINING EXERCISE' : item.source ? 'PRACTICE ROUND' : 'LIVE REQUEST', 'eyebrow');
+  const clock = node('span', item.training ? 'Untimed' : '30.0s', 'clock'); clock.setAttribute('aria-label', item.training ? 'No time limit' : 'Time remaining');
   head.append(label, clock);
   const state = node('div', undefined, 'state'); state.append(node('div', 'STATE', 'eyebrow'), node('pre', text(item.request.state)));
   const questions = node('div', undefined, 'questions');
@@ -194,7 +195,7 @@ function makeForm(item) {
     questions.append(field);
   }
   const actions = node('div', undefined, 'actions');
-  const button = node('button', 'Submit answers'); button.type = 'submit';
+  const button = node('button', item.training ? 'Submit & see JEV’s answer' : 'Submit answers'); button.type = 'submit';
   const hint = node('p', '');
   actions.append(hint, button); card.append(head, state, questions, actions);
   function validity() {
@@ -206,6 +207,7 @@ function makeForm(item) {
   card.addEventListener('submit', event => {
     event.preventDefault(); validity(); if (button.disabled) return;
     try {
+      if (onTrainingSubmit) { onTrainingSubmit(answerRequest(item.request, values)); return; }
       const compare = $('#compare').checked && Boolean((item.local && savedExample(item.request)) || getKey());
       submitting = true; validity(); showError('');
       if (item.local) submitPractice(item, values, compare);
@@ -283,7 +285,7 @@ function render() {
     $('#requests').append(emptyState(playing));
   } else $('#requests .empty p').textContent = playing ? 'Next example coming up…' : 'Press play to answer questions. Live requests are always welcome.';
   tick();
-  if (newQuestion) {
+  if (newQuestion && !training.active) {
     const card = forms.get(newQuestion.id).card;
     const top = card.getBoundingClientRect().top + window.scrollY - $('header').getBoundingClientRect().height - 16;
     window.scrollTo({ top, behavior: 'instant' });
@@ -312,8 +314,8 @@ function connect() {
   socket.addEventListener('close', () => { for (const [id, controller] of comparisons) if (!practiceResults.some(result => result.id === id)) controller.abort(); $('#connection').textContent = 'Disconnected · reconnecting…'; tick(); setTimeout(connect, 1000); });
   socket.addEventListener('message', event => { const message = JSON.parse(event.data); if (message.type === 'queue') update(message); if (message.type === 'compare') void compareInBrowser(message); if (message.type === 'error') { showError(message.message); for (const form of forms.values()) form.reset(); } });
 }
-$('#play').addEventListener('click', () => {
-  playing = !playing;
+function setPlaying(value) {
+  playing = value;
   if (practice) {
     if (playing && practice.pausedAt !== undefined) {
       practice.deadline += Date.now() - practice.pausedAt;
@@ -328,7 +330,16 @@ $('#play').addEventListener('click', () => {
   if (playing) dealPractice();
   render();
   schedulePractice();
+}
+$('#play').addEventListener('click', () => setPlaying(!playing));
+let resumePractice;
+const training = createTraining({
+  dialog: $('#training'), makeForm, getSavedExample: savedExample,
+  onOpen() { resumePractice = playing; setPlaying(false); },
+  onClose(error) { setPlaying(resumePractice); if (error) showError(error); },
 });
+$('#train').addEventListener('click', () => training.open());
+training.start();
 $('#auth').addEventListener('click', async () => {
   $('#auth').disabled = true;
   try {
@@ -362,6 +373,7 @@ async function initialize() {
     const runs = await response.json();
     savedExamples = runs.map(run => ({ ...run, jev: validateJevResponse(run.request, run.jev) }));
   } catch { showError('Saved JEV answers could not be loaded. Refresh to try again.'); }
+  training.refresh();
   try { refreshAuth(); } catch { showError('Browser storage is unavailable. Allow site storage to connect OpenRouter.'); }
   connect();
   dealPractice();
