@@ -120,3 +120,33 @@ $('#builder').addEventListener('submit', async event => {
   finally { clearInterval(timer); sending = false; $('#draft').disabled = false; preview(); }
 });
 addQuestion();
+
+const exampleRequest = {
+  "model": "jev-latest",
+  "state": "My package arrived two days late, but everything inside looks great.",
+  "questions": {
+    "damaged": { "type": "noul", "instructions": "Did anything arrive damaged?" },
+    "topic": { "type": "choice", "instructions": "What is this message about?", "criteria": { "shipping": "Delivery and packages", "billing": "Charges and payments", "support": "Technical help" } },
+    "mood": { "type": "score", "instructions": "How does the customer feel overall?", "criteria": ["Unhappy", "Mixed or neutral", "Happy"] }
+  }
+};
+function showCurlExample() {
+  const command = `curl '${location.origin}/api/v1/systemone' \\\n  -H 'Content-Type: application/json' \\\n  --data-binary @- <<'JSON'\n${JSON.stringify(exampleRequest, null, 2)}\nJSON`;
+  const input = node('textarea', undefined, 'curl-example');
+  input.value = command;
+  input.rows = 16;
+  input.spellcheck = false;
+  input.setAttribute('aria-label', 'Editable curl request');
+  const copy = node('button', 'Copy', 'secondary');
+  copy.type = 'button';
+  const copyStatus = node('span', '', 'copy-status');
+  copyStatus.setAttribute('role', 'status');
+  copy.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(input.value); copyStatus.textContent = 'Copied. Paste it into your terminal and edit it.'; }
+    catch { copyStatus.textContent = 'Could not copy. Select the command below and copy it manually.'; }
+  });
+  const controls = node('div', undefined, 'curl-controls');
+  controls.append(copy, copyStatus);
+  $('#curl-example').append(node('h2', 'Try the API with curl'), node('p', 'An editable example with all three question types. Copy it into your terminal to send a request.'), controls, input);
+}
+showCurlExample();

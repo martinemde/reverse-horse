@@ -49,34 +49,9 @@ function submitPractice(item, values, compare) {
   if (compare && !saved) void compareInBrowser(item);
   else schedulePractice();
 }
-const exampleRequest = {
-  "model": "jev-latest",
-  "state": "My package arrived two days late, but everything inside looks great.",
-  "questions": {
-    "damaged": { "type": "noul", "instructions": "Did anything arrive damaged?" },
-    "topic": { "type": "choice", "instructions": "What is this message about?", "criteria": { "shipping": "Delivery and packages", "billing": "Charges and payments", "support": "Technical help" } },
-    "mood": { "type": "score", "instructions": "How does the customer feel overall?", "criteria": ["Unhappy", "Mixed or neutral", "Happy"] }
-  }
-};
 function emptyState(auto) {
   const empty = node('div', undefined, 'empty');
-  const command = `curl '${location.origin}/api/v1/systemone' \\\n  -H 'Content-Type: application/json' \\\n  --data-binary @- <<'JSON'\n${JSON.stringify(exampleRequest, null, 2)}\nJSON`;
-  const input = node('textarea', undefined, 'curl-example');
-  input.value = command;
-  input.rows = 16;
-  input.spellcheck = false;
-  input.setAttribute('aria-label', 'Editable curl request');
-  const copy = node('button', 'Copy', 'secondary');
-  copy.type = 'button';
-  const copyStatus = node('span', '', 'copy-status');
-  copyStatus.setAttribute('role', 'status');
-  copy.addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(input.value); copyStatus.textContent = 'Copied. Paste it into your terminal and edit it.'; }
-    catch { copyStatus.textContent = 'Could not copy. Select the command below and copy it manually.'; }
-  });
-  const controls = node('div', undefined, 'curl-controls');
-  controls.append(copy, copyStatus);
-  empty.append(node('div', '?', 'waiting-mark'), node('h2', 'No questions yet'), node('p', auto ? 'Next example coming up…' : 'Waiting for a request, or turn on auto mode.'), controls, input);
+  empty.append(node('div', '?', 'waiting-mark'), node('h2', 'No questions yet'), node('p', auto ? 'Next example coming up…' : 'Waiting for a request, or turn on auto mode.'));
   return empty;
 }
 function send(message) { if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message)); }
