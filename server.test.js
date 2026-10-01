@@ -62,7 +62,10 @@ test('holds the API connection, accepts all primitives, and skips JEV without cr
   expect(result.answers.mood.probabilities).toEqual({ 0: 0, 1: 0.75, 2: 0.25 });
   expect(result.answers.mood.legend).toEqual({ 0: 'Sad', 1: 'Neutral', 2: { label: 'Happy' } });
   expect(result.answers.department.confidence).toBeCloseTo(0.1887218755);
-  const completed = await client.next(m => m.results?.[0]?.human);
+  // The first completion snapshot must contain the result; an empty snapshot
+  // would remove the original browser card before the result arrives.
+  const completed = await client.next(m => m.type === 'queue');
+  expect(completed.results[0]?.human).toBeDefined();
   expect(completed.results[0].status).toBe('Answered · comparison off');
   expect(completed.results[0].jev).toBeUndefined();
   expect(completed.requests).toEqual([]);

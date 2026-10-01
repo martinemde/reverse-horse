@@ -14,7 +14,7 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
   function enqueue(request, resolve, signal) {
     const id = crypto.randomUUID();
     const createdAt = Date.now();
-    const finish = (response, outcome) => {
+    const finish = (response, outcome, notify = true) => {
       const entry = pending.get(id);
       if (!entry) return;
       clearTimeout(entry.timer);
@@ -25,7 +25,7 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
         results.splice(20);
       }
       resolve(response);
-      broadcast();
+      if (notify) broadcast();
     };
     const abort = () => finish(error('Caller disconnected', 499), 'Caller disconnected');
     const expire = () => {
@@ -111,7 +111,7 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
           if (message.compare !== undefined && typeof message.compare !== 'boolean') throw new Error('Invalid comparison setting');
           const response = answerRequest(entry.request, message.values);
           ws.send(JSON.stringify({ type: 'submitted', id: message.id }));
-          entry.finish(json(response));
+          entry.finish(json(response), undefined, false);
           compare(entry, response, ws, message.compare === true);
         } catch (e) { ws.send(JSON.stringify({ type: 'error', message: e.message })); }
       },

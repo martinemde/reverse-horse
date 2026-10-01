@@ -47,17 +47,20 @@ page to stay connected. OAuth and inference use the documented
 [PKCE flow](https://openrouter.ai/docs/guides/overview/auth/oauth) and
 [System One endpoint](https://openrouter.ai/docs/api/api-reference/systemone/submit-a-system-one-request).
 
-Auto mode cycles through thirty single-question rounds inspired by TypeSafe,
+Auto mode shuffles thirty single-question rounds inspired by TypeSafe,
 [email classification use cases](https://hackernoon.com/101-real-world-examples-of-how-to-use-jev),
 six simple video game decisions, and recognizable Holy Grail scenes.
 Game rounds include the necessary context rather than testing obscure lore. Each judgment is a separate request, including
 questions split from a shared situation. It starts
 a round immediately, then waits four seconds after completion/comparison before
-dealing another. Practice requests, answers, and history stay in the current tab;
+dealing another. Each shuffle uses every round once and avoids an immediate repeat
+at the boundary between shuffles. Practice requests, answers, and history stay in the current tab;
 practice comparisons reuse the real runs in `public/example-results.json` with no
-API call or key required. Results show how many answers match JEV: the same choice,
-yes/no side (0.5 counts as yes), or nearest score level (halfway rounds up). Exact
-values and differences remain visible. Saved runs match the complete request, so
+API call or key required. Submitted cards stay in place with their sliders locked. Pink markers show JEV on
+the same scale, and the human slider and feedback turn green for a match or pink
+for a mismatch. Matching uses the same choice, yes/no side (0.5 counts as yes), or
+nearest score level (halfway rounds up). Exact values remain visible. New rounds
+append after completed cards; results no longer move into a separate history panel. Saved runs match the complete request, so
 edited questions never reuse an old answer. Practice
 works without a WebSocket connection and pauses new rounds while live requests or
 comparisons are active. Turning it off stops future rounds; the current round
@@ -88,8 +91,10 @@ requests (including timed-out ones) is accepted.
 
 Noul maps to 0–1. Choice rounds start with zero weights and no selection.
 Pick an option to give it full weight, then optionally add weight to others.
-Choice radio buttons select one option outright; sliders set
-relative weights that normalize to probabilities (all-zero weights are rejected).
+Choice radio buttons select one option outright. Sliders show actual probabilities;
+changing one redistributes the remainder among the other weighted options. This
+keeps the human and JEV markers on the same scale without moving sliders on submit
+(all-zero weights are rejected).
 Ties choose the first option. Score sliders permit fractional values with visible
 integer stops; probabilities interpolate between the two adjacent stops.
 Structured state, instructions, and criteria are displayed as JSON.
@@ -145,7 +150,10 @@ runs an isolated WebKit browser against a local server, checks saved comparisons
 and the off switch, and verifies no external requests occur. Install
 WebKit through that Playwright installation's CLI (`install webkit`) first; set
 `PLAYWRIGHT_BROWSERS_PATH` when using a separate browser cache. The check holds each
-click for 350 ms across several clock ticks and also submits after API timeout.
+click for 350 ms across several clock ticks, checks card identity and slider
+positions on a mobile viewport, and delivers a recorded JEV answer after API
+timeout through the real WebSocket protocol. It also checks a full shuffled deck,
+marker positions, match colors, and the comparison-off behavior.
 Keep the submit button's text stable during clock updates: replacing its text node
 between pointer-down and pointer-up makes WebKit drop the click event even though
 the button remains enabled and the form is valid.
@@ -155,3 +163,11 @@ To record built-in examples, set `OPENROUTER_API_KEY` in the ignored `.env` and 
 per missing request, validates each response, and saves the request, answer, and
 recording timestamp. Successful calls are saved immediately so retries resume
 without another charge. Remove the temporary key from `.env` after generation.
+
+On API submission, the room removes the pending request and publishes its result
+in one queue snapshot. An intermediate empty snapshot would remove the original
+card before the result arrived. Older cards are trimmed when a new card arrives,
+not during submission, to avoid shifting the submitted card at the history limit.
+Result updates decorate the existing form; they
+must not rebuild or move it. Keep completed button dimensions and reserved marker
+space unchanged so mobile scroll anchoring cannot shift the submitted controls.
