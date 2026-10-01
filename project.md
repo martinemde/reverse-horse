@@ -47,9 +47,10 @@ page to stay connected. OAuth and inference use the documented
 [PKCE flow](https://openrouter.ai/docs/guides/overview/auth/oauth) and
 [System One endpoint](https://openrouter.ai/docs/api/api-reference/systemone/submit-a-system-one-request).
 
-Auto mode cycles through twenty-five single-question rounds inspired by TypeSafe,
+Auto mode cycles through thirty-one single-question rounds inspired by TypeSafe,
 [email classification use cases](https://hackernoon.com/101-real-world-examples-of-how-to-use-jev),
-and recognizable Holy Grail scenes. Each judgment is a separate request, including
+six simple video game decisions, and recognizable Holy Grail scenes.
+Game rounds include the necessary context rather than testing obscure lore. Each judgment is a separate request, including
 questions split from a shared situation. It starts
 a round immediately, then waits four seconds after completion/comparison before
 dealing another. Practice requests, answers, and history stay in the current tab;
@@ -85,7 +86,9 @@ key and binds to loopback. Invalid requests return 400; unanswered requests retu
 disconnects before the deadline remove their request. A maximum of 100 unanswered
 requests (including timed-out ones) is accepted.
 
-Noul maps to 0–1. Choice radio buttons select one option outright; sliders set
+Noul maps to 0–1. Choice rounds start with zero weights and no selection.
+Pick an option to give it full weight, then optionally add weight to others.
+Choice radio buttons select one option outright; sliders set
 relative weights that normalize to probabilities (all-zero weights are rejected).
 Ties choose the first option. Score sliders permit fractional values with visible
 integer stops; probabilities interpolate between the two adjacent stops.

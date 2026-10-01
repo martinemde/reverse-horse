@@ -84,7 +84,7 @@ function makeForm(item) {
     field.append(node('legend', `${q.type.toUpperCase()} / ${id}`), node('div', text(q.instructions), 'instructions'));
     if (q.type === 'choice') {
       const keys = Object.keys(q.criteria);
-      values[id] = Object.fromEntries(keys.map(key => [key, 1 / keys.length]));
+      values[id] = Object.fromEntries(keys.map(key => [key, 0]));
       const controls = [];
       const refresh = () => {
         const total = Object.values(values[id]).reduce((a, b) => a + b, 0);
@@ -106,7 +106,7 @@ function makeForm(item) {
         if (q.criteria[key] !== null) option.append(node('p', text(q.criteria[key])));
         option.append(slider); field.append(option);
       }
-      field.append(node('p', 'Sliders set relative weights; percentages always add to 100%.'));
+      field.append(node('p', 'Pick an option, then adjust the sliders to give other options some weight.'));
       // Wait until the submit button exists before refreshing validity.
       queueMicrotask(refresh);
     } else {
@@ -138,7 +138,7 @@ function makeForm(item) {
     const invalidChoice = Object.values(values).some(v => typeof v === 'object' && !Object.values(v).some(n => n > 0));
     const late = Date.now() + (item.local ? 0 : offset) >= item.deadline;
     // Keep the button DOM stable: WebKit drops clicks if its text changes mid-press.
-    hint.textContent = item.local ? 'Practice stays in this browser. You can answer after the timer ends.' : late ? 'The deadline passed. You can still save your answers and compare with JEV; the API caller already timed out.' : 'Your answers go back to the caller. JEV comparison is optional.';
+    hint.textContent = invalidChoice ? 'Choose an option or raise at least one slider to submit.' : item.local ? 'Practice stays in this browser. You can answer after the timer ends.' : late ? 'The deadline passed. You can still save your answers and compare with JEV; the API caller already timed out.' : 'Your answers go back to the caller. JEV comparison is optional.';
     button.disabled = submitting || (!item.local && socket?.readyState !== WebSocket.OPEN) || invalidChoice;
   }
   card.addEventListener('submit', event => {

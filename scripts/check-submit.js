@@ -24,9 +24,25 @@ try {
     await page.locator('form.request').waitFor();
     await page.locator('#auto').uncheck();
     assert.equal(await page.locator('form.request fieldset.question').count(), 1);
+    const choices = page.locator('form.request input[type=radio]');
+    if (await choices.count()) {
+      assert.equal(await page.locator('form.request input[type=radio]:checked').count(), 0);
+      assert.equal(await page.locator('form.request button').isDisabled(), true);
+      assert.deepEqual(await page.locator('form.request input[type=range]').evaluateAll(inputs => inputs.map(input => Number(input.value))), Array(await choices.count()).fill(0));
+      // The first option must be selectable too, without an earlier default choice.
+      await choices.first().check();
+      assert.equal(await page.locator('form.request button').isEnabled(), true);
+      assert.deepEqual(await page.locator('form.request input[type=range]').evaluateAll(inputs => inputs.map(input => Number(input.value))), [1, ...Array(await choices.count() - 1).fill(0)]);
+    }
     for (const slider of await page.locator('form.request input[type=range]').all()) {
       await slider.focus();
       await page.keyboard.press('ArrowRight');
+    }
+    if (await choices.count()) {
+      const percentages = await page.locator('form.request output').allTextContents();
+      const total = percentages.reduce((sum, text) => sum + parseFloat(text), 0);
+      assert.ok(Math.abs(total - 100) < 0.2);
+      assert.ok(parseFloat(percentages[1]) > 0);
     }
     // Span several timer ticks between press and release. Replacing button text
     // here used to suppress WebKit's click event, leaving the form on screen.
@@ -40,6 +56,7 @@ try {
   await page.locator('#compare').uncheck();
   await page.locator('#auto').check();
   await page.locator('#auto').uncheck();
+  if (await page.locator('form.request input[type=radio]').count()) await page.locator('form.request input[type=radio]').first().check();
   await page.locator('form.request button').click({ delay: 350 });
   await page.locator('form.request').waitFor({ state: 'detached', timeout: 1500 });
   assert.match(await page.locator('#history .result').first().textContent(), /Answered · comparison off/);
@@ -48,6 +65,7 @@ try {
   });
   await page.locator('form.request').waitFor();
   assert.equal((await response).status, 504);
+  if (await page.locator('form.request input[type=radio]').count()) await page.locator('form.request input[type=radio]').first().check();
   await page.locator('form.request button').click({ delay: 350 });
   await page.locator('form.request').waitFor({ state: 'detached', timeout: 1500 });
   assert.equal(await page.locator('#history .result').count(), Math.min(examples.length + 1, 20) + 1);
