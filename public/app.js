@@ -175,7 +175,7 @@ function resultCard(result) {
   const card = node('article', undefined, 'result');
   const head = node('div', undefined, 'result-head');
   const heading = node('div'); heading.append(node('h2', result.title), node('p', result.late ? `Answered after timeout · ${result.status}` : result.status)); head.append(heading);
-  if (result.source) { const link = node('a', 'Doc example', 'source'); link.href = result.source; link.target = '_blank'; link.rel = 'noreferrer'; head.append(link); }
+  if (result.source) { const link = node('a', 'Example source', 'source'); link.href = result.source; link.target = '_blank'; link.rel = 'noreferrer'; head.append(link); }
   card.append(head);
   const details = node('details'); details.append(node('summary', 'State & questions'), node('pre', text({ state: result.request.state, questions: result.request.questions }))); card.append(details);
   if (!result.human) return card;
