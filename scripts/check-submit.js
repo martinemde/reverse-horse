@@ -23,11 +23,14 @@ try {
   assert.equal(await page.locator('#compare').isChecked(), true);
   const active = page.locator('form.request:not(.answered)');
   const setRange = (input, value) => input.evaluate((el, value) => { el.value = String(value); el.dispatchEvent(new Event('input', { bubbles: true })); }, value);
-  await page.locator('#auto').check();
+  assert.equal(await page.locator('#play').getAttribute('aria-pressed'), 'true');
   for (let i = 0; i < examples.length; i++) {
     await active.waitFor();
+    const cardTop = await active.evaluate(el => el.getBoundingClientRect().top);
+    const headerBottom = await page.locator('header').evaluate(el => el.getBoundingClientRect().bottom);
+    assert.ok(Math.abs(cardTop - headerBottom - 16) < 2, `New question scrolls beneath the fixed navigation: ${JSON.stringify({ cardTop, headerBottom, scroll: await page.evaluate(() => ({y: scrollY, height: innerHeight, total: document.documentElement.scrollHeight})) })}`);
     assert.equal(await active.getAttribute('data-id'), await page.locator('#requests > form').first().getAttribute('data-id'));
-    await page.locator('#auto').uncheck();
+    await page.getByRole('button', { name: 'Pause practice', exact: true }).click();
     assert.equal(await active.locator('fieldset.question').count(), 1);
     assert.equal(await active.locator('h2').count(), 0);
     const state = await active.locator('.state pre').textContent();
@@ -78,13 +81,16 @@ try {
     assert.equal(await card.locator('input:enabled').count(), 0);
     assert.equal(await page.locator('#history').count(), 0);
     if (i < 3) await page.screenshot({ path: `/tmp/meat-jev-inline-${i}.png` });
-    if (i + 1 < examples.length) await page.locator('#auto').check();
+    if (i + 1 < examples.length) await page.getByRole('button', { name: 'Play practice', exact: true }).click();
   }
   assert.equal(new Set(dealt).size, examples.length);
+  await page.waitForTimeout(4200);
+  assert.equal(await active.count(), 0, 'Paused practice does not deal another question');
+  assert.equal(await page.locator('header').evaluate(el => el.getBoundingClientRect().top), 0);
   // A second deck must not immediately repeat the last question.
   await page.locator('#compare').uncheck();
-  await page.locator('#auto').check();
-  await page.locator('#auto').uncheck();
+  await page.getByRole('button', { name: 'Play practice', exact: true }).click();
+  await page.getByRole('button', { name: 'Pause practice', exact: true }).click();
   const nextState = await active.locator('.state pre').textContent(), nextId = await active.locator('fieldset').getAttribute('data-question');
   const next = recordings.find(run => run.request.state === nextState && Object.hasOwn(run.request.questions, nextId));
   assert.notEqual(JSON.stringify(next.request), dealt.at(-1));
@@ -114,7 +120,7 @@ try {
   peer.send(JSON.stringify({ type: 'comparison', id: requestId, jev: run.jev }));
   await page.waitForFunction(el => !el.querySelector('.jev-marker').hidden, live);
   assert.equal(await live.evaluate(el => el.isConnected), true);
-  assert.match(await live.textContent(), /Answered after timeout/);
+  assert.equal(await live.$eval('.actions p', el => el.textContent), '');
   peer.close();
   await page.reload();
   await page.waitForFunction(() => document.querySelector('form.answered .jev-marker:not([hidden])'));

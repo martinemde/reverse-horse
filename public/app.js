@@ -23,8 +23,8 @@ let savedExamples = [];
 function savedExample(request) {
   return savedExamples.find(run => JSON.stringify(run.request) === JSON.stringify(request));
 }
-let auto = false;
-let autoTimer;
+let playing = true;
+let practiceTimer;
 let exampleDeck = [];
 let lastExample;
 function nextExample() {
@@ -43,14 +43,14 @@ function nextExample() {
   return lastExample;
 }
 function dealPractice() {
-  if (!auto || practice || serverQueue.requests.length || comparisons.size) return;
+  if (!playing || practice || serverQueue.requests.length || comparisons.size) return;
   const example = nextExample();
   practice = { ...example, id: crypto.randomUUID(), local: true, deadline: Date.now() + 30_000 };
   render();
 }
 function schedulePractice() {
-  clearTimeout(autoTimer);
-  if (auto && !practice && !serverQueue.requests.length && !comparisons.size) autoTimer = setTimeout(dealPractice, 4000);
+  clearTimeout(practiceTimer);
+  if (playing && !practice && !serverQueue.requests.length && !comparisons.size) practiceTimer = setTimeout(dealPractice, 4000);
 }
 function submitPractice(item, values, compare) {
   const human = answerRequest(item.request, values);
@@ -64,9 +64,9 @@ function submitPractice(item, values, compare) {
   if (compare && !saved) void compareInBrowser(item);
   else schedulePractice();
 }
-function emptyState(auto) {
+function emptyState(playing) {
   const empty = node('div', undefined, 'empty');
-  empty.append(node('div', '?', 'waiting-mark'), node('h2', 'No questions yet'), node('p', auto ? 'Next example coming up…' : 'Waiting for a request, or turn on auto mode.'));
+  empty.append(node('div', '?', 'waiting-mark'), node('h2', 'No questions yet'), node('p', playing ? 'Next example coming up…' : 'Press play to answer questions. Live requests are always welcome.'));
   return empty;
 }
 function send(message) { if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message)); }
@@ -164,7 +164,6 @@ function makeForm(item) {
         if (q.criteria[key] !== null) option.append(node('p', text(q.criteria[key])));
         option.append(scale.wrapper); field.append(option);
       }
-      field.append(node('p', 'Pick an option, then adjust the sliders to share the probability.'));
       Object.assign(view, { controls, refresh });
       queueMicrotask(refresh);
     } else {
@@ -195,14 +194,12 @@ function makeForm(item) {
   }
   const actions = node('div', undefined, 'actions');
   const button = node('button', 'Submit answers'); button.type = 'submit';
-  const hint = node('p', 'Your answers go back to the caller. JEV comparison is optional.');
+  const hint = node('p', '');
   actions.append(hint, button); card.append(head, state, questions, actions);
   function validity() {
     if (completed) return;
     const invalidChoice = Object.values(values).some(v => typeof v === 'object' && !Object.values(v).some(n => n > 0));
-    const late = Date.now() + (item.local ? 0 : offset) >= item.deadline;
     // Keep the button DOM stable: WebKit drops clicks if its text changes mid-press.
-    hint.textContent = invalidChoice ? 'Choose an option or raise at least one slider to submit.' : item.local ? 'Practice stays in this browser. You can answer after the timer ends.' : late ? 'The deadline passed. You can still save your answers and compare with JEV; the API caller already timed out.' : 'Your answers go back to the caller. JEV comparison is optional.';
     button.disabled = submitting || (!item.local && socket?.readyState !== WebSocket.OPEN) || invalidChoice;
   }
   card.addEventListener('submit', event => {
@@ -238,7 +235,7 @@ function makeForm(item) {
         }
       }
     }
-    hint.textContent = `${result.late ? 'Answered after timeout · ' : ''}${result.status}${result.jev ? ' · Pink marks JEV.' : ''}`;
+    hint.textContent = result.jev ? '' : result.status;
     for (const [id, view] of views) {
       const human = result.human?.answers[id];
       const jev = result.jev?.answers[id];
@@ -270,6 +267,7 @@ function render() {
   current = [...serverQueue.requests, ...(practice ? [practice] : [])];
   const results = [...practiceResults, ...serverQueue.results];
   const ids = new Set([...current, ...results].map(item => item.id));
+  const newQuestion = current.findLast(item => !forms.has(item.id));
   const newCards = [...current, ...results].some(item => !forms.has(item.id));
   // Trimming old history during submission moves the card the user just answered.
   for (const [id, form] of forms) if (!ids.has(id) && (newCards || !form.card.classList.contains('answered'))) { form.card.remove(); forms.delete(id); }
@@ -281,9 +279,14 @@ function render() {
     }
     for (const result of results) forms.get(result.id).finish(result);
   } else if (!$('#requests .empty')) {
-    $('#requests').append(emptyState(auto));
-  } else $('#requests .empty p').textContent = auto ? 'Next example coming up…' : 'Waiting for a request, or turn on auto mode.';
+    $('#requests').append(emptyState(playing));
+  } else $('#requests .empty p').textContent = playing ? 'Next example coming up…' : 'Press play to answer questions. Live requests are always welcome.';
   tick();
+  if (newQuestion) {
+    const card = forms.get(newQuestion.id).card;
+    const top = card.getBoundingClientRect().top + window.scrollY - $('header').getBoundingClientRect().height - 16;
+    window.scrollTo({ top, behavior: 'instant' });
+  }
 }
 function tick() { for (const item of current) { const form = forms.get(item.id); const seconds = Math.max(0, (item.deadline - Date.now() - (item.local ? 0 : offset)) / 1000); form.clock.textContent = seconds > 0 ? `${seconds.toFixed(1)}s` : 'Timed out'; form.clock.classList.toggle('urgent', seconds < 10); form.validity(); } }
 async function compareInBrowser(message) {
@@ -308,7 +311,17 @@ function connect() {
   socket.addEventListener('close', () => { for (const [id, controller] of comparisons) if (!practiceResults.some(result => result.id === id)) controller.abort(); $('#connection').textContent = 'Disconnected · reconnecting…'; tick(); setTimeout(connect, 1000); });
   socket.addEventListener('message', event => { const message = JSON.parse(event.data); if (message.type === 'queue') update(message); if (message.type === 'compare') void compareInBrowser(message); if (message.type === 'error') { showError(message.message); for (const form of forms.values()) form.reset(); } });
 }
-$('#auto').addEventListener('change', event => { auto = event.target.checked; clearTimeout(autoTimer); if (auto) dealPractice(); render(); schedulePractice(); });
+$('#play').addEventListener('click', () => {
+  playing = !playing;
+  $('#play').setAttribute('aria-pressed', String(playing));
+  $('#play').setAttribute('aria-label', playing ? 'Pause practice' : 'Play practice');
+  $('#play-icon').textContent = playing ? 'Ⅱ' : '▶';
+  $('#play-label').textContent = playing ? 'Pause' : 'Play';
+  clearTimeout(practiceTimer);
+  if (playing) dealPractice();
+  render();
+  schedulePractice();
+});
 $('#auth').addEventListener('click', async () => {
   $('#auth').disabled = true;
   try {
@@ -343,6 +356,7 @@ async function initialize() {
   } catch { showError('Saved JEV answers could not be loaded. Refresh to try again.'); }
   try { refreshAuth(); } catch { showError('Browser storage is unavailable. Allow site storage to connect OpenRouter.'); }
   connect();
+  dealPractice();
 }
 setInterval(tick, 100);
 setInterval(() => send({ type: 'ping' }), 20_000);

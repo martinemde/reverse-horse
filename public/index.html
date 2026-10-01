@@ -9,12 +9,12 @@
   <script type="module" src="/app.js"></script>
 </head>
 <body>
-  <header><a class="brand" href="/">Meat Jev<span> HUMAN INFERENCE</span></a><nav aria-label="Main"><a href="/" aria-current="page">Answer</a><a href="/request">Make a request</a></nav><span id="connection" role="status">Connecting…</span></header>
+  <header class="player-header"><a class="brand" href="/">Meat Jev<span> HUMAN INFERENCE</span></a><nav aria-label="Main"><a href="/" aria-current="page">Answer</a><a href="/request">Make a request</a></nav><div class="player-controls"><span id="connection" role="status">Connecting…</span><button id="play" type="button" aria-label="Pause practice" aria-pressed="true"><span id="play-icon" aria-hidden="true">Ⅱ</span> <span id="play-label">Pause</span></button></div></header>
   <main>
-    <div class="toolbar"><div><h1>You are the model.</h1><p>Read the state. Make the call.</p></div><label class="auto"><input id="auto" type="checkbox"> Auto mode <small>Deal me examples</small></label></div>
+    <div class="toolbar"><div><h1>You are the model.</h1><p>Read the state. Make the call.</p></div></div>
     <div class="auth-bar"><p id="auth-status" role="status">Connect your OpenRouter account to compare with JEV.</p><label class="compare-toggle"><input id="compare" type="checkbox" disabled> Compare with JEV</label><button id="auth" type="button" class="secondary">Connect OpenRouter</button></div>
     <p id="error" role="alert" hidden></p>
-    <section id="requests" aria-label="Requests and answers"><div class="empty"><div class="waiting-mark">?</div><h2>No questions yet</h2><p>Waiting for a request, or turn on auto mode.</p></div></section>
+    <section id="requests" aria-label="Requests and answers"><div class="empty"><div class="waiting-mark">?</div><h2>No questions yet</h2><p>Press play to answer questions. Live requests are always welcome.</p></div></section>
   </main>
   <footer>Meat Jev <span>30 seconds. One human. Your judgment.</span></footer>
 </body>
