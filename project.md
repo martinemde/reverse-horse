@@ -36,9 +36,9 @@ controls and shows its request JSON, human response, and actual recorded JEV
 response. Training does not submit to the shared queue or call OpenRouter.
 Practice pauses while training is open; exiting restores the previous play state.
 Live requests still arrive and keep their original deadlines.
-**Exit training** and Escape return to the site from any step. Only **Enter the
-site** on the certification step saves `reverse-horse.training-completed = 1`
-in local storage. To verify first-visit behavior again, remove that key and reload.
+**Exit training** and Escape return to the site from any step. Leaving training
+any way, including **Enter the site**, saves `reverse-horse.training-completed = 1`
+in local storage, so it auto-opens only once. To verify first-visit behavior again, remove that key and reload.
 **Training** in the navigation reopens the course without clearing certification.
 Blocked storage permits training but cannot remember completion.
 

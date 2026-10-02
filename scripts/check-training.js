@@ -117,7 +117,7 @@ try {
     assert.equal(await page.getByRole('button', { name: 'Play practice', exact: true }).isVisible(), true, 'Replay preserves Pause');
     await context.close();
   }
-  // Leaving any stage is allowed, but does not claim the course was completed.
+  // Leaving any stage also saves completion, so training never reopens on its own.
   for (let exitStep = 0; exitStep <= 4; exitStep++) {
     const { context, page } = await pageFor({ width: 390, height: 844 });
     const dialog = page.getByRole('dialog');
@@ -133,7 +133,7 @@ try {
     await page.locator('#requests form').waitFor();
     assert.equal(await dialog.isVisible(), false);
     await page.reload();
-    assert.equal(await dialog.isVisible(), true, 'Exit does not save completion');
+    assert.equal(await dialog.isVisible(), false, 'Exit saves completion');
     await context.close();
   }
   const { context, page } = await pageFor({ width: 390, height: 844 }, () => {

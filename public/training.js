@@ -77,12 +77,11 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
     },
     refresh() { if (dialog.open) render(); },
   };
+  // Any exit counts: training opens once on a first visit and never nags again.
   function close(completed = false) {
     let error;
-    if (completed) {
-      try { localStorage.setItem(completionKey, '1'); }
-      catch { error = 'Training complete, but browser storage could not save your certificate. Training will appear again on your next visit.'; }
-    }
+    try { localStorage.setItem(completionKey, '1'); }
+    catch { if (completed) error = 'Training complete, but browser storage could not save your certificate. Training will appear again on your next visit.'; }
     dialog.close();
     document.body.classList.remove('in-training');
     onClose(error);
