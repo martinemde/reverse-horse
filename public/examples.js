@@ -99,6 +99,27 @@ const pokemonGym = (leader, place) => ({
   title: `${leader}'s gym · Pokémon`, source: pokemonSource,
   request: { model: 'jev-latest', state: `You are about to enter the ${place} gym to face ${leader}.`, questions: { starter } },
 });
+// Credit card statements: price questions offer every amount in the email, date questions
+// offer every date in the email, so the distractors come from the email itself.
+const options = labels => Object.fromEntries(labels.map(label => [label, null]));
+const cardStatement = (title, state, prices, dates) => ({
+  title, source: emailSource,
+  request: { model: 'jev-latest', state, questions: {
+    statement_amount: { type: 'choice', instructions: 'What is the statement amount?', criteria: options([...prices, 'Unknown']) },
+    due_date: { type: 'choice', instructions: 'What is the payment due date?', criteria: options([...dates, 'Unknown', 'Not specified']) },
+    minimum_payment: { type: 'choice', instructions: 'What is the minimum payment amount?', criteria: options([...prices, 'Unknown']) },
+  } },
+});
+const cardStatements = [
+  cardStatement('Card statement · everything listed', 'From: Northwind Card\nSubject: Your September statement is ready\nStatement date: September 28, 2026\nStatement balance: $1,248.30\nMinimum payment: $35.00\nPayment due: October 25, 2026', ['$35.00', '$1,248.30'], ['September 28, 2026', 'October 25, 2026']),
+  cardStatement('Card statement · no minimum shown', 'From: Northwind Card\nSubject: Your September statement is ready\nStatement date: September 28, 2026\nStatement balance: $1,248.30\nPayment due: October 25, 2026\nLog in to see your minimum payment.', ['$1,248.30'], ['September 28, 2026', 'October 25, 2026']),
+  cardStatement('Card statement · no due date', 'From: Northwind Card\nSubject: Your September statement is ready\nStatement date: September 28, 2026\nStatement balance: $1,248.30\nMinimum payment: $35.00\nPay by the due date shown in your account to avoid a late fee.', ['$35.00', '$1,248.30'], ['September 28, 2026']),
+  cardStatement('Card statement · autopay', 'From: Northwind Card\nSubject: Your September statement is ready\nStatement date: September 28, 2026\nStatement balance: $1,248.30\nAutopay will draft your minimum payment of $35.00 on October 25, 2026. No action is needed.', ['$35.00', '$1,248.30'], ['September 28, 2026', 'October 25, 2026']),
+  cardStatement('Card statement · busy summary', 'From: Harbor Rewards Card\nSubject: Statement summary\nClosing date: September 20, 2026\nPrevious balance: $640.00\nPayments: -$640.00\nPurchases: $1,290.00\nInterest charged: $22.45\nNew balance: $1,312.45\nMinimum payment due: $40.00\nDue date: October 17, 2026\nCredit limit: $5,000.00', ['$22.45', '$40.00', '$640.00', '$1,290.00', '$1,312.45', '$5,000.00'], ['September 20, 2026', 'October 17, 2026']),
+  cardStatement('Card statement · small balance', 'From: Harbor Rewards Card\nSubject: Statement summary\nClosing date: September 20, 2026\nNew balance: $18.75\nMinimum payment due: $18.75\nDue date: October 17, 2026', ['$18.75'], ['September 20, 2026', 'October 17, 2026']),
+  cardStatement('Card statement · nothing owed', 'From: Harbor Rewards Card\nSubject: Statement summary\nClosing date: September 20, 2026\nNew balance: $0.00\nMinimum payment due: $0.00\nNo payment is due this month.', ['$0.00'], ['September 20, 2026']),
+  cardStatement('Card statement · written out', 'From: Cedar Bank Visa\nSubject: Your statement\nHi Alex, your Visa statement dated 10/01/2026 shows a balance of $486.20. Pay at least $25.00 by 10/26/2026 to keep your account in good standing.', ['$25.00', '$486.20'], ['10/01/2026', '10/26/2026']),
+];
 const scenarios = [
   {
     title: 'The broken integration', source: 'https://docs.typesafe.ai/introduction/quickstart',
@@ -172,6 +193,7 @@ const scenarios = [
     } },
   },
   ...etiquetteScenarios,
+  ...cardStatements,
   {
     title: 'Another castle · Mario', source: 'https://mario.nintendo.com/',
     request: { model: 'jev-latest', state: 'Mario reaches the end of the castle. Toad tells him the princess is somewhere else.', questions: {

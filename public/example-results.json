@@ -2872,6 +2872,838 @@
     }
   },
   {
+    "title": "Card statement · everything listed",
+    "recordedAt": "2026-10-02T04:42:32.427Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Northwind Card\nSubject: Your September statement is ready\nStatement date: September 28, 2026\nStatement balance: $1,248.30\nMinimum payment: $35.00\nPayment due: October 25, 2026",
+      "questions": {
+        "statement_amount": {
+          "type": "choice",
+          "instructions": "What is the statement amount?",
+          "criteria": {
+            "$35.00": null,
+            "$1,248.30": null,
+            "Unknown": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "statement_amount": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "$35.00": 0,
+            "$1,248.30": 1,
+            "Unknown": 0
+          },
+          "choice": "$1,248.30"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · everything listed",
+    "recordedAt": "2026-10-02T04:42:32.594Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Northwind Card\nSubject: Your September statement is ready\nStatement date: September 28, 2026\nStatement balance: $1,248.30\nMinimum payment: $35.00\nPayment due: October 25, 2026",
+      "questions": {
+        "due_date": {
+          "type": "choice",
+          "instructions": "What is the payment due date?",
+          "criteria": {
+            "September 28, 2026": null,
+            "October 25, 2026": null,
+            "Unknown": null,
+            "Not specified": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "due_date": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "September 28, 2026": 0,
+            "October 25, 2026": 1,
+            "Unknown": 0,
+            "Not specified": 0
+          },
+          "choice": "October 25, 2026"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · everything listed",
+    "recordedAt": "2026-10-02T04:42:32.807Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Northwind Card\nSubject: Your September statement is ready\nStatement date: September 28, 2026\nStatement balance: $1,248.30\nMinimum payment: $35.00\nPayment due: October 25, 2026",
+      "questions": {
+        "minimum_payment": {
+          "type": "choice",
+          "instructions": "What is the minimum payment amount?",
+          "criteria": {
+            "$35.00": null,
+            "$1,248.30": null,
+            "Unknown": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "minimum_payment": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "$35.00": 1,
+            "$1,248.30": 0,
+            "Unknown": 0
+          },
+          "choice": "$35.00"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · no minimum shown",
+    "recordedAt": "2026-10-02T04:42:33.116Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Northwind Card\nSubject: Your September statement is ready\nStatement date: September 28, 2026\nStatement balance: $1,248.30\nPayment due: October 25, 2026\nLog in to see your minimum payment.",
+      "questions": {
+        "statement_amount": {
+          "type": "choice",
+          "instructions": "What is the statement amount?",
+          "criteria": {
+            "$1,248.30": null,
+            "Unknown": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "statement_amount": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "$1,248.30": 1,
+            "Unknown": 0
+          },
+          "choice": "$1,248.30"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · no minimum shown",
+    "recordedAt": "2026-10-02T04:42:33.290Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Northwind Card\nSubject: Your September statement is ready\nStatement date: September 28, 2026\nStatement balance: $1,248.30\nPayment due: October 25, 2026\nLog in to see your minimum payment.",
+      "questions": {
+        "due_date": {
+          "type": "choice",
+          "instructions": "What is the payment due date?",
+          "criteria": {
+            "September 28, 2026": null,
+            "October 25, 2026": null,
+            "Unknown": null,
+            "Not specified": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "due_date": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "September 28, 2026": 0,
+            "October 25, 2026": 1,
+            "Unknown": 0,
+            "Not specified": 0
+          },
+          "choice": "October 25, 2026"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · no minimum shown",
+    "recordedAt": "2026-10-02T04:42:33.478Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Northwind Card\nSubject: Your September statement is ready\nStatement date: September 28, 2026\nStatement balance: $1,248.30\nPayment due: October 25, 2026\nLog in to see your minimum payment.",
+      "questions": {
+        "minimum_payment": {
+          "type": "choice",
+          "instructions": "What is the minimum payment amount?",
+          "criteria": {
+            "$1,248.30": null,
+            "Unknown": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "minimum_payment": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "$1,248.30": 0,
+            "Unknown": 1
+          },
+          "choice": "Unknown"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · no due date",
+    "recordedAt": "2026-10-02T04:42:33.645Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Northwind Card\nSubject: Your September statement is ready\nStatement date: September 28, 2026\nStatement balance: $1,248.30\nMinimum payment: $35.00\nPay by the due date shown in your account to avoid a late fee.",
+      "questions": {
+        "statement_amount": {
+          "type": "choice",
+          "instructions": "What is the statement amount?",
+          "criteria": {
+            "$35.00": null,
+            "$1,248.30": null,
+            "Unknown": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "statement_amount": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "$35.00": 0,
+            "$1,248.30": 1,
+            "Unknown": 0
+          },
+          "choice": "$1,248.30"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · no due date",
+    "recordedAt": "2026-10-02T04:42:33.818Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Northwind Card\nSubject: Your September statement is ready\nStatement date: September 28, 2026\nStatement balance: $1,248.30\nMinimum payment: $35.00\nPay by the due date shown in your account to avoid a late fee.",
+      "questions": {
+        "due_date": {
+          "type": "choice",
+          "instructions": "What is the payment due date?",
+          "criteria": {
+            "September 28, 2026": null,
+            "Unknown": null,
+            "Not specified": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "due_date": {
+          "type": "choice",
+          "confidence": 0.65,
+          "probabilities": {
+            "September 28, 2026": 0.01,
+            "Unknown": 0.22,
+            "Not specified": 0.77
+          },
+          "choice": "Not specified"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · no due date",
+    "recordedAt": "2026-10-02T04:42:34.165Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Northwind Card\nSubject: Your September statement is ready\nStatement date: September 28, 2026\nStatement balance: $1,248.30\nMinimum payment: $35.00\nPay by the due date shown in your account to avoid a late fee.",
+      "questions": {
+        "minimum_payment": {
+          "type": "choice",
+          "instructions": "What is the minimum payment amount?",
+          "criteria": {
+            "$35.00": null,
+            "$1,248.30": null,
+            "Unknown": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "minimum_payment": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "$35.00": 1,
+            "$1,248.30": 0,
+            "Unknown": 0
+          },
+          "choice": "$35.00"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · autopay",
+    "recordedAt": "2026-10-02T04:42:34.333Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Northwind Card\nSubject: Your September statement is ready\nStatement date: September 28, 2026\nStatement balance: $1,248.30\nAutopay will draft your minimum payment of $35.00 on October 25, 2026. No action is needed.",
+      "questions": {
+        "statement_amount": {
+          "type": "choice",
+          "instructions": "What is the statement amount?",
+          "criteria": {
+            "$35.00": null,
+            "$1,248.30": null,
+            "Unknown": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "statement_amount": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "$35.00": 0,
+            "$1,248.30": 1,
+            "Unknown": 0
+          },
+          "choice": "$1,248.30"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · autopay",
+    "recordedAt": "2026-10-02T04:42:34.537Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Northwind Card\nSubject: Your September statement is ready\nStatement date: September 28, 2026\nStatement balance: $1,248.30\nAutopay will draft your minimum payment of $35.00 on October 25, 2026. No action is needed.",
+      "questions": {
+        "due_date": {
+          "type": "choice",
+          "instructions": "What is the payment due date?",
+          "criteria": {
+            "September 28, 2026": null,
+            "October 25, 2026": null,
+            "Unknown": null,
+            "Not specified": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "due_date": {
+          "type": "choice",
+          "confidence": 0.9,
+          "probabilities": {
+            "September 28, 2026": 0,
+            "October 25, 2026": 0.93,
+            "Unknown": 0.02,
+            "Not specified": 0.05
+          },
+          "choice": "October 25, 2026"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · autopay",
+    "recordedAt": "2026-10-02T04:42:34.857Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Northwind Card\nSubject: Your September statement is ready\nStatement date: September 28, 2026\nStatement balance: $1,248.30\nAutopay will draft your minimum payment of $35.00 on October 25, 2026. No action is needed.",
+      "questions": {
+        "minimum_payment": {
+          "type": "choice",
+          "instructions": "What is the minimum payment amount?",
+          "criteria": {
+            "$35.00": null,
+            "$1,248.30": null,
+            "Unknown": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "minimum_payment": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "$35.00": 1,
+            "$1,248.30": 0,
+            "Unknown": 0
+          },
+          "choice": "$35.00"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · busy summary",
+    "recordedAt": "2026-10-02T04:42:35.045Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Harbor Rewards Card\nSubject: Statement summary\nClosing date: September 20, 2026\nPrevious balance: $640.00\nPayments: -$640.00\nPurchases: $1,290.00\nInterest charged: $22.45\nNew balance: $1,312.45\nMinimum payment due: $40.00\nDue date: October 17, 2026\nCredit limit: $5,000.00",
+      "questions": {
+        "statement_amount": {
+          "type": "choice",
+          "instructions": "What is the statement amount?",
+          "criteria": {
+            "$22.45": null,
+            "$40.00": null,
+            "$640.00": null,
+            "$1,290.00": null,
+            "$1,312.45": null,
+            "$5,000.00": null,
+            "Unknown": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "statement_amount": {
+          "type": "choice",
+          "confidence": 0.89,
+          "probabilities": {
+            "$22.45": 0.01,
+            "$40.00": 0.02,
+            "$640.00": 0.01,
+            "$1,290.00": 0.03,
+            "$1,312.45": 0.91,
+            "$5,000.00": 0,
+            "Unknown": 0.02
+          },
+          "choice": "$1,312.45"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · busy summary",
+    "recordedAt": "2026-10-02T04:42:35.236Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Harbor Rewards Card\nSubject: Statement summary\nClosing date: September 20, 2026\nPrevious balance: $640.00\nPayments: -$640.00\nPurchases: $1,290.00\nInterest charged: $22.45\nNew balance: $1,312.45\nMinimum payment due: $40.00\nDue date: October 17, 2026\nCredit limit: $5,000.00",
+      "questions": {
+        "due_date": {
+          "type": "choice",
+          "instructions": "What is the payment due date?",
+          "criteria": {
+            "September 20, 2026": null,
+            "October 17, 2026": null,
+            "Unknown": null,
+            "Not specified": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "due_date": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "September 20, 2026": 0,
+            "October 17, 2026": 1,
+            "Unknown": 0,
+            "Not specified": 0
+          },
+          "choice": "October 17, 2026"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · busy summary",
+    "recordedAt": "2026-10-02T04:42:35.479Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Harbor Rewards Card\nSubject: Statement summary\nClosing date: September 20, 2026\nPrevious balance: $640.00\nPayments: -$640.00\nPurchases: $1,290.00\nInterest charged: $22.45\nNew balance: $1,312.45\nMinimum payment due: $40.00\nDue date: October 17, 2026\nCredit limit: $5,000.00",
+      "questions": {
+        "minimum_payment": {
+          "type": "choice",
+          "instructions": "What is the minimum payment amount?",
+          "criteria": {
+            "$22.45": null,
+            "$40.00": null,
+            "$640.00": null,
+            "$1,290.00": null,
+            "$1,312.45": null,
+            "$5,000.00": null,
+            "Unknown": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "minimum_payment": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "$22.45": 0,
+            "$40.00": 1,
+            "$640.00": 0,
+            "$1,290.00": 0,
+            "$1,312.45": 0,
+            "$5,000.00": 0,
+            "Unknown": 0
+          },
+          "choice": "$40.00"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · small balance",
+    "recordedAt": "2026-10-02T04:42:35.737Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Harbor Rewards Card\nSubject: Statement summary\nClosing date: September 20, 2026\nNew balance: $18.75\nMinimum payment due: $18.75\nDue date: October 17, 2026",
+      "questions": {
+        "statement_amount": {
+          "type": "choice",
+          "instructions": "What is the statement amount?",
+          "criteria": {
+            "$18.75": null,
+            "Unknown": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "statement_amount": {
+          "type": "choice",
+          "confidence": 0.99,
+          "probabilities": {
+            "$18.75": 1,
+            "Unknown": 0
+          },
+          "choice": "$18.75"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · small balance",
+    "recordedAt": "2026-10-02T04:42:35.935Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Harbor Rewards Card\nSubject: Statement summary\nClosing date: September 20, 2026\nNew balance: $18.75\nMinimum payment due: $18.75\nDue date: October 17, 2026",
+      "questions": {
+        "due_date": {
+          "type": "choice",
+          "instructions": "What is the payment due date?",
+          "criteria": {
+            "September 20, 2026": null,
+            "October 17, 2026": null,
+            "Unknown": null,
+            "Not specified": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "due_date": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "September 20, 2026": 0,
+            "October 17, 2026": 1,
+            "Unknown": 0,
+            "Not specified": 0
+          },
+          "choice": "October 17, 2026"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · small balance",
+    "recordedAt": "2026-10-02T04:42:36.261Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Harbor Rewards Card\nSubject: Statement summary\nClosing date: September 20, 2026\nNew balance: $18.75\nMinimum payment due: $18.75\nDue date: October 17, 2026",
+      "questions": {
+        "minimum_payment": {
+          "type": "choice",
+          "instructions": "What is the minimum payment amount?",
+          "criteria": {
+            "$18.75": null,
+            "Unknown": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "minimum_payment": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "$18.75": 1,
+            "Unknown": 0
+          },
+          "choice": "$18.75"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · nothing owed",
+    "recordedAt": "2026-10-02T04:42:36.478Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Harbor Rewards Card\nSubject: Statement summary\nClosing date: September 20, 2026\nNew balance: $0.00\nMinimum payment due: $0.00\nNo payment is due this month.",
+      "questions": {
+        "statement_amount": {
+          "type": "choice",
+          "instructions": "What is the statement amount?",
+          "criteria": {
+            "$0.00": null,
+            "Unknown": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "statement_amount": {
+          "type": "choice",
+          "confidence": 0.99,
+          "probabilities": {
+            "$0.00": 0.99,
+            "Unknown": 0.01
+          },
+          "choice": "$0.00"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · nothing owed",
+    "recordedAt": "2026-10-02T04:42:36.788Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Harbor Rewards Card\nSubject: Statement summary\nClosing date: September 20, 2026\nNew balance: $0.00\nMinimum payment due: $0.00\nNo payment is due this month.",
+      "questions": {
+        "due_date": {
+          "type": "choice",
+          "instructions": "What is the payment due date?",
+          "criteria": {
+            "September 20, 2026": null,
+            "Unknown": null,
+            "Not specified": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "due_date": {
+          "type": "choice",
+          "confidence": 0.69,
+          "probabilities": {
+            "September 20, 2026": 0.06,
+            "Unknown": 0.15,
+            "Not specified": 0.79
+          },
+          "choice": "Not specified"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · nothing owed",
+    "recordedAt": "2026-10-02T04:42:36.964Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Harbor Rewards Card\nSubject: Statement summary\nClosing date: September 20, 2026\nNew balance: $0.00\nMinimum payment due: $0.00\nNo payment is due this month.",
+      "questions": {
+        "minimum_payment": {
+          "type": "choice",
+          "instructions": "What is the minimum payment amount?",
+          "criteria": {
+            "$0.00": null,
+            "Unknown": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "minimum_payment": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "$0.00": 1,
+            "Unknown": 0
+          },
+          "choice": "$0.00"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · written out",
+    "recordedAt": "2026-10-02T04:42:37.147Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Cedar Bank Visa\nSubject: Your statement\nHi Alex, your Visa statement dated 10/01/2026 shows a balance of $486.20. Pay at least $25.00 by 10/26/2026 to keep your account in good standing.",
+      "questions": {
+        "statement_amount": {
+          "type": "choice",
+          "instructions": "What is the statement amount?",
+          "criteria": {
+            "$25.00": null,
+            "$486.20": null,
+            "Unknown": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "statement_amount": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "$25.00": 0,
+            "$486.20": 1,
+            "Unknown": 0
+          },
+          "choice": "$486.20"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · written out",
+    "recordedAt": "2026-10-02T04:42:37.315Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Cedar Bank Visa\nSubject: Your statement\nHi Alex, your Visa statement dated 10/01/2026 shows a balance of $486.20. Pay at least $25.00 by 10/26/2026 to keep your account in good standing.",
+      "questions": {
+        "due_date": {
+          "type": "choice",
+          "instructions": "What is the payment due date?",
+          "criteria": {
+            "10/01/2026": null,
+            "10/26/2026": null,
+            "Unknown": null,
+            "Not specified": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "due_date": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "10/01/2026": 0,
+            "10/26/2026": 1,
+            "Unknown": 0,
+            "Not specified": 0
+          },
+          "choice": "10/26/2026"
+        }
+      }
+    }
+  },
+  {
+    "title": "Card statement · written out",
+    "recordedAt": "2026-10-02T04:42:37.491Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Cedar Bank Visa\nSubject: Your statement\nHi Alex, your Visa statement dated 10/01/2026 shows a balance of $486.20. Pay at least $25.00 by 10/26/2026 to keep your account in good standing.",
+      "questions": {
+        "minimum_payment": {
+          "type": "choice",
+          "instructions": "What is the minimum payment amount?",
+          "criteria": {
+            "$25.00": null,
+            "$486.20": null,
+            "Unknown": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "minimum_payment": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "$25.00": 1,
+            "$486.20": 0,
+            "Unknown": 0
+          },
+          "choice": "$25.00"
+        }
+      }
+    }
+  },
+  {
     "title": "Another castle · Mario",
     "recordedAt": "2026-10-02T04:38:42.426Z",
     "request": {
