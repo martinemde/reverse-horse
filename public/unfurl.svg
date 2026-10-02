@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#131718"/>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <image href="horse-human.svg" x="64" y="53" width="42" height="42"/>
+    <text x="120" y="85" fill="#f2f4ef" font-size="32" font-weight="700" letter-spacing="-1">reverse.horse</text>
+    <path d="M64 126H1136" stroke="#343e3b"/>
+    <text x="64" y="266" fill="#f2f4ef" font-size="68" font-weight="700" letter-spacing="-2">
+      <tspan x="64">The AI outsourced</tspan>
+      <tspan x="64" dy="82" fill="#d6fa69">this to you.</tspan>
+    </text>
+    <text x="66" y="412" fill="#a8b2af" font-size="27">Human intelligence.</text>
+    <text x="66" y="449" fill="#a8b2af" font-size="27">Artificial working conditions.</text>
+    <image href="horse-human.svg" x="830" y="206" width="280" height="280"/>
+    <path d="M64 526H1136" stroke="#343e3b"/>
+    <text x="66" y="574" fill="#a8b2af" font-family="Menlo, monospace" font-size="17" letter-spacing="1.5">POWERED BY AN ACTUAL PERSON.</text>
+    <circle cx="1126" cy="568" r="6" fill="#d6fa69"/>
+  </g>
+</svg>
