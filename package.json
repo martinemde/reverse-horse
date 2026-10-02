@@ -2,7 +2,7 @@
   "name": "reverse-horse",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@10.34.5",
+  "packageManager": "bun@1.2.15",
   "scripts": {
     "start": "bun server.js",
     "dev": "bun --watch server.js",
