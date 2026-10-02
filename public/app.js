@@ -115,7 +115,7 @@ function makeForm(item, onTrainingSubmit) {
     return { wrapper, marker };
   }
   function mark(control, value, max, label) {
-    control.marker.style[control.vertical ? 'bottom' : 'left'] = `${100 * value / max}%`;
+    control.marker.style[control.vertical ? 'top' : 'left'] = `${100 * value / max}%`;
     control.marker.hidden = false;
     control.jev.textContent = `JEV ${label}`;
     control.jev.classList.remove('pending');
@@ -187,10 +187,10 @@ function makeForm(item, onTrainingSubmit) {
         ends.append(node('span', `No · 0${q.criteria?.false !== undefined ? '\n' + text(q.criteria.false) : ''}`), node('span', `Yes · 1${q.criteria?.true !== undefined ? '\n' + text(q.criteria.true) : ''}`));
         field.append(ends);
       } else {
-        // Vertical, highest level on top, so labels read horizontally beside their level.
+        // Vertical, lowest level on top, so labels read horizontally beside their level.
         const levels = node('div', undefined, 'score-levels');
         q.criteria.forEach((label, i) => {
-          const level = node('span'); level.style.bottom = `${100 * i / max}%`;
+          const level = node('span'); level.style.top = `${100 * i / max}%`;
           level.append(node('b', i), node('span', text(label)));
           levels.append(level);
         });
