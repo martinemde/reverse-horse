@@ -334,7 +334,7 @@ function setPlaying(value) {
     if (playing && practice.pausedAt !== undefined) {
       practice.deadline += Date.now() - practice.pausedAt;
       delete practice.pausedAt;
-    } else if (!playing) practice.pausedAt = Date.now();
+    } else if (!playing && practice.pausedAt === undefined) practice.pausedAt = Date.now();
   }
   $('#play').setAttribute('aria-pressed', String(playing));
   $('#play').setAttribute('aria-label', playing ? 'Pause practice' : 'Play practice');

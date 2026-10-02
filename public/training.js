@@ -3,28 +3,28 @@ import { examples } from './examples.js';
 const completionKey = 'reverse-horse.training-completed';
 const lessons = [
   {
-    id: 'is_repeat_contact', type: 'noul', title: 'Turn a gut feeling into a number.',
-    brief: 'Your first assignment: determine whether this person has contacted support before. Read the whole state, then answer the actual question. We have every confidence in your biological inference engine.',
+    id: 'payment_needed', type: 'noul', title: 'Decide whether this email needs a payment.',
+    brief: 'Your first assignment: distinguish a payment request from a receipt. Read the whole email, then decide whether the sender is asking you to pay. We have every confidence in your biological inference engine.',
     controls: 'Move the slider toward 1 for yes or 0 for no. The middle, 0.5, means you are unsure. This is a probability of yes, so a confident no belongs near 0.',
     criteria: 'Optional descriptions under true and false define what yes and no mean. Noul also works without criteria.',
     response: 'noul is the probability of yes, from 0 to 1. It is a number, not a boolean. Noul has no separate confidence field.',
-    explanation: '“Third attempt” is evidence of earlier contact. JEV puts its probability of yes near 1. The pink marker shows the saved answer on your slider.',
+    explanation: 'The sender says the payment was received and no action is needed. JEV puts the probability of a payment request at 0.02: a confident no belongs near 0. The pink marker shows the saved answer on your slider.',
   },
   {
-    id: 'color', type: 'choice', title: 'Select your most probable favorite color.',
-    brief: 'You are now qualified to choose between things. For this assignment you are Sir Lancelot. Read the state before applying your own favorite color. Personal preferences are not covered by this contract.',
+    id: 'team', type: 'choice', title: 'Route this email to the right team.',
+    brief: 'You are now qualified to choose between things. A customer reports a duplicate charge and asks for a refund. Decide which team should handle the email. Compliments about the product do not settle the bill.',
     controls: 'Fill each bar anywhere from 0% to 100%. You do not have to fill it all the way. The fullest bar sets your confidence; the relative fullness of all bars sets the probability of each choice. Move another bar and the chances readjust. The option with the most weight wins.',
     criteria: 'An object maps option keys to descriptions. The keys are the possible answers; descriptions explain them and may be null. Choice accepts 1–255 options.',
     response: 'choice is the winning option key; ties go to the first option. probabilities gives a weight from 0 to 1 for every option, totaling 1. Your confidence is how full you made the fullest bar, from 0 to 1. Even a single slightly filled bar can win with very low confidence.',
-    explanation: 'Lancelot answers blue. JEV chooses blue too, but leaves some probability on the alternatives. A choice and its certainty are two different pieces of information.',
+    explanation: 'A duplicate charge and a refund request belong with billing. JEV chooses billing with probability 1 and confidence 1. Your bars can still express uncertainty about the alternatives. A choice and its certainty are two different pieces of information.',
   },
   {
-    id: 'healing', type: 'score', title: 'Locate the correct amount of urgency.',
-    brief: 'Our final assignment requires a finely calibrated sense of “probably quite a lot.” Link has one heart left. You have a slider. Please use your respective resources responsibly.',
-    controls: 'Move the slider along the ordered levels. The first level is 0, the next is 1, and so on. You can stop between levels: 1.75 means mostly “Right now,” with a little “Soon.”',
+    id: 'urgency', type: 'score', title: 'Rate how urgently this email needs attention.',
+    brief: 'Our final assignment requires a finely calibrated sense of “probably quite soon.” A colleague needs slides for a client meeting in 30 minutes and cannot present without them. You have a slider. The meeting has a deadline.',
+    controls: 'Move the slider along the ordered levels. The first level is 0, the next is 1, and so on. You can stop between levels: 1.75 means mostly “Needs attention now,” with a little “Needs attention today.”',
     criteria: 'An array of 2–10 descriptions defines the scale in order. Array positions become the numeric levels. Score ranges from 0 to the last position, not necessarily 0 to 1.',
     response: 'score is the position on the scale. legend maps numeric levels back to their descriptions. probabilities distributes weight across those levels; confidence describes certainty.',
-    explanation: 'JEV lands between “Soon” and “Right now,” much closer to “Right now.” A fractional score is useful information, not a rounding error.',
+    explanation: 'The meeting starts in 30 minutes and the sender cannot present without the slides. JEV scores this 2, “Needs attention now.” You can also submit fractional scores when the urgency falls between levels.',
   },
 ];
 
@@ -118,7 +118,7 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
           ['model', 'The caller requests jev-latest. Here, you do the inference. Your response identifies the model as reverse-horse.'],
           ['state', 'The situation to judge. It can be text, an object, or an array. Read all of it.'],
           ['questions', 'A map of question IDs to tasks. A real request can contain several; you must answer every one.'],
-          ['question ID', 'A key such as is_repeat_contact. Return the answer under the same key in answers.'],
+          ['question ID', 'A key such as payment_needed. Return the answer under the same key in answers.'],
           ['type', 'The shape of the judgment: noul, choice, or score. We will train one at a time.'],
           ['instructions', 'What to decide about the state. Instructions can also be structured JSON.'],
           ['criteria', 'What the possible answers mean. Its shape depends on the question type.'],

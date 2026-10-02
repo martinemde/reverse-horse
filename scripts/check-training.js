@@ -61,14 +61,14 @@ try {
     await noOverflow(page);
     await page.screenshot({ path: `/tmp/reverse-horse-training-${viewport.width}-induction.png` });
     await dialog.getByRole('button', { name: 'Begin mandatory training' }).click();
-    for (const [index, id] of ['is_repeat_contact', 'color', 'healing'].entries()) {
+    for (const [index, id] of ['payment_needed', 'team', 'urgency'].entries()) {
       const card = dialog.locator('form');
       await card.locator(`[data-question="${id}"]`).waitFor();
       const run = recordings.find(run => Object.hasOwn(run.request.questions, id));
       assert.deepEqual(JSON.parse(await dialog.locator('.training-request-json pre').textContent()), run.request);
       assert.equal(await dialog.locator('.training-actions button').last().isDisabled(), true);
       let values;
-      if (id === 'color') {
+      if (id === 'team') {
         assert.equal(await card.getByRole('button').isDisabled(), true, 'Choice needs a selection');
         assert.equal(await card.getByRole('radio').count(), 0);
         for (const [weights, confidence, probabilities] of choiceCases) {
@@ -79,9 +79,9 @@ try {
         }
         await setRange(card.locator('input[type=range]').first(), 0.5);
         await setRange(card.locator('input[type=range]').nth(1), 0.2);
-        values = { blue: 0.5, yellow: 0.2, red: 0 };
+        values = { billing: 0.5, technical: 0.2, sales: 0 };
       } else {
-        values = id === 'healing' ? 1.75 : 0.1;
+        values = id === 'urgency' ? 0.75 : 0.9;
         await setRange(card.locator('input[type=range]'), values);
       }
       await noOverflow(page);
@@ -90,7 +90,7 @@ try {
       sameResponse(JSON.parse(await dialog.locator('.training-json pre').first().textContent()), answerRequest(run.request, { [id]: values }));
       assert.deepEqual(JSON.parse(await dialog.locator('.training-jev pre').textContent()), run.jev);
       assert.equal(await card.locator('input:enabled').count(), 0);
-      assert.equal(await card.locator('.jev-marker:not([hidden])').count(), id === 'color' ? 3 : 1);
+      assert.equal(await card.locator('.jev-marker:not([hidden])').count(), id === 'team' ? 3 : 1);
       assert.equal(await dialog.locator('.training-actions button').last().isEnabled(), true, 'A mismatch still permits progress');
       if (index === 0) {
         await dialog.getByRole('button', { name: 'Back', exact: true }).click();
@@ -109,6 +109,7 @@ try {
     assert.equal(await dialog.isVisible(), false, 'Completion survives reload');
     await page.getByRole('button', { name: 'Pause practice', exact: true }).click();
     const paused = await page.locator('#requests form .clock').first().textContent();
+    await page.waitForTimeout(300);
     await page.getByRole('button', { name: 'Training', exact: true }).click();
     await page.waitForTimeout(300);
     assert.equal(await page.locator('#requests form .clock').first().textContent(), paused);

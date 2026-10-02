@@ -29,7 +29,9 @@ and runs the local server and tests. `bun dev` restarts on server changes; refre
 the page after UI edits.
 
 First-time visitors enter an untimed training walkthrough: induction, Noul,
-Choice, Score, and certification. Each exercise uses the answering screen's
+Choice, Score, and certification. The exercises classify emails: whether payment
+is required, which support team should handle a refund, and how urgently a meeting
+request needs attention. Each exercise uses the answering screen's
 controls and shows its request JSON, human response, and actual recorded JEV
 response. Training does not submit to the shared queue or call OpenRouter.
 Practice pauses while training is open; exiting restores the previous play state.
