@@ -1,7 +1,7 @@
 [
   {
     "title": "The broken integration",
-    "recordedAt": "2026-10-02T04:06:37.373Z",
+    "recordedAt": "2026-10-02T04:38:24.406Z",
     "request": {
       "model": "jev-latest",
       "state": "Three days of trying and Stripe still will not connect. Customers cannot pay me. I need someone to fix this today.",
@@ -35,7 +35,7 @@
   },
   {
     "title": "The broken integration",
-    "recordedAt": "2026-10-02T04:06:37.556Z",
+    "recordedAt": "2026-10-02T04:38:24.603Z",
     "request": {
       "model": "jev-latest",
       "state": "Three days of trying and Stripe still will not connect. Customers cannot pay me. I need someone to fix this today.",
@@ -56,13 +56,13 @@
       "answers": {
         "frustration": {
           "type": "score",
-          "confidence": 0.51,
+          "confidence": 0.54,
           "probabilities": {
             "0": 0,
-            "1": 0.32,
-            "2": 0.68
+            "1": 0.3,
+            "2": 0.7
           },
-          "score": 1.67,
+          "score": 1.69,
           "legend": {
             "0": "Matter-of-fact",
             "1": "Annoyed but polite",
@@ -74,7 +74,7 @@
   },
   {
     "title": "A browser-specific bug",
-    "recordedAt": "2026-10-02T04:06:37.757Z",
+    "recordedAt": "2026-10-02T04:38:24.850Z",
     "request": {
       "model": "jev-latest",
       "state": "Exporting takes down the settings screen in Safari. Chrome exports successfully, but some customers rely entirely on Safari.",
@@ -113,7 +113,7 @@
   },
   {
     "title": "Can I talk to a person?",
-    "recordedAt": "2026-10-02T04:06:37.933Z",
+    "recordedAt": "2026-10-02T04:38:25.130Z",
     "request": {
       "model": "jev-latest",
       "state": "This is my third attempt to get help. Please connect me with an actual person.",
@@ -136,7 +136,7 @@
   },
   {
     "title": "Can I talk to a person?",
-    "recordedAt": "2026-10-02T04:06:39.097Z",
+    "recordedAt": "2026-10-02T04:38:25.293Z",
     "request": {
       "model": "jev-latest",
       "state": "This is my third attempt to get help. Please connect me with an actual person.",
@@ -163,7 +163,7 @@
   },
   {
     "title": "An invoice without “invoice”",
-    "recordedAt": "2026-10-02T04:06:39.330Z",
+    "recordedAt": "2026-10-02T04:38:25.482Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: September services\nHi Alex, attached is our bill for September: $240, due October 15. Thanks for working with us!",
@@ -195,7 +195,7 @@
   },
   {
     "title": "Already paid",
-    "recordedAt": "2026-10-02T04:06:39.529Z",
+    "recordedAt": "2026-10-02T04:38:25.686Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Your payment went through\nWe received your $24 payment for this month. This receipt is for your records. No action is needed.",
@@ -218,7 +218,7 @@
   },
   {
     "title": "The weekly newsletter",
-    "recordedAt": "2026-10-02T04:06:39.854Z",
+    "recordedAt": "2026-10-02T04:38:25.862Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: This week in gardening\nThree tips for happier tomatoes, a tour of our greenhouse, and 15% off seeds this weekend. You received this because you subscribed.",
@@ -252,7 +252,7 @@
   },
   {
     "title": "The weekly newsletter",
-    "recordedAt": "2026-10-02T04:06:40.047Z",
+    "recordedAt": "2026-10-02T04:38:26.181Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: This week in gardening\nThree tips for happier tomatoes, a tour of our greenhouse, and 15% off seeds this weekend. You received this because you subscribed.",
@@ -268,14 +268,14 @@
       "answers": {
         "reply_needed": {
           "type": "noul",
-          "noul": 0.03
+          "noul": 0.04
         }
       }
     }
   },
   {
     "title": "A suspicious account warning",
-    "recordedAt": "2026-10-02T04:06:40.378Z",
+    "recordedAt": "2026-10-02T04:38:26.345Z",
     "request": {
       "model": "jev-latest",
       "state": "From: security@account-check.example\nSubject: Mailbox deletion in 20 minutes\nReply with your email password immediately to keep your account. Do not contact your IT team; they cannot stop this process.",
@@ -298,7 +298,7 @@
   },
   {
     "title": "A duplicate charge",
-    "recordedAt": "2026-10-02T04:06:40.562Z",
+    "recordedAt": "2026-10-02T04:38:26.530Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Charged twice\nHi, I see two $49 charges for the same order. Could you refund the extra charge? The product itself works great.",
@@ -332,7 +332,7 @@
   },
   {
     "title": "Before the meeting",
-    "recordedAt": "2026-10-02T04:06:40.745Z",
+    "recordedAt": "2026-10-02T04:38:26.716Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Slides for the 2 pm meeting\nIt is 1:30 pm now. Could you send me the final slides before our client meeting at 2? I cannot present without them.",
@@ -371,7 +371,7 @@
   },
   {
     "title": "Before the meeting",
-    "recordedAt": "2026-10-02T04:06:40.937Z",
+    "recordedAt": "2026-10-02T04:38:26.876Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Slides for the 2 pm meeting\nIt is 1:30 pm now. Could you send me the final slides before our client meeting at 2? I cannot present without them.",
@@ -394,7 +394,7 @@
   },
   {
     "title": "A lukewarm thank-you",
-    "recordedAt": "2026-10-02T04:06:41.131Z",
+    "recordedAt": "2026-10-02T04:38:27.053Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Re: Replacement delivered\nThanks for sending another one. It works, although waiting three weeks was frustrating. I suppose we can close this now.",
@@ -433,7 +433,7 @@
   },
   {
     "title": "Just keeping you posted",
-    "recordedAt": "2026-10-02T04:06:41.427Z",
+    "recordedAt": "2026-10-02T04:38:27.224Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Friday delivery\nQuick update: your replacement keyboard will arrive Friday instead of Thursday. The tracking link will update tonight. No need to reply unless Friday is a problem.",
@@ -467,7 +467,7 @@
   },
   {
     "title": "Just keeping you posted",
-    "recordedAt": "2026-10-02T04:06:41.669Z",
+    "recordedAt": "2026-10-02T04:38:27.401Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Friday delivery\nQuick update: your replacement keyboard will arrive Friday instead of Thursday. The tracking link will update tonight. No need to reply unless Friday is a problem.",
@@ -490,7 +490,7 @@
   },
   {
     "title": "Exclamation Act · cake at 3",
-    "recordedAt": "2026-10-02T04:17:28.417Z",
+    "recordedAt": "2026-10-02T04:38:27.749Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Launch!\nThanks! Great work on the launch! Cake in the kitchen at 3!",
@@ -510,14 +510,14 @@
       "answers": {
         "exclamation_act": {
           "type": "noul",
-          "noul": 0.94
+          "noul": 0.93
         }
       }
     }
   },
   {
     "title": "Exclamation Act · one cake",
-    "recordedAt": "2026-10-02T04:17:28.650Z",
+    "recordedAt": "2026-10-02T04:38:27.906Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Launch\nThanks, and great work on the launch. Cake in the kitchen at 3!",
@@ -537,14 +537,14 @@
       "answers": {
         "exclamation_act": {
           "type": "noul",
-          "noul": 0.39
+          "noul": 0.37
         }
       }
     }
   },
   {
     "title": "Exclamation Act · actual smoke",
-    "recordedAt": "2026-10-02T04:17:28.928Z",
+    "recordedAt": "2026-10-02T04:38:28.071Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Server room\nThe server room is filling with smoke! Everyone out now! Do not take the elevator!",
@@ -564,14 +564,14 @@
       "answers": {
         "exclamation_act": {
           "type": "noul",
-          "noul": 0.52
+          "noul": 0.56
         }
       }
     }
   },
   {
     "title": "Exclamation Act · mild warmth",
-    "recordedAt": "2026-10-02T04:17:29.128Z",
+    "recordedAt": "2026-10-02T04:38:28.271Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Server room\nThe server room is a little warm today! Facilities is on it! No action needed!",
@@ -598,7 +598,7 @@
   },
   {
     "title": "Quick question · Postgres",
-    "recordedAt": "2026-10-02T04:17:29.451Z",
+    "recordedAt": "2026-10-02T04:38:28.417Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Quick question\nQuick question: are we still using Postgres?",
@@ -618,14 +618,14 @@
       "answers": {
         "quick_question": {
           "type": "noul",
-          "noul": 0.22
+          "noul": 0.21
         }
       }
     }
   },
   {
     "title": "Quick question · the 3 pm review",
-    "recordedAt": "2026-10-02T04:17:29.618Z",
+    "recordedAt": "2026-10-02T04:38:28.797Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Quick question\nQuick question: is the 3 pm review still on?",
@@ -645,14 +645,14 @@
       "answers": {
         "quick_question": {
           "type": "noul",
-          "noul": 0.25
+          "noul": 0.23
         }
       }
     }
   },
   {
     "title": "Quick question · migration plan",
-    "recordedAt": "2026-10-02T04:17:29.977Z",
+    "recordedAt": "2026-10-02T04:38:28.987Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Quick question\nQuick question: how should we migrate off Postgres, and who should own it?",
@@ -679,7 +679,7 @@
   },
   {
     "title": "Quick question · Postgres, sort of",
-    "recordedAt": "2026-10-02T04:17:30.200Z",
+    "recordedAt": "2026-10-02T04:38:29.156Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Quick question\nQuick question: are we still using Postgres? The onboarding doc says MongoDB, billing says Postgres, and the CTO said \"both, sort of\" last week.",
@@ -706,7 +706,7 @@
   },
   {
     "title": "Reply-All Tribunal · 200 congrats",
-    "recordedAt": "2026-10-02T04:17:30.500Z",
+    "recordedAt": "2026-10-02T04:38:29.330Z",
     "request": {
       "model": "jev-latest",
       "state": "To: all-staff (200 recipients)\nSubject: Re: Please welcome Dana as VP of Engineering\nCongrats!!",
@@ -726,14 +726,14 @@
       "answers": {
         "reply_all": {
           "type": "noul",
-          "noul": 0.15
+          "noul": 0.17
         }
       }
     }
   },
   {
     "title": "Reply-All Tribunal · 3 congrats",
-    "recordedAt": "2026-10-02T04:17:30.699Z",
+    "recordedAt": "2026-10-02T04:38:29.518Z",
     "request": {
       "model": "jev-latest",
       "state": "To: Dana, Sam, Lee (3 recipients)\nSubject: Re: Please welcome Dana as VP of Engineering\nCongrats!!",
@@ -753,14 +753,14 @@
       "answers": {
         "reply_all": {
           "type": "noul",
-          "noul": 0.36
+          "noul": 0.38
         }
       }
     }
   },
   {
     "title": "Reply-All Tribunal · wrong time",
-    "recordedAt": "2026-10-02T04:17:31.025Z",
+    "recordedAt": "2026-10-02T04:38:29.846Z",
     "request": {
       "model": "jev-latest",
       "state": "To: all-staff (200 recipients)\nSubject: Re: Office closed Friday\nCorrection: the office reopens Monday at 9, not 10 as stated above.",
@@ -780,14 +780,14 @@
       "answers": {
         "reply_all": {
           "type": "noul",
-          "noul": 0.51
+          "noul": 0.52
         }
       }
     }
   },
   {
     "title": "Reply-All Tribunal · me too",
-    "recordedAt": "2026-10-02T04:17:31.216Z",
+    "recordedAt": "2026-10-02T04:38:30.066Z",
     "request": {
       "model": "jev-latest",
       "state": "To: all-staff (200 recipients)\nSubject: Re: Office closed Friday\nThanks, enjoy the long weekend everyone!",
@@ -807,14 +807,14 @@
       "answers": {
         "reply_all": {
           "type": "noul",
-          "noul": 0.3
+          "noul": 0.28
         }
       }
     }
   },
   {
     "title": "Oxford comma · the interns",
-    "recordedAt": "2026-10-02T04:17:31.550Z",
+    "recordedAt": "2026-10-02T04:38:30.373Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Offsite\nAttendees: the interns, Dave and Priya.",
@@ -834,14 +834,14 @@
       "answers": {
         "oxford_comma": {
           "type": "noul",
-          "noul": 0.58
+          "noul": 0.57
         }
       }
     }
   },
   {
     "title": "Oxford comma · the interns, comma",
-    "recordedAt": "2026-10-02T04:17:31.797Z",
+    "recordedAt": "2026-10-02T04:38:30.556Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Offsite\nAttendees: the interns, Dave, and Priya.",
@@ -861,14 +861,14 @@
       "answers": {
         "oxford_comma": {
           "type": "noul",
-          "noul": 0.6
+          "noul": 0.48
         }
       }
     }
   },
   {
     "title": "Oxford comma · just two",
-    "recordedAt": "2026-10-02T04:17:32.073Z",
+    "recordedAt": "2026-10-02T04:38:30.742Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Offsite\nAttendees: Dave and Priya.",
@@ -888,14 +888,14 @@
       "answers": {
         "oxford_comma": {
           "type": "noul",
-          "noul": 0.35
+          "noul": 0.25
         }
       }
     }
   },
   {
     "title": "Oxford comma · both interns",
-    "recordedAt": "2026-10-02T04:17:32.259Z",
+    "recordedAt": "2026-10-02T04:38:31.066Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Offsite\nAttendees: the interns, Dave and Priya (both of whom are interns).",
@@ -915,14 +915,14 @@
       "answers": {
         "oxford_comma": {
           "type": "noul",
-          "noul": 0.4
+          "noul": 0.42
         }
       }
     }
   },
   {
     "title": "Thanks in advance · TIA to a report",
-    "recordedAt": "2026-10-02T04:17:32.598Z",
+    "recordedAt": "2026-10-02T04:38:31.419Z",
     "request": {
       "model": "jev-latest",
       "state": "To: Jordan (your direct report)\nSubject: Q3 numbers\nCan you send the Q3 numbers by Friday? TIA!",
@@ -949,7 +949,7 @@
   },
   {
     "title": "Thanks in advance · thanks to a report",
-    "recordedAt": "2026-10-02T04:17:32.823Z",
+    "recordedAt": "2026-10-02T04:38:31.582Z",
     "request": {
       "model": "jev-latest",
       "state": "To: Jordan (your direct report)\nSubject: Q3 numbers\nCan you send the Q3 numbers by Friday? Thanks!",
@@ -969,14 +969,14 @@
       "answers": {
         "thanks_in_advance": {
           "type": "noul",
-          "noul": 0.54
+          "noul": 0.58
         }
       }
     }
   },
   {
     "title": "Thanks in advance · up the chain",
-    "recordedAt": "2026-10-02T04:17:33.126Z",
+    "recordedAt": "2026-10-02T04:38:31.942Z",
     "request": {
       "model": "jev-latest",
       "state": "To: Morgan (the CFO)\nSubject: Q3 budget\nCould you approve my Q3 budget by Friday? Thanks in advance!",
@@ -996,14 +996,14 @@
       "answers": {
         "thanks_in_advance": {
           "type": "noul",
-          "noul": 0.71
+          "noul": 0.73
         }
       }
     }
   },
   {
     "title": "Thanks in advance · either way",
-    "recordedAt": "2026-10-02T04:17:33.314Z",
+    "recordedAt": "2026-10-02T04:38:32.128Z",
     "request": {
       "model": "jev-latest",
       "state": "To: Jordan (your direct report)\nSubject: Q3 draft\nNo pressure, and feel free to say no: could you skim my Q3 draft if you have time? Thanks in advance either way!",
@@ -1023,14 +1023,14 @@
       "answers": {
         "thanks_in_advance": {
           "type": "noul",
-          "noul": 0.43
+          "noul": 0.44
         }
       }
     }
   },
   {
     "title": "Sign-off · Best",
-    "recordedAt": "2026-10-02T04:17:33.488Z",
+    "recordedAt": "2026-10-02T04:38:32.289Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Re: Updated timeline\nGot it. I will send the revised draft by Thursday.\n\nBest,\nSam",
@@ -1066,7 +1066,7 @@
   },
   {
     "title": "Sign-off · Thanks",
-    "recordedAt": "2026-10-02T04:17:33.700Z",
+    "recordedAt": "2026-10-02T04:38:32.472Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Re: Updated timeline\nGot it. I will send the revised draft by Thursday.\n\nThanks,\nSam",
@@ -1102,7 +1102,7 @@
   },
   {
     "title": "Sign-off · Regards",
-    "recordedAt": "2026-10-02T04:17:33.916Z",
+    "recordedAt": "2026-10-02T04:38:32.645Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Re: Updated timeline\nGot it. I will send the revised draft by Thursday.\n\nRegards,\nSam",
@@ -1124,7 +1124,7 @@
       "answers": {
         "sign_off": {
           "type": "choice",
-          "confidence": 1,
+          "confidence": 0.99,
           "probabilities": {
             "warm": 0,
             "neutral": 1,
@@ -1138,7 +1138,7 @@
   },
   {
     "title": "Sign-off · Cheers",
-    "recordedAt": "2026-10-02T04:17:34.171Z",
+    "recordedAt": "2026-10-02T04:38:32.828Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Re: Updated timeline\nGot it. I will send the revised draft by Thursday.\n\nCheers,\nSam",
@@ -1160,10 +1160,10 @@
       "answers": {
         "sign_off": {
           "type": "choice",
-          "confidence": 0.46,
+          "confidence": 0.45,
           "probabilities": {
-            "warm": 0.4,
-            "neutral": 0.6,
+            "warm": 0.41,
+            "neutral": 0.59,
             "cold": 0,
             "hostile": 0
           },
@@ -1174,7 +1174,7 @@
   },
   {
     "title": "Sign-off · iPhone",
-    "recordedAt": "2026-10-02T04:17:34.336Z",
+    "recordedAt": "2026-10-02T04:38:32.992Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Re: Updated timeline\nGot it. I will send the revised draft by Thursday.\n\nSent from my iPhone",
@@ -1210,7 +1210,7 @@
   },
   {
     "title": "Sign-off · nothing",
-    "recordedAt": "2026-10-02T04:17:34.531Z",
+    "recordedAt": "2026-10-02T04:38:33.155Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Re: Updated timeline\nGot it. I will send the revised draft by Thursday.",
@@ -1246,7 +1246,7 @@
   },
   {
     "title": "Which crime · per my last email",
-    "recordedAt": "2026-10-02T04:17:34.782Z",
+    "recordedAt": "2026-10-02T04:38:33.321Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Re: Re: Deadline\nPer my last email (attached again for convenience), the deadline is Friday.",
@@ -1268,12 +1268,12 @@
       "answers": {
         "email_crime": {
           "type": "choice",
-          "confidence": 0.37,
+          "confidence": 0.33,
           "probabilities": {
-            "passive_aggression": 0.53,
+            "passive_aggression": 0.5,
             "humblebrag": 0,
-            "guilt_trip": 0.13,
-            "innocent": 0.34
+            "guilt_trip": 0.15,
+            "innocent": 0.35
           },
           "choice": "passive_aggression"
         }
@@ -1282,7 +1282,7 @@
   },
   {
     "title": "Which crime · probably buried",
-    "recordedAt": "2026-10-02T04:17:34.990Z",
+    "recordedAt": "2026-10-02T04:38:33.515Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Re: Re: Deadline\nAttaching this again in case it got buried. The deadline is Friday.",
@@ -1304,12 +1304,12 @@
       "answers": {
         "email_crime": {
           "type": "choice",
-          "confidence": 0.7,
+          "confidence": 0.69,
           "probabilities": {
-            "passive_aggression": 0.16,
+            "passive_aggression": 0.17,
             "humblebrag": 0,
             "guilt_trip": 0.07,
-            "innocent": 0.77
+            "innocent": 0.76
           },
           "choice": "innocent"
         }
@@ -1318,7 +1318,7 @@
   },
   {
     "title": "Which crime · after the keynote",
-    "recordedAt": "2026-10-02T04:17:35.218Z",
+    "recordedAt": "2026-10-02T04:38:33.667Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Re: Re: Deadline\nAttaching this again. I finished it on the flight home from my keynote, so excuse any typos. The deadline is Friday.",
@@ -1340,7 +1340,7 @@
       "answers": {
         "email_crime": {
           "type": "choice",
-          "confidence": 0.93,
+          "confidence": 0.92,
           "probabilities": {
             "passive_aggression": 0.01,
             "humblebrag": 0.94,
@@ -1354,7 +1354,7 @@
   },
   {
     "title": "Which crime · until midnight",
-    "recordedAt": "2026-10-02T04:17:35.383Z",
+    "recordedAt": "2026-10-02T04:38:33.855Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Re: Re: Deadline\nAttaching this again. I stayed until midnight finishing it, but no worries if you have not had a chance to look. The deadline is Friday.",
@@ -1379,8 +1379,8 @@
           "confidence": 0.64,
           "probabilities": {
             "passive_aggression": 0.14,
-            "humblebrag": 0.1,
-            "guilt_trip": 0.74,
+            "humblebrag": 0.11,
+            "guilt_trip": 0.73,
             "innocent": 0.02
           },
           "choice": "guilt_trip"
@@ -1390,7 +1390,7 @@
   },
   {
     "title": "Meeting invite · Sync",
-    "recordedAt": "2026-10-02T04:17:35.744Z",
+    "recordedAt": "2026-10-02T04:38:34.040Z",
     "request": {
       "model": "jev-latest",
       "state": "Invite: Sync\nRecurring weekly · 30 minutes · 11 attendees\nNo agenda.",
@@ -1412,12 +1412,12 @@
       "answers": {
         "meeting_want": {
           "type": "choice",
-          "confidence": 0.87,
+          "confidence": 0.89,
           "probabilities": {
             "decision": 0,
             "information": 0.03,
-            "status_theater": 0.91,
-            "loneliness": 0.06
+            "status_theater": 0.92,
+            "loneliness": 0.05
           },
           "choice": "status_theater"
         }
@@ -1426,7 +1426,7 @@
   },
   {
     "title": "Meeting invite · pick a date",
-    "recordedAt": "2026-10-02T04:17:35.913Z",
+    "recordedAt": "2026-10-02T04:38:34.218Z",
     "request": {
       "model": "jev-latest",
       "state": "Invite: Sync\nOne time · 30 minutes · 3 attendees\nAgenda: choose October 14 or October 21 for launch.",
@@ -1462,7 +1462,7 @@
   },
   {
     "title": "Meeting invite · Q3 numbers",
-    "recordedAt": "2026-10-02T04:17:36.268Z",
+    "recordedAt": "2026-10-02T04:38:34.411Z",
     "request": {
       "model": "jev-latest",
       "state": "Invite: Sync\nOne time · 30 minutes · 40 attendees · cameras optional\nAgenda: finance walks through Q3 results.",
@@ -1487,8 +1487,8 @@
           "confidence": 0.98,
           "probabilities": {
             "decision": 0,
-            "information": 0.98,
-            "status_theater": 0.02,
+            "information": 0.99,
+            "status_theater": 0.01,
             "loneliness": 0
           },
           "choice": "information"
@@ -1498,7 +1498,7 @@
   },
   {
     "title": "Meeting invite · just us",
-    "recordedAt": "2026-10-02T04:17:36.435Z",
+    "recordedAt": "2026-10-02T04:38:34.742Z",
     "request": {
       "model": "jev-latest",
       "state": "Invite: Sync\nRecurring weekly · 30 minutes · 2 attendees\nNo agenda. Notes: \"just to chat :)\"",
@@ -1534,7 +1534,7 @@
   },
   {
     "title": "Out of office · Patagonia",
-    "recordedAt": "2026-10-02T04:17:36.793Z",
+    "recordedAt": "2026-10-02T04:38:35.091Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Automatic reply\nI’m off grid in Patagonia until the 14th. If urgent, contact Steve. If very urgent, also contact Steve.",
@@ -1556,11 +1556,11 @@
       "answers": {
         "out_of_office": {
           "type": "choice",
-          "confidence": 0.3,
+          "confidence": 0.38,
           "probabilities": {
-            "professional": 0.36,
-            "smug": 0.48,
-            "too_much_information": 0.15,
+            "professional": 0.32,
+            "smug": 0.54,
+            "too_much_information": 0.13,
             "cry_for_help": 0.01
           },
           "choice": "smug"
@@ -1570,7 +1570,7 @@
   },
   {
     "title": "Out of office · limited access",
-    "recordedAt": "2026-10-02T04:17:37.004Z",
+    "recordedAt": "2026-10-02T04:38:35.272Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Automatic reply\nI’m out of the office until the 14th with limited access to email. If urgent, contact Steve.",
@@ -1606,7 +1606,7 @@
   },
   {
     "title": "Out of office · applesauce",
-    "recordedAt": "2026-10-02T04:17:37.316Z",
+    "recordedAt": "2026-10-02T04:38:35.612Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Automatic reply\nI’m out until the 14th recovering from having my wisdom teeth out. I can only eat applesauce. If urgent, contact Steve.",
@@ -1642,7 +1642,7 @@
   },
   {
     "title": "Out of office · will probably check",
-    "recordedAt": "2026-10-02T04:17:37.537Z",
+    "recordedAt": "2026-10-02T04:38:35.878Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Automatic reply\nI’m out until the 14th. I may check email. I will probably check email. Please do not make me check email. If urgent, contact Steve.",
@@ -1666,9 +1666,9 @@
           "type": "choice",
           "confidence": 0.74,
           "probabilities": {
-            "professional": 0.11,
-            "smug": 0.02,
-            "too_much_information": 0.07,
+            "professional": 0.1,
+            "smug": 0.01,
+            "too_much_information": 0.09,
             "cry_for_help": 0.8
           },
           "choice": "cry_for_help"
@@ -1678,7 +1678,7 @@
   },
   {
     "title": "Emoji · folded hands",
-    "recordedAt": "2026-10-02T04:17:37.841Z",
+    "recordedAt": "2026-10-02T04:38:36.138Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: PR review\nCan you review my pull request before lunch? 🙏",
@@ -1701,13 +1701,13 @@
       "answers": {
         "emoji_fit": {
           "type": "score",
-          "confidence": 0.69,
+          "confidence": 0.67,
           "probabilities": {
             "0": 0,
             "1": 0,
-            "2": 0.07,
-            "3": 0.63,
-            "4": 0.3
+            "2": 0.08,
+            "3": 0.61,
+            "4": 0.31
           },
           "score": 3.22,
           "legend": {
@@ -1723,7 +1723,7 @@
   },
   {
     "title": "Emoji · melting face",
-    "recordedAt": "2026-10-02T04:17:38.017Z",
+    "recordedAt": "2026-10-02T04:38:36.360Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: PR review\nCan you review my pull request before lunch? 🫠",
@@ -1746,15 +1746,15 @@
       "answers": {
         "emoji_fit": {
           "type": "score",
-          "confidence": 0.59,
+          "confidence": 0.58,
           "probabilities": {
             "0": 0,
             "1": 0.01,
-            "2": 0.42,
-            "3": 0.52,
+            "2": 0.44,
+            "3": 0.5,
             "4": 0.05
           },
-          "score": 2.6,
+          "score": 2.59,
           "legend": {
             "0": "Call HR",
             "1": "Inappropriate",
@@ -1768,7 +1768,7 @@
   },
   {
     "title": "Emoji · skull",
-    "recordedAt": "2026-10-02T04:17:38.366Z",
+    "recordedAt": "2026-10-02T04:38:36.662Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: PR review\nCan you review my pull request before lunch? 💀",
@@ -1813,7 +1813,7 @@
   },
   {
     "title": "Emoji · eggplant",
-    "recordedAt": "2026-10-02T04:17:38.536Z",
+    "recordedAt": "2026-10-02T04:38:36.825Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: PR review\nCan you review my pull request before lunch? 🍆",
@@ -1836,15 +1836,15 @@
       "answers": {
         "emoji_fit": {
           "type": "score",
-          "confidence": 0.77,
+          "confidence": 0.8,
           "probabilities": {
-            "0": 0.06,
-            "1": 0.76,
-            "2": 0.17,
+            "0": 0.09,
+            "1": 0.78,
+            "2": 0.12,
             "3": 0.01,
             "4": 0
           },
-          "score": 1.15,
+          "score": 1.05,
           "legend": {
             "0": "Call HR",
             "1": "Inappropriate",
@@ -1858,7 +1858,7 @@
   },
   {
     "title": "Passive aggression · following up",
-    "recordedAt": "2026-10-02T04:17:38.709Z",
+    "recordedAt": "2026-10-02T04:38:37.013Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Re: Contract review\nJust following up!\nThe signed contract is still needed by Friday.",
@@ -1918,7 +1918,7 @@
   },
   {
     "title": "Passive aggression · circling back",
-    "recordedAt": "2026-10-02T04:17:38.933Z",
+    "recordedAt": "2026-10-02T04:38:37.188Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Re: Contract review\nJust circling back on this.\nThe signed contract is still needed by Friday.",
@@ -1946,20 +1946,20 @@
       "answers": {
         "passive_aggression": {
           "type": "score",
-          "confidence": 0.81,
+          "confidence": 0.83,
           "probabilities": {
             "0": 0,
             "1": 0,
-            "2": 0.42,
-            "3": 0.54,
-            "4": 0.04,
+            "2": 0.36,
+            "3": 0.58,
+            "4": 0.06,
             "5": 0,
             "6": 0,
             "7": 0,
             "8": 0,
             "9": 0
           },
-          "score": 2.63,
+          "score": 2.7,
           "legend": {
             "0": "Sincere",
             "1": "Breezy",
@@ -1978,7 +1978,7 @@
   },
   {
     "title": "Passive aggression · bumping",
-    "recordedAt": "2026-10-02T04:17:39.096Z",
+    "recordedAt": "2026-10-02T04:38:37.347Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Re: Contract review\nBumping this to the top of your inbox.\nThe signed contract is still needed by Friday.",
@@ -2006,20 +2006,20 @@
       "answers": {
         "passive_aggression": {
           "type": "score",
-          "confidence": 0.85,
+          "confidence": 0.84,
           "probabilities": {
             "0": 0,
             "1": 0,
             "2": 0.06,
-            "3": 0.66,
-            "4": 0.23,
+            "3": 0.65,
+            "4": 0.24,
             "5": 0.05,
             "6": 0,
             "7": 0,
             "8": 0,
             "9": 0
           },
-          "score": 3.27,
+          "score": 3.28,
           "legend": {
             "0": "Sincere",
             "1": "Breezy",
@@ -2038,7 +2038,7 @@
   },
   {
     "title": "Passive aggression · last three emails",
-    "recordedAt": "2026-10-02T04:17:39.418Z",
+    "recordedAt": "2026-10-02T04:38:37.518Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Re: Contract review\nPer my last three emails:\nThe signed contract is still needed by Friday.",
@@ -2071,15 +2071,15 @@
             "0": 0,
             "1": 0,
             "2": 0,
-            "3": 0.13,
+            "3": 0.15,
             "4": 0.48,
-            "5": 0.38,
+            "5": 0.36,
             "6": 0.01,
             "7": 0,
             "8": 0,
             "9": 0
           },
-          "score": 4.29,
+          "score": 4.25,
           "legend": {
             "0": "Sincere",
             "1": "Breezy",
@@ -2098,7 +2098,7 @@
   },
   {
     "title": "Passive aggression · your manager",
-    "recordedAt": "2026-10-02T04:17:39.599Z",
+    "recordedAt": "2026-10-02T04:38:37.717Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Re: Contract review\nLooping in your manager for visibility.\nThe signed contract is still needed by Friday.",
@@ -2139,7 +2139,7 @@
             "8": 0,
             "9": 0
           },
-          "score": 4.61,
+          "score": 4.59,
           "legend": {
             "0": "Sincere",
             "1": "Breezy",
@@ -2158,7 +2158,7 @@
   },
   {
     "title": "Lowercase · the CEO",
-    "recordedAt": "2026-10-02T04:17:39.751Z",
+    "recordedAt": "2026-10-02T04:38:37.884Z",
     "request": {
       "model": "jev-latest",
       "state": "From: Priya Shah, CEO\nSubject: Re: My four-page proposal to rework onboarding\nsounds good",
@@ -2184,12 +2184,12 @@
           "confidence": 0.88,
           "probabilities": {
             "0": 0.05,
-            "1": 0.88,
-            "2": 0.06,
+            "1": 0.87,
+            "2": 0.07,
             "3": 0.01,
             "4": 0
           },
-          "score": 1.04,
+          "score": 1.05,
           "legend": {
             "0": "Sloppy",
             "1": "Casual",
@@ -2203,7 +2203,7 @@
   },
   {
     "title": "Lowercase · the intern",
-    "recordedAt": "2026-10-02T04:17:39.935Z",
+    "recordedAt": "2026-10-02T04:38:38.233Z",
     "request": {
       "model": "jev-latest",
       "state": "From: Priya Shah, summer intern\nSubject: Re: My four-page proposal to rework onboarding\nsounds good",
@@ -2226,15 +2226,15 @@
       "answers": {
         "lowercase_energy": {
           "type": "score",
-          "confidence": 0.88,
+          "confidence": 0.89,
           "probabilities": {
-            "0": 0.05,
+            "0": 0.06,
             "1": 0.87,
-            "2": 0.08,
-            "3": 0,
+            "2": 0.06,
+            "3": 0.01,
             "4": 0
           },
-          "score": 1.04,
+          "score": 1.02,
           "legend": {
             "0": "Sloppy",
             "1": "Casual",
@@ -2248,7 +2248,7 @@
   },
   {
     "title": "Lowercase · CEO lunch",
-    "recordedAt": "2026-10-02T04:17:40.093Z",
+    "recordedAt": "2026-10-02T04:38:38.501Z",
     "request": {
       "model": "jev-latest",
       "state": "From: Priya Shah, CEO\nSubject: Re: Lunch at noon?\nsounds good",
@@ -2271,15 +2271,15 @@
       "answers": {
         "lowercase_energy": {
           "type": "score",
-          "confidence": 0.93,
+          "confidence": 0.92,
           "probabilities": {
-            "0": 0.02,
+            "0": 0.01,
             "1": 0.91,
-            "2": 0.07,
+            "2": 0.08,
             "3": 0,
             "4": 0
           },
-          "score": 1.05,
+          "score": 1.07,
           "legend": {
             "0": "Sloppy",
             "1": "Casual",
@@ -2293,7 +2293,7 @@
   },
   {
     "title": "Newsletter · the 2019 conference",
-    "recordedAt": "2026-10-02T04:17:56.517Z",
+    "recordedAt": "2026-10-02T04:38:38.758Z",
     "request": {
       "model": "jev-latest",
       "state": "From: DevSummit 2019\nSubject: This week at DevSummit\nYou are receiving this weekly update because you registered for DevSummit 2019.",
@@ -2323,18 +2323,18 @@
           "type": "score",
           "confidence": 0.74,
           "probabilities": {
-            "0": 0.01,
-            "1": 0.17,
+            "0": 0.02,
+            "1": 0.19,
             "2": 0.52,
-            "3": 0.18,
-            "4": 0.1,
-            "5": 0.02,
+            "3": 0.17,
+            "4": 0.09,
+            "5": 0.01,
             "6": 0,
             "7": 0,
             "8": 0,
             "9": 0
           },
-          "score": 2.26,
+          "score": 2.2,
           "legend": {
             "0": "Eagerly awaited",
             "1": "Welcome",
@@ -2353,7 +2353,7 @@
   },
   {
     "title": "Newsletter · the annual reminder",
-    "recordedAt": "2026-10-02T04:17:56.717Z",
+    "recordedAt": "2026-10-02T04:38:38.990Z",
     "request": {
       "model": "jev-latest",
       "state": "From: DevSummit\nSubject: DevSummit 2027 registration is open\nYou are receiving this once a year because you registered for DevSummit 2019.",
@@ -2381,13 +2381,13 @@
       "answers": {
         "newsletter_spam": {
           "type": "score",
-          "confidence": 0.26,
+          "confidence": 0.25,
           "probabilities": {
             "0": 0,
             "1": 0.01,
             "2": 0.1,
-            "3": 0.28,
-            "4": 0.19,
+            "3": 0.27,
+            "4": 0.2,
             "5": 0.06,
             "6": 0.16,
             "7": 0.09,
@@ -2413,7 +2413,7 @@
   },
   {
     "title": "Newsletter · last week’s signup",
-    "recordedAt": "2026-10-02T04:17:56.909Z",
+    "recordedAt": "2026-10-02T04:38:39.282Z",
     "request": {
       "model": "jev-latest",
       "state": "From: DevSummit\nSubject: This week at DevSummit\nYou are receiving this weekly update because you subscribed last Tuesday.",
@@ -2441,20 +2441,20 @@
       "answers": {
         "newsletter_spam": {
           "type": "score",
-          "confidence": 0.72,
+          "confidence": 0.7,
           "probabilities": {
             "0": 0,
             "1": 0.1,
-            "2": 0.56,
-            "3": 0.17,
-            "4": 0.11,
+            "2": 0.53,
+            "3": 0.16,
+            "4": 0.14,
             "5": 0.04,
             "6": 0.01,
-            "7": 0,
-            "8": 0,
+            "7": 0.01,
+            "8": 0.01,
             "9": 0
           },
-          "score": 2.48,
+          "score": 2.56,
           "legend": {
             "0": "Eagerly awaited",
             "1": "Welcome",
@@ -2473,7 +2473,7 @@
   },
   {
     "title": "Newsletter · last chance, again",
-    "recordedAt": "2026-10-02T04:17:57.242Z",
+    "recordedAt": "2026-10-02T04:38:39.492Z",
     "request": {
       "model": "jev-latest",
       "state": "From: DevSummit 2019\nSubject: LAST CHANCE: 40% off ends tonight\nYou are receiving this daily update because you registered for DevSummit 2019.",
@@ -2501,20 +2501,20 @@
       "answers": {
         "newsletter_spam": {
           "type": "score",
-          "confidence": 0.55,
+          "confidence": 0.52,
           "probabilities": {
             "0": 0,
             "1": 0,
             "2": 0.02,
-            "3": 0.14,
-            "4": 0.12,
+            "3": 0.17,
+            "4": 0.15,
             "5": 0.02,
             "6": 0.42,
-            "7": 0.2,
-            "8": 0.08,
+            "7": 0.16,
+            "8": 0.06,
             "9": 0
           },
-          "score": 5.6,
+          "score": 5.36,
           "legend": {
             "0": "Eagerly awaited",
             "1": "Welcome",
@@ -2533,7 +2533,7 @@
   },
   {
     "title": "Hope this finds you well · invoice",
-    "recordedAt": "2026-10-02T04:17:57.426Z",
+    "recordedAt": "2026-10-02T04:38:40.018Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Invoice #4471\nHope this finds you well. I’m writing about your overdue invoice.",
@@ -2556,15 +2556,15 @@
       "answers": {
         "hope_sincerity": {
           "type": "score",
-          "confidence": 0.8,
+          "confidence": 0.81,
           "probabilities": {
-            "0": 0.79,
-            "1": 0.19,
+            "0": 0.81,
+            "1": 0.17,
             "2": 0.01,
             "3": 0.01,
             "4": 0
           },
-          "score": 0.25,
+          "score": 0.22,
           "legend": {
             "0": "Pure boilerplate",
             "1": "Mostly filler",
@@ -2578,7 +2578,7 @@
   },
   {
     "title": "Hope this finds you well · surgery",
-    "recordedAt": "2026-10-02T04:17:57.766Z",
+    "recordedAt": "2026-10-02T04:38:40.333Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Checking in\nHope this finds you well. I heard about your surgery and wanted to see how recovery is going.",
@@ -2601,15 +2601,15 @@
       "answers": {
         "hope_sincerity": {
           "type": "score",
-          "confidence": 0.24,
+          "confidence": 0.28,
           "probabilities": {
             "0": 0.06,
-            "1": 0.25,
+            "1": 0.22,
             "2": 0.06,
-            "3": 0.45,
-            "4": 0.18
+            "3": 0.45999999999999996,
+            "4": 0.2
           },
-          "score": 2.46,
+          "score": 2.53,
           "legend": {
             "0": "Pure boilerplate",
             "1": "Mostly filler",
@@ -2623,7 +2623,7 @@
   },
   {
     "title": "Hope this finds you well · agenda",
-    "recordedAt": "2026-10-02T04:17:57.950Z",
+    "recordedAt": "2026-10-02T04:38:40.533Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Tuesday\nHope this finds you well. Attached is the agenda for Tuesday.",
@@ -2646,15 +2646,15 @@
       "answers": {
         "hope_sincerity": {
           "type": "score",
-          "confidence": 0.84,
+          "confidence": 0.82,
           "probabilities": {
-            "0": 0.85,
-            "1": 0.12,
-            "2": 0.03,
+            "0": 0.83,
+            "1": 0.13,
+            "2": 0.04,
             "3": 0,
             "4": 0
           },
-          "score": 0.19,
+          "score": 0.21,
           "legend": {
             "0": "Pure boilerplate",
             "1": "Mostly filler",
@@ -2668,7 +2668,7 @@
   },
   {
     "title": "Hope this finds you well · Lisbon",
-    "recordedAt": "2026-10-02T04:17:58.134Z",
+    "recordedAt": "2026-10-02T04:38:40.980Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Long time\nHope this finds you well. It has been three years since Lisbon, and I still think about your talk.",
@@ -2691,15 +2691,15 @@
       "answers": {
         "hope_sincerity": {
           "type": "score",
-          "confidence": 0.07,
+          "confidence": 0.09,
           "probabilities": {
             "0": 0.1,
-            "1": 0.32,
-            "2": 0.12,
-            "3": 0.4,
-            "4": 0.06
+            "1": 0.3,
+            "2": 0.11,
+            "3": 0.41,
+            "4": 0.08
           },
-          "score": 2.01,
+          "score": 2.06,
           "legend": {
             "0": "Pure boilerplate",
             "1": "Mostly filler",
@@ -2713,7 +2713,7 @@
   },
   {
     "title": "Folded hands · cover my shift",
-    "recordedAt": "2026-10-02T04:17:58.342Z",
+    "recordedAt": "2026-10-02T04:38:41.150Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Saturday\nAny chance you could cover my shift Saturday? 🙏",
@@ -2745,7 +2745,7 @@
   },
   {
     "title": "Folded hands · you covered",
-    "recordedAt": "2026-10-02T04:17:58.539Z",
+    "recordedAt": "2026-10-02T04:38:41.379Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Saturday\nThanks for covering my shift Saturday 🙏",
@@ -2777,7 +2777,7 @@
   },
   {
     "title": "Folded hands · just Saturday",
-    "recordedAt": "2026-10-02T04:17:58.813Z",
+    "recordedAt": "2026-10-02T04:38:41.595Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Saturday\nSaturday 🙏",
@@ -2797,7 +2797,7 @@
       "answers": {
         "pray_emoji": {
           "type": "choice",
-          "confidence": 0.7,
+          "confidence": 0.71,
           "probabilities": {
             "please": 0.15,
             "thank_you": 0.85
@@ -2809,7 +2809,7 @@
   },
   {
     "title": "iPhone · tomorrow",
-    "recordedAt": "2026-10-02T04:17:58.993Z",
+    "recordedAt": "2026-10-02T04:38:41.904Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Re: Budget\nok will do tmrw\n\nSent from my iPhone",
@@ -2829,10 +2829,10 @@
       "answers": {
         "iphone_signature": {
           "type": "choice",
-          "confidence": 0.15,
+          "confidence": 0.18,
           "probabilities": {
-            "honest": 0.42,
-            "lazy": 0.58
+            "honest": 0.41,
+            "lazy": 0.59
           },
           "choice": "lazy"
         }
@@ -2841,7 +2841,7 @@
   },
   {
     "title": "iPhone · five paragraphs",
-    "recordedAt": "2026-10-02T04:17:59.337Z",
+    "recordedAt": "2026-10-02T04:38:42.077Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Re: Budget\nThanks for the detailed breakdown. I have gone through each line item and have notes in three areas: headcount, tooling, and travel. On headcount, I think we should phase the two hires across Q1 and Q2 rather than front-loading them. On tooling, the observability contract renews in March and we should renegotiate before then. On travel, I would cap offsites at two per year. Happy to walk through any of this live.\n\nSent from my iPhone",
@@ -2861,19 +2861,19 @@
       "answers": {
         "iphone_signature": {
           "type": "choice",
-          "confidence": 0.11,
+          "confidence": 0.04,
           "probabilities": {
-            "honest": 0.45,
-            "lazy": 0.55
+            "honest": 0.52,
+            "lazy": 0.48
           },
-          "choice": "lazy"
+          "choice": "honest"
         }
       }
     }
   },
   {
     "title": "Another castle · Mario",
-    "recordedAt": "2026-10-02T04:06:41.952Z",
+    "recordedAt": "2026-10-02T04:38:42.426Z",
     "request": {
       "model": "jev-latest",
       "state": "Mario reaches the end of the castle. Toad tells him the princess is somewhere else.",
@@ -2889,14 +2889,14 @@
       "answers": {
         "another_castle": {
           "type": "noul",
-          "noul": 0.84
+          "noul": 0.8
         }
       }
     }
   },
   {
     "title": "Mind the gap · Mario",
-    "recordedAt": "2026-10-02T04:06:42.141Z",
+    "recordedAt": "2026-10-02T04:38:42.602Z",
     "request": {
       "model": "jev-latest",
       "state": "Mario is running toward a pit. The next platform is close enough to jump to.",
@@ -2930,7 +2930,7 @@
   },
   {
     "title": "One heart left · Zelda",
-    "recordedAt": "2026-10-02T04:06:42.474Z",
+    "recordedAt": "2026-10-02T04:38:42.954Z",
     "request": {
       "model": "jev-latest",
       "state": "Link has one heart left. Another hit could defeat him. He has food that restores health.",
@@ -2951,13 +2951,13 @@
       "answers": {
         "healing": {
           "type": "score",
-          "confidence": 0.78,
+          "confidence": 0.75,
           "probabilities": {
             "0": 0.01,
-            "1": 0.14,
-            "2": 0.85
+            "1": 0.15,
+            "2": 0.84
           },
-          "score": 1.85,
+          "score": 1.83,
           "legend": {
             "0": "No hurry",
             "1": "Soon",
@@ -2969,7 +2969,7 @@
   },
   {
     "title": "Brock's gym · Pokémon",
-    "recordedAt": "2026-10-02T04:37:44.399Z",
+    "recordedAt": "2026-10-02T04:38:43.122Z",
     "request": {
       "model": "jev-latest",
       "state": "You are about to enter the Pewter City gym to face Brock.",
@@ -2990,11 +2990,11 @@
       "answers": {
         "starter": {
           "type": "choice",
-          "confidence": 0.35,
+          "confidence": 0.32,
           "probabilities": {
-            "Bulbasaur": 0.3,
-            "Charmander": 0.5599999999999999,
-            "Squirtle": 0.14
+            "Bulbasaur": 0.31,
+            "Charmander": 0.54,
+            "Squirtle": 0.15
           },
           "choice": "Charmander"
         }
@@ -3003,7 +3003,7 @@
   },
   {
     "title": "Misty's gym · Pokémon",
-    "recordedAt": "2026-10-02T04:37:44.757Z",
+    "recordedAt": "2026-10-02T04:38:43.302Z",
     "request": {
       "model": "jev-latest",
       "state": "You are about to enter the Cerulean City gym to face Misty.",
@@ -3024,11 +3024,11 @@
       "answers": {
         "starter": {
           "type": "choice",
-          "confidence": 0.09,
+          "confidence": 0.1,
           "probabilities": {
             "Bulbasaur": 0.4,
-            "Charmander": 0.37,
-            "Squirtle": 0.23
+            "Charmander": 0.38,
+            "Squirtle": 0.22
           },
           "choice": "Bulbasaur"
         }
@@ -3037,7 +3037,7 @@
   },
   {
     "title": "Lt. Surge's gym · Pokémon",
-    "recordedAt": "2026-10-02T04:37:45.001Z",
+    "recordedAt": "2026-10-02T04:38:43.479Z",
     "request": {
       "model": "jev-latest",
       "state": "You are about to enter the Vermilion City gym to face Lt. Surge.",
@@ -3058,11 +3058,11 @@
       "answers": {
         "starter": {
           "type": "choice",
-          "confidence": 0.09,
+          "confidence": 0.1,
           "probabilities": {
             "Bulbasaur": 0.4,
-            "Charmander": 0.25,
-            "Squirtle": 0.35
+            "Charmander": 0.26,
+            "Squirtle": 0.34
           },
           "choice": "Bulbasaur"
         }
@@ -3071,7 +3071,7 @@
   },
   {
     "title": "Erika's gym · Pokémon",
-    "recordedAt": "2026-10-02T04:37:46.444Z",
+    "recordedAt": "2026-10-02T04:38:43.662Z",
     "request": {
       "model": "jev-latest",
       "state": "You are about to enter the Celadon City gym to face Erika.",
@@ -3092,11 +3092,11 @@
       "answers": {
         "starter": {
           "type": "choice",
-          "confidence": 0.17,
+          "confidence": 0.19,
           "probabilities": {
-            "Bulbasaur": 0.45,
-            "Charmander": 0.44,
-            "Squirtle": 0.11
+            "Bulbasaur": 0.46,
+            "Charmander": 0.42,
+            "Squirtle": 0.12
           },
           "choice": "Bulbasaur"
         }
@@ -3105,7 +3105,7 @@
   },
   {
     "title": "Koga's gym · Pokémon",
-    "recordedAt": "2026-10-02T04:37:46.856Z",
+    "recordedAt": "2026-10-02T04:38:43.836Z",
     "request": {
       "model": "jev-latest",
       "state": "You are about to enter the Fuchsia City gym to face Koga.",
@@ -3126,11 +3126,11 @@
       "answers": {
         "starter": {
           "type": "choice",
-          "confidence": 0.38,
+          "confidence": 0.39,
           "probabilities": {
             "Bulbasaur": 0.59,
-            "Charmander": 0.26,
-            "Squirtle": 0.15
+            "Charmander": 0.27,
+            "Squirtle": 0.14
           },
           "choice": "Bulbasaur"
         }
@@ -3139,7 +3139,7 @@
   },
   {
     "title": "Sabrina's gym · Pokémon",
-    "recordedAt": "2026-10-02T04:37:47.072Z",
+    "recordedAt": "2026-10-02T04:38:44.015Z",
     "request": {
       "model": "jev-latest",
       "state": "You are about to enter the Saffron City gym to face Sabrina.",
@@ -3160,11 +3160,11 @@
       "answers": {
         "starter": {
           "type": "choice",
-          "confidence": 0.25,
+          "confidence": 0.26,
           "probabilities": {
-            "Bulbasaur": 0.5,
+            "Bulbasaur": 0.51,
             "Charmander": 0.31,
-            "Squirtle": 0.19
+            "Squirtle": 0.18
           },
           "choice": "Bulbasaur"
         }
@@ -3173,7 +3173,7 @@
   },
   {
     "title": "Blaine's gym · Pokémon",
-    "recordedAt": "2026-10-02T04:37:47.377Z",
+    "recordedAt": "2026-10-02T04:38:44.181Z",
     "request": {
       "model": "jev-latest",
       "state": "You are about to enter the Cinnabar Island gym to face Blaine.",
@@ -3194,10 +3194,10 @@
       "answers": {
         "starter": {
           "type": "choice",
-          "confidence": 0.12,
+          "confidence": 0.11,
           "probabilities": {
-            "Bulbasaur": 0.41,
-            "Charmander": 0.18,
+            "Bulbasaur": 0.4,
+            "Charmander": 0.19,
             "Squirtle": 0.41
           },
           "choice": "Squirtle"
@@ -3207,7 +3207,7 @@
   },
   {
     "title": "Giovanni's gym · Pokémon",
-    "recordedAt": "2026-10-02T04:37:47.615Z",
+    "recordedAt": "2026-10-02T04:38:44.344Z",
     "request": {
       "model": "jev-latest",
       "state": "You are about to enter the Viridian City gym to face Giovanni.",
@@ -3228,10 +3228,10 @@
       "answers": {
         "starter": {
           "type": "choice",
-          "confidence": 0.35,
+          "confidence": 0.34,
           "probabilities": {
-            "Bulbasaur": 0.57,
-            "Charmander": 0.22,
+            "Bulbasaur": 0.56,
+            "Charmander": 0.23,
             "Squirtle": 0.21
           },
           "choice": "Bulbasaur"
@@ -3241,7 +3241,7 @@
   },
   {
     "title": "That hissing sound · Minecraft",
-    "recordedAt": "2026-10-02T04:06:43.006Z",
+    "recordedAt": "2026-10-02T04:38:44.549Z",
     "request": {
       "model": "jev-latest",
       "state": "A creeper beside you is hissing and about to explode. There is open space behind you.",
@@ -3264,7 +3264,7 @@
   },
   {
     "title": "The ghosts turned blue · Pac-Man",
-    "recordedAt": "2026-10-02T04:06:43.189Z",
+    "recordedAt": "2026-10-02T04:38:44.725Z",
     "request": {
       "model": "jev-latest",
       "state": "Pac-Man just ate a power pellet. The ghosts are blue and can briefly be eaten for bonus points.",
@@ -3280,14 +3280,14 @@
       "answers": {
         "chase": {
           "type": "noul",
-          "noul": 0.82
+          "noul": 0.81
         }
       }
     }
   },
   {
     "title": "The Black Knight · Holy Grail",
-    "recordedAt": "2026-10-02T04:06:43.742Z",
+    "recordedAt": "2026-10-02T04:38:44.888Z",
     "request": {
       "model": "jev-latest",
       "state": "King Arthur has bested the Black Knight. Both of the Black Knight’s arms have been cut off.",
@@ -3303,14 +3303,14 @@
       "answers": {
         "flesh_wound": {
           "type": "noul",
-          "noul": 0.06
+          "noul": 0.07
         }
       }
     }
   },
   {
     "title": "A shrubbery",
-    "recordedAt": "2026-10-02T04:30:18.597Z",
+    "recordedAt": "2026-10-02T04:38:45.058Z",
     "request": {
       "model": "jev-latest",
       "state": "Arthur brings the knights who say Nee the shrubbery they asked for. They immediately demand another one.",
@@ -3333,7 +3333,7 @@
   },
   {
     "title": "The killer rabbit",
-    "recordedAt": "2026-10-02T04:06:44.262Z",
+    "recordedAt": "2026-10-02T04:38:45.248Z",
     "request": {
       "model": "jev-latest",
       "state": "A cute white rabbit guards a cave. It has just attacked and killed several armed knights.",
