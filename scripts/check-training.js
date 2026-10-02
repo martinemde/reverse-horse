@@ -41,6 +41,10 @@ async function pageFor(viewport, init) {
 const setRange = (input, value) => input.evaluate((el, value) => {
   el.value = String(value); el.dispatchEvent(new Event('input', { bubbles: true }));
 }, value);
+async function begin(dialog) {
+  await dialog.getByRole('button', { name: 'Next: System One' }).click();
+  await dialog.getByRole('button', { name: 'Begin mandatory training' }).click();
+}
 async function noOverflow(page) {
   assert.equal(await page.locator('#training').evaluate(el => el.scrollWidth > el.clientWidth), false, 'Training fits the viewport');
 }
@@ -52,7 +56,7 @@ try {
     assert.equal(await page.locator('#requests form').count(), 0, 'Training does not deal practice');
     await noOverflow(page);
     await page.screenshot({ path: `/tmp/reverse-horse-training-${viewport.width}-induction.png` });
-    await dialog.getByRole('button', { name: 'Begin mandatory training' }).click();
+    await begin(dialog);
     for (const [index, id] of ['payment_needed', 'team', 'urgency'].entries()) {
       const card = dialog.locator('form');
       await card.locator(`[data-question="${id}"]`).waitFor();
@@ -113,7 +117,7 @@ try {
   for (let exitStep = 0; exitStep <= 4; exitStep++) {
     const { context, page } = await pageFor({ width: 390, height: 844 });
     const dialog = page.getByRole('dialog');
-    if (exitStep > 0) await dialog.getByRole('button', { name: 'Begin mandatory training' }).click();
+    if (exitStep > 0) await begin(dialog);
     for (let step = 1; step < exitStep; step++) {
       const card = dialog.locator('form');
       await setRange(card.locator('input[type=range]').first(), 0.5);
@@ -132,7 +136,7 @@ try {
     Object.defineProperty(window, 'localStorage', { get() { throw new DOMException('Storage blocked', 'SecurityError'); } });
   });
   const dialog = page.getByRole('dialog');
-  await dialog.getByRole('button', { name: 'Begin mandatory training' }).click();
+  await begin(dialog);
   await dialog.locator('form button').click();
   assert.equal(await dialog.locator('.jev-marker').first().isVisible(), true, 'Recorded comparison works with blocked storage');
   await dialog.getByRole('button', { name: 'Exit training' }).click();

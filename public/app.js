@@ -150,6 +150,7 @@ function makeForm(item, onTrainingSubmit) {
         const option = node('div', undefined, 'choice');
         const row = node('div', undefined, 'range-row');
         const label = node('span', key, 'choice-name');
+        if (q.criteria[key] !== null) label.append(node('span', `: ${text(q.criteria[key])}`, 'choice-description'));
         const fullness = node('output');
         const output = node('output', undefined, 'choice-probability');
         const jev = node('span', 'JEV', 'jev-value pending');
@@ -162,7 +163,6 @@ function makeForm(item, onTrainingSubmit) {
         const probabilities = node('div', undefined, 'choice-probabilities'); probabilities.append(output, jev);
         controls.push({ key, slider, fullness, output, jev, option, marker: scale.marker });
         row.append(label, numbers); option.append(row);
-        if (q.criteria[key] !== null) option.append(node('p', text(q.criteria[key])));
         option.append(scale.wrapper, probabilities); field.append(option);
       }
       const summary = node('div', undefined, 'choice-summary');

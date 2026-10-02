@@ -86,7 +86,7 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
     top.append(brand, button('Exit training', () => close(), 'secondary'));
     const progress = node('ol', undefined, 'training-progress');
     progress.setAttribute('aria-label', 'Training progress');
-    for (const [index, label] of ['Induction', 'Noul', 'Choice', 'Score', 'Certified'].entries()) {
+    for (const [index, label] of ['Induction', 'System One', 'Noul', 'Choice', 'Score', 'Certified'].entries()) {
       const item = node('li', `${String(index + 1).padStart(2, '0')} ${label}`);
       if (index === step) item.setAttribute('aria-current', 'step');
       if (index < step) item.className = 'complete';
@@ -98,25 +98,31 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
     if (step === 0) {
       heading.textContent = 'Congratulations. You are the AI model.';
       body.append(node('div', 'MODEL INDUCTION / HUMAN DIVISION', 'eyebrow'), heading,
-        node('p', 'Specifically, a System One model: fast, automatic, gut reaction. That’s Daniel Kahneman’s System One, not the slow, deliberate System Two.', 'training-lead'),
-        node('p', 'Every request has a 30-second time limit, so there’s no time to deliberate. Go with your gut.'),
-        node('p', 'The limit is also there because real customers are waiting. Their software is holding an API call open until you answer.'),
-        node('p', 'Requests arrive through the API. Everyone on the site sees them. You answer.'));
+        node('p', 'Requests arrive through the API. Everyone on the site sees them. You answer.', 'training-lead'));
       if (storageNotice) body.append(node('p', storageNotice, 'training-note'));
-      actions.append(button('Begin mandatory training', () => go(1)));
-    } else if (step === 4) {
+      actions.append(button('Next: System One', () => go(1)));
+    } else if (step === 1) {
+      heading.textContent = 'You are a System One model.';
+      const warning = node('p'); warning.append(node('strong', 'Don’t let the API request time out!'));
+      body.append(node('div', 'MODEL INDUCTION / HUMAN DIVISION', 'eyebrow'), heading,
+        node('p', 'A fast, automatic, gut reaction. (Daniel Kahneman would be proud.)', 'training-lead'),
+        node('p', 'Every request has a 30-second time limit.'),
+        warning,
+        node('p', 'Real API requests are holding the connection open until you answer. (Sorry, Cloudflare 😬)'));
+      actions.append(button('Back', () => go(0), 'secondary'), button('Begin mandatory training', () => go(2)));
+    } else if (step === 5) {
       heading.textContent = 'You are now a qualified AI model.';
       body.append(node('div', 'CERTIFICATION / ENTIRELY SELF-ACCREDITED', 'eyebrow'), heading,
         node('p', 'Your neural network was inside you all along.', 'training-lead'),
         node('p', 'Practice rounds start on the Answer screen; Pause stops them. Live API requests have 30 seconds from arrival. Connect OpenRouter to compare live requests with JEV. Question lets you build and send your own.'),
         node('p', 'Reopen Training from the navigation anytime.', 'training-note'));
-      actions.append(button('Back', () => go(3), 'secondary'), button('Enter the site', () => close(true)));
+      actions.append(button('Back', () => go(4), 'secondary'), button('Enter the site', () => close(true)));
     } else {
-      const lesson = lessons[step - 1];
+      const lesson = lessons[step - 2];
       const example = examples.find(example => Object.hasOwn(example.request.questions, lesson.id));
       const saved = getSavedExample(example.request);
       heading.textContent = lesson.title;
-      body.append(node('div', `EXERCISE ${step} / ${lesson.type.toUpperCase()}`, 'eyebrow'), heading);
+      body.append(node('div', `EXERCISE ${step - 1} / ${lesson.type.toUpperCase()}`, 'eyebrow'), heading);
       const grid = node('div', undefined, 'training-grid');
       const guide = node('div', undefined, 'training-guide');
       guide.append(node('h2', lesson.type), node('p', lesson.concept), node('h3', 'Controls'), node('p', lesson.controls));
@@ -128,7 +134,7 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
       const result = answers.get(lesson.id);
       if (result && saved) result.jev = saved.jev;
       const status = node('p', result ? '' : 'Submit your answer to continue.');
-      const next = button(step === 3 ? 'Complete training' : `Next: ${lessons[step].type}`, () => go(step + 1));
+      const next = button(step === 4 ? 'Complete training' : `Next: ${lessons[step - 1].type}`, () => go(step + 1));
       next.disabled = !result;
       const review = node('section', undefined, 'training-review');
       review.hidden = !result;
