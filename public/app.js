@@ -359,7 +359,9 @@ const training = createTraining({
   onClose(error) { setPlaying(resumePractice); presence(); if (error) showError(error); },
 });
 $('#train').addEventListener('click', () => training.open());
-training.start();
+// Other pages link Training to /#training.
+if (location.hash === '#training') { history.replaceState(null, '', location.pathname + location.search); training.open(); }
+else training.start();
 $('#auth').addEventListener('click', async () => {
   $('#auth').disabled = true;
   try {
