@@ -189,7 +189,7 @@ function makeForm(item, onTrainingSubmit) {
       } else {
         const ticks = node('div', undefined, 'scale');
         const legend = node('div', undefined, 'legend');
-        q.criteria.forEach((label, i) => { const tick = node('span'); tick.append(node('b', i)); ticks.append(tick); legend.append(node('span', text(label))); });
+        q.criteria.forEach((label, i) => { const tick = node('span'); tick.append(node('b', i)); ticks.append(tick); const slot = node('span'); slot.append(node('span', text(label))); legend.append(slot); });
         field.append(ticks, legend);
       }
     }
