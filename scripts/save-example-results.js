@@ -10,7 +10,7 @@ for (const example of examples) {
   const existing = saved.find(run => JSON.stringify(run.request) === JSON.stringify(example.request));
   if (existing) {
     validateJevResponse(example.request, existing.jev);
-    results.push(existing);
+    results.push({ ...existing, title: example.title });
     console.log(`Reused: ${example.title}`);
   } else {
     if (!apiKey) throw new Error('Set OPENROUTER_API_KEY in .env before recording missing examples.');
