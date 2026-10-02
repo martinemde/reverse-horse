@@ -6,6 +6,7 @@ import { resolve } from 'node:path';
 import { startServer } from '../server.js';
 import recordings from '../public/example-results.json';
 import { answerRequest } from '../public/protocol.js';
+import { matchesJev } from '../public/compare.js';
 
 if (!process.argv[2]) throw new Error('Pass the path to an installed playwright-core/index.mjs');
 const { chromium } = await import(pathToFileURL(resolve(process.argv[2])).href);
@@ -43,15 +44,6 @@ const setRange = (input, value) => input.evaluate((el, value) => {
 async function noOverflow(page) {
   assert.equal(await page.locator('#training').evaluate(el => el.scrollWidth > el.clientWidth), false, 'Training fits the viewport');
 }
-function sameResponse(actual, expected) {
-  for (const [id, answer] of Object.entries(expected.answers)) {
-    if (answer.confidence !== undefined) {
-      assert.ok(Math.abs(actual.answers[id].confidence - answer.confidence) < 1e-12, 'Confidence agrees across JS engines');
-      answer.confidence = actual.answers[id].confidence;
-    }
-  }
-  assert.deepEqual(actual, expected);
-}
 try {
   for (const viewport of [{ width: 1280, height: 900 }, { width: 390, height: 844 }]) {
     const { context, page } = await pageFor(viewport);
@@ -65,7 +57,6 @@ try {
       const card = dialog.locator('form');
       await card.locator(`[data-question="${id}"]`).waitFor();
       const run = recordings.find(run => Object.hasOwn(run.request.questions, id));
-      assert.deepEqual(JSON.parse(await dialog.locator('.training-request-json pre').textContent()), run.request);
       assert.equal(await dialog.locator('.training-actions button').last().isDisabled(), true);
       let values;
       if (id === 'team') {
@@ -87,15 +78,16 @@ try {
       await noOverflow(page);
       await page.screenshot({ path: `/tmp/reverse-horse-training-${viewport.width}-${id}.png` });
       await card.getByRole('button').click();
-      sameResponse(JSON.parse(await dialog.locator('.training-json pre').first().textContent()), answerRequest(run.request, { [id]: values }));
-      assert.deepEqual(JSON.parse(await dialog.locator('.training-jev pre').textContent()), run.jev);
+      const verdict = matchesJev(answerRequest(run.request, { [id]: values }).answers[id], run.jev.answers[id]) ? 'Matched JEV' : 'Different from JEV';
+      assert.equal(await card.locator('.question-feedback').textContent(), verdict);
+      assert.equal(await dialog.locator('pre').count(), 1, 'Only the state is shown, no JSON');
       assert.equal(await card.locator('input:enabled').count(), 0);
       assert.equal(await card.locator('.jev-marker:not([hidden])').count(), id === 'team' ? 3 : 1);
       assert.equal(await dialog.locator('.training-actions button').last().isEnabled(), true, 'A mismatch still permits progress');
       if (index === 0) {
         await dialog.getByRole('button', { name: 'Back', exact: true }).click();
         await dialog.getByRole('button', { name: 'Begin mandatory training' }).click();
-        sameResponse(JSON.parse(await dialog.locator('.training-json pre').first().textContent()), answerRequest(run.request, { [id]: values }));
+        assert.equal(await card.locator('.question-feedback').textContent(), verdict);
       }
       await page.screenshot({ path: `/tmp/reverse-horse-training-${viewport.width}-${id}-review.png` });
       await noOverflow(page);
@@ -142,7 +134,7 @@ try {
   const dialog = page.getByRole('dialog');
   await dialog.getByRole('button', { name: 'Begin mandatory training' }).click();
   await dialog.locator('form button').click();
-  assert.equal(await dialog.locator('.training-jev').isVisible(), true, 'Recorded comparison works with blocked storage');
+  assert.equal(await dialog.locator('.jev-marker').first().isVisible(), true, 'Recorded comparison works with blocked storage');
   await dialog.getByRole('button', { name: 'Exit training' }).click();
   await page.locator('#requests form').waitFor();
   await context.close();

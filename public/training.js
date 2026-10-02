@@ -6,21 +6,18 @@ const lessons = [
     id: 'payment_needed', type: 'noul', title: 'Does this email need a payment?',
     concept: 'Named after Jacob Bernoulli (not the Bernoulli Principle Bernoulli; that’s Daniel, his nephew). Jacob proved that as you repeat an experiment, the observed frequency of an outcome converges to its true probability: the law of large numbers. Noul is short for “Bernoulli trial”: a true/false outcome and how often it occurs.',
     controls: 'Slide toward 1 for yes, 0 for no. 0.5 means you can’t tell.',
-    response: 'noul is the probability of yes, from 0 to 1. There is no separate confidence.',
     explanation: 'The email says payment was received and nothing is needed. JEV says 0.02. The pink marker shows its answer.',
   },
   {
     id: 'team', type: 'choice', title: 'Which team should handle this email?',
     concept: 'Jev picks between the choices you give it. Usually you want an “unknown” or “not available” choice too. Force “how will the coin land?” between heads and tails and it picks heads; offer “unknowable” and it honestly says it can’t be known.',
     controls: 'Fill each bar from 0 to 100%. Your fullest bar is your confidence; relative fullness sets each probability.',
-    response: 'choice is the winning key (ties go first). probabilities covers every option and sums to 1. confidence is your fullest bar.',
     explanation: 'A duplicate charge and refund belong with billing. JEV picks billing with probability 1 and confidence 1.',
   },
   {
     id: 'urgency', type: 'score', title: 'How urgent is this email?',
     concept: 'Picture one of those sliders from “Strongly Disagree” to “Strongly Agree.” A score isn’t discrete: the answer doesn’t have to land on a step. With five levels, Jev could return 1.3, between “disagree” and “neutral.”',
     controls: 'Slide along the levels. The first is 0, the next 1, and so on. Stop between them if that fits.',
-    response: 'score is the position on the scale. legend maps levels to labels. probabilities spreads weight across levels.',
     explanation: 'The meeting is in 30 minutes and the slides are blocking. JEV scores it 2, “Needs attention now.”',
   },
 ];
@@ -44,11 +41,6 @@ function fields(entries) {
     list.append(term, node('dd', description));
   }
   return list;
-}
-function jsonPanel(title, value, className = '') {
-  const panel = node('section', undefined, `training-json ${className}`);
-  panel.append(node('h3', title), node('pre', JSON.stringify(value, null, 2)));
-  return panel;
 }
 
 export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onClose }) {
@@ -106,9 +98,10 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
     if (step === 0) {
       heading.textContent = 'Congratulations. You are the AI model.';
       body.append(node('div', 'MODEL INDUCTION / HUMAN DIVISION', 'eyebrow'), heading,
-        node('p', 'Software sends you a request. You read the state, answer every question, and your answers go back as JSON before the caller times out.', 'training-lead'),
-        node('p', 'Jev answers three types of questions: noul, choice, and score. You will too. Don’t think. Go with your gut. Get it right.'),
-        node('p', 'Three untimed exercises, checked against recorded JEV answers.', 'training-note'));
+        node('p', 'Specifically, a System One model: fast, automatic, gut reaction. That’s Daniel Kahneman’s System One, not the slow, deliberate System Two.', 'training-lead'),
+        node('p', 'Every request has a 30-second time limit, so there’s no time to deliberate. Go with your gut.'),
+        node('p', 'The limit is also there because real customers are waiting. Their software is holding an API call open until you answer.'),
+        node('p', 'Requests arrive through the API. Everyone on the site sees them. You answer.'));
       if (storageNotice) body.append(node('p', storageNotice, 'training-note'));
       actions.append(button('Begin mandatory training', () => go(1)));
     } else if (step === 4) {
@@ -131,9 +124,6 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
         ['100 / 100 / 0', 'Confidence 100%, probabilities 50 / 50 / 0.'],
         ['50 / 50 / 0', 'Confidence 50%, same probabilities.'],
       ]));
-      const requestJSON = node('details', undefined, 'training-request-json');
-      requestJSON.append(node('summary', 'The API request'), node('pre', JSON.stringify(example.request, null, 2)));
-      guide.append(requestJSON);
       const exercise = node('div');
       const result = answers.get(lesson.id);
       if (result && saved) result.jev = saved.jev;
@@ -142,14 +132,14 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
       next.disabled = !result;
       const review = node('section', undefined, 'training-review');
       review.hidden = !result;
-      review.setAttribute('aria-label', 'Answer comparison and API response');
+      review.setAttribute('aria-label', 'What JEV said');
       review.tabIndex = -1;
       const item = { ...example, id: `training-${lesson.id}`, local: true, training: true };
       const form = makeForm(item, human => {
         const outcome = { human, jev: saved?.jev, status: 'Training answer saved' };
         answers.set(lesson.id, outcome);
         form.finish(outcome);
-        showReview(outcome);
+        showReview();
         next.disabled = false;
         status.textContent = '';
         review.focus({ preventScroll: true });
@@ -158,18 +148,13 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
       exercise.append(form.card);
       grid.append(guide, exercise);
       body.append(grid, review);
-      function showReview(outcome) {
+      function showReview() {
         review.hidden = false;
-        review.replaceChildren(node('h2', 'How you compare'));
+        review.replaceChildren(node('h2', 'What JEV said'));
         if (saved) review.append(node('p', lesson.explanation), node('p', `Actual JEV run · ${new Date(saved.recordedAt).toLocaleDateString()} · ${saved.jev.model}`, 'training-note'));
         else review.append(node('p', 'The recorded JEV answer didn’t load. Refresh to retry, or continue.'));
-        review.append(node('p', lesson.response, 'training-note'));
-        const comparison = node('div', undefined, 'training-grid');
-        comparison.append(jsonPanel('Your API response', outcome.human));
-        if (saved) comparison.append(jsonPanel('JEV’s recorded response', saved.jev, 'training-jev'));
-        review.append(comparison);
       }
-      if (result) { form.finish(result); showReview(result); }
+      if (result) { form.finish(result); showReview(); }
       actions.append(button('Back', () => go(step - 1), 'secondary'), status, next);
     }
     dialog.replaceChildren(top, progress, body, actions);
