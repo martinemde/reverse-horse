@@ -71,6 +71,7 @@ function emptyState(playing) {
   return empty;
 }
 function send(message) { if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message)); }
+function presence() { send({ type: 'presence', active: document.visibilityState === 'visible' && !training.active }); }
 function showError(message) { $('#error').textContent = message; $('#error').hidden = !message; }
 function refreshAuth() {
   const connected = Boolean(getKey());
@@ -93,6 +94,7 @@ function makeForm(item, onTrainingSubmit) {
   const views = new Map();
   let submitting = false;
   let completed = false;
+  let submitted = false;
   let outcomeSignature = '';
   const card = node('form', undefined, 'request');
   card.dataset.id = item.id;
@@ -202,7 +204,7 @@ function makeForm(item, onTrainingSubmit) {
     if (completed) return;
     const invalidChoice = Object.values(values).some(v => typeof v === 'object' && !Object.values(v).some(n => n > 0));
     // Keep the button DOM stable: WebKit drops clicks if its text changes mid-press.
-    button.disabled = submitting || (!item.local && socket?.readyState !== WebSocket.OPEN) || invalidChoice;
+    button.disabled = submitted || submitting || (!item.local && socket?.readyState !== WebSocket.OPEN) || invalidChoice;
   }
   card.addEventListener('submit', event => {
     event.preventDefault(); validity(); if (button.disabled) return;
@@ -238,7 +240,7 @@ function makeForm(item, onTrainingSubmit) {
         }
       }
     }
-    hint.textContent = result.jev ? '' : result.status;
+    hint.textContent = result.answerCount > 1 ? `Average of ${result.answerCount} answers${result.jev ? '' : ` · ${result.status}`}` : result.jev ? '' : result.status;
     for (const [id, view] of views) {
       const human = result.human?.answers[id];
       const jev = result.jev?.answers[id];
@@ -260,7 +262,16 @@ function makeForm(item, onTrainingSubmit) {
       } else mark(view, human.type === 'noul' ? jev.noul : jev.score, view.max, (human.type === 'noul' ? jev.noul : jev.score).toFixed(3));
     }
   }
-  return { card, clock, validity, finish, reset() { if (!completed) { submitting = false; validity(); } } };
+  function progress(item) {
+    submitted = Boolean(item.submitted);
+    const label = submitted ? 'Submitted' : 'Submit answers';
+    if (button.textContent !== label) button.textContent = label;
+    for (const view of views.values()) view.field.disabled = submitted;
+    if (submitted) submitting = false;
+    hint.textContent = submitted ? `Waiting for answers · ${item.received}/${item.expected} received` : `${item.received}/${item.expected} answers received`;
+    validity();
+  }
+  return { card, clock, validity, finish, progress, reset() { if (!completed) { submitting = false; validity(); } } };
 }
 function update(message) {
   offset = message.serverTime - Date.now();
@@ -283,6 +294,7 @@ function render() {
       if (!forms.has(item.id)) { const form = makeForm(item); forms.set(item.id, form); $('#requests').prepend(form.card); }
     }
     for (const result of results) forms.get(result.id).finish(result);
+    for (const item of serverQueue.requests) forms.get(item.id).progress(item);
   } else if (!$('#requests .empty')) {
     $('#requests').append(emptyState(playing));
   } else $('#requests .empty p').textContent = playing ? 'Next example coming up…' : 'Press play to answer questions. Live requests are always welcome.';
@@ -312,7 +324,7 @@ async function compareInBrowser(message) {
 }
 function connect() {
   socket = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/ws`);
-  socket.addEventListener('open', () => { $('#connection').textContent = 'Connected'; for (const form of forms.values()) form.reset(); });
+  socket.addEventListener('open', () => { presence(); $('#connection').textContent = 'Connected'; for (const form of forms.values()) form.reset(); });
   socket.addEventListener('close', () => { for (const [id, controller] of comparisons) if (!practiceResults.some(result => result.id === id)) controller.abort(); $('#connection').textContent = 'Disconnected · reconnecting…'; tick(); setTimeout(connect, 1000); });
   socket.addEventListener('message', event => { const message = JSON.parse(event.data); if (message.type === 'queue') update(message); if (message.type === 'compare') void compareInBrowser(message); if (message.type === 'error') { showError(message.message); for (const form of forms.values()) form.reset(); } });
 }
@@ -337,8 +349,8 @@ $('#play').addEventListener('click', () => setPlaying(!playing));
 let resumePractice;
 const training = createTraining({
   dialog: $('#training'), makeForm, getSavedExample: savedExample,
-  onOpen() { resumePractice = playing; setPlaying(false); },
-  onClose(error) { setPlaying(resumePractice); if (error) showError(error); },
+  onOpen() { resumePractice = playing; setPlaying(false); presence(); },
+  onClose(error) { setPlaying(resumePractice); presence(); if (error) showError(error); },
 });
 $('#train').addEventListener('click', () => training.open());
 training.start();
@@ -357,6 +369,7 @@ $('#compare').addEventListener('change', () => {
   catch { showError('Could not save your comparison preference in browser storage.'); }
 });
 window.addEventListener('storage', () => { try { refreshAuth(); if (!$('#compare').checked) for (const controller of comparisons.values()) controller.abort(); } catch { /* Storage may be disabled. */ } });
+document.addEventListener('visibilitychange', presence);
 async function initialize() {
   try { migrateStorage(); } catch { showError("Could not migrate browser storage. Allow site storage to connect OpenRouter."); }
   const callback = new URL(location.href);

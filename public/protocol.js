@@ -58,3 +58,20 @@ export function answerRequest(request, values) {
   }));
   return { model: 'reverse-horse', answers, usage: { input_tokens: 0, output_tokens: 0 } };
 }
+
+// Every respondent has equal weight, regardless of how full their Choice bars are.
+export function averageResponses(responses) {
+  assert(responses.length > 0, 'At least one answer is required');
+  if (responses.length === 1) return responses[0];
+  const mean = values => values.reduce((sum, value) => sum + value, 0) / values.length;
+  const answers = Object.fromEntries(Object.entries(responses[0].answers).map(([id, first]) => {
+    const replies = responses.map(response => response.answers[id]);
+    if (first.type === 'noul') return [id, { type: 'noul', noul: mean(replies.map(answer => answer.noul)) }];
+    const probabilities = Object.fromEntries(Object.keys(first.probabilities).map(key => [key, mean(replies.map(answer => answer.probabilities[key]))]));
+    const answer = { ...first, probabilities, confidence: mean(replies.map(answer => answer.confidence)) };
+    if (first.type === 'score') answer.score = mean(replies.map(answer => answer.score));
+    else answer.choice = Object.keys(probabilities).reduce((best, key) => probabilities[key] > probabilities[best] ? key : best);
+    return [id, answer];
+  }));
+  return { ...responses[0], answers };
+}

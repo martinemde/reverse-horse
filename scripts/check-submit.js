@@ -117,6 +117,7 @@ try {
   // protocol. No model is mocked and no external inference is made by this test.
   const peer = new WebSocket(new URL('/ws', app.server.url).href.replace('http:', 'ws:'), { headers: { Origin: app.server.url.origin } });
   await new Promise(resolve => peer.addEventListener('open', resolve, { once: true }));
+  peer.send(JSON.stringify({ type: 'presence', active: true }));
   const run = recordings[0];
   let requestId;
   const comparison = new Promise(resolve => peer.addEventListener('message', event => { const message = JSON.parse(event.data); if (message.type === 'compare') resolve(message); }));
@@ -131,6 +132,14 @@ try {
 
   const values = Object.fromEntries(Object.entries(run.jev.answers).map(([id, answer]) => [id, answer.type === 'choice' ? answer.probabilities : answer.type === 'noul' ? answer.noul : answer.score]));
   peer.send(JSON.stringify({ type: 'submit', id: requestId, values, compare: true }));
+  await page.locator('#compare').uncheck();
+  for (const [id, question] of Object.entries(run.request.questions)) {
+    const inputs = page.locator(`form[data-id="${requestId}"] fieldset[data-question="${id}"] input[type=range]`);
+    if (question.type === 'choice') {
+      for (const [index, weight] of Object.values(values[id]).entries()) await setRange(inputs.nth(index), weight);
+    } else await setRange(inputs, values[id]);
+  }
+  await page.locator(`form[data-id="${requestId}"] button`).click({ delay: 350 });
   await comparison;
   await page.waitForFunction(el => el.classList.contains('answered'), live);
   assert.equal(await live.$eval('.jev-marker', marker => marker.hidden), true);

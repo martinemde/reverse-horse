@@ -9,7 +9,9 @@ url: https://reverse-horse.poblonko.workers.dev
 Be Jev: a Bun server or Cloudflare Worker accepts TypeSafe System One requests, shows their
 state and questions live over a WebSocket, and holds the HTTP connection while
 you answer. Each API call has 30 seconds from arrival, including time in the queue.
-After that the caller receives 504, but the questions and your draft remain on
+The caller receives the average of the participating browsers' answers once
+everyone submits. At the deadline it receives the average submitted so far,
+or 504 if nobody answered. After a 504 the questions and your draft remain on
 the page. You can save late answers and optionally compare them with JEV; late
 answers cannot reach the expired caller. Auto mode waits for your answer before
 dealing the next round, even after its timer expires.
@@ -44,8 +46,8 @@ a random verifier and state are kept in session storage, the callback exchanges
 the code directly with OpenRouter, and the key stays in this origin's local
 storage. Callbacks expire after ten minutes and must match the initiating tab.
 
-After submission, the caller immediately receives your answers. If comparison is
-enabled, that browser sends the original request directly to
+After all participating browsers submit, the caller receives their average. If comparison is
+enabled, one connected submitter who opted in sends the original request directly to
 `https://openrouter.ai/api/v1/systemone`. Only the comparison result returns to
 the local server for display and reconnects; the key is never sent to it or to
 another browser. Requests use the submitter's OpenRouter credits. No connection
@@ -97,7 +99,7 @@ curl http://127.0.0.1:3000/api/v1/systemone \
 ```
 
 `/v1/systemone` is also supported for SDK clients. The local endpoint needs no API
-key and binds to loopback. Invalid requests return 400; unanswered requests return
+key and binds to loopback. Invalid requests return 400; requests with no answers return
 504 after 30 seconds. Callers need an HTTP timeout longer than 30 seconds. Client
 disconnects before the deadline remove their request. A maximum of 100 unanswered
 requests (including timed-out ones) is accepted.
@@ -126,8 +128,18 @@ proxy for overall confidence. Neither formula is numerically equivalent to JEV's
 
 The queue and latest 20 results live in memory. Reconnecting gets a fresh snapshot;
 draft slider values survive a connection interruption while the page stays open,
-but not a page refresh. Multiple tabs see the same queue; the first valid submission
-wins. Restarting the server clears requests and results.
+but not a page refresh. Multiple tabs see the same queue. Only visible answering
+pages outside training participate: they send `{type: "presence", active: true}`
+when available and `active: false` when hidden or in training. A newly available
+page joins pending requests. Each connection gets one submission per request;
+unanswered connections stop holding it open when hidden or disconnected, while
+saved replies remain in the average. Submitted controls lock while waiting, and
+the final card displays the average and answer count. Noul and Score values,
+probabilities, and confidence are arithmetic means; Choice selects the highest
+mean probability, with ties using the first option. Each person's normalized
+Choice distribution has equal weight regardless of bar fullness. Score averages
+preserve the submitted distributions rather than interpolating from the mean
+score. Restarting the server clears requests and results.
 
 ## Cloudflare
 
@@ -167,14 +179,14 @@ Durable Object named `shared`. The Bun and Cloudflare adapters use the same
 queue implementation in `room.js`.
 
 This is one shared room: every connected browser sees the same requests and
-results, and the first valid answer wins. Standard WebSockets keep that object
+results, and live answering pages contribute to one averaged response. Standard WebSockets keep that object
 active while browsers are connected (no hibernation). The queue is still in
 memory, not persisted; object restarts and deployments can clear it and interrupt
 waiting API calls. OpenRouter keys remain exclusively in each browser.
 
 Run `bun scripts/check-worker.js http://127.0.0.1:8787` against the local Worker,
 or pass the deployed HTTPS origin after publishing. It sends two labeled test
-requests, checks two sockets racing to answer, and waits the actual 30 seconds
+requests, checks two participating sockets averaging their answers, and waits the actual 30 seconds
 to verify a 504 followed by a saved late answer. It does not call OpenRouter.
 
 ## Verify
@@ -189,7 +201,15 @@ server and refuses external network requests. Set `PLAYWRIGHT_CHROMIUM_EXECUTABL
 to use an existing Chromium executable; otherwise install the matching browser
 with Playwright's CLI. Screenshots are written to `/tmp/reverse-horse-training-*`.
 
+`bun scripts/check-average.js /path/to/playwright-core/index.mjs` runs two live
+answering pages and a training page through Chromium, verifies waiting and locked
+controls, the averaged HTTP response and displayed sliders, and participation
+changes on entering/exiting training. It refuses external requests. Use
+`PLAYWRIGHT_CHROMIUM_EXECUTABLE` to select an existing Chromium executable.
+The screenshot is saved to `/tmp/reverse-horse-average.png`.
+
 `bun test` exercises real local HTTP/WebSocket connections, all three answer types,
+averaging, presence, disconnects, partial answers at the deadline,
 reconnection, duplicate submission, validation, expiration, auto mode, and static
 assets. Auth tests check PKCE, callback rejection, and browser key removal.
 Tests never call a model; there is no fake JEV. For a live comparison, connect

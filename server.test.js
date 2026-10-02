@@ -9,13 +9,18 @@ function app(options = {}) {
   resources.push(() => running.stop());
   return running.server.url;
 }
-function connect(base) {
+function connect(base, { active = true } = {}) {
   const ws = new WebSocket(new URL('/ws', base).href.replace('http:', 'ws:'), { headers: { Origin: base.origin } });
   const messages = [];
   const waiters = new Set();
+  let registered;
+  const ready = new Promise(resolve => { registered = resolve; });
+  ws.addEventListener('open', () => ws.send(JSON.stringify({ type: 'presence', active })));
+  ws.addEventListener('message', event => { if (JSON.parse(event.data).type === 'presence') registered(); });
   ws.addEventListener('message', event => { const message = JSON.parse(event.data); messages.push(message); for (const waiter of [...waiters]) waiter(); });
   resources.push(() => ws.close());
-  function next(predicate) {
+  async function next(predicate) {
+    await ready;
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => { waiters.delete(check); reject(new Error('WebSocket message timed out')); }, 2000);
       function check() {
@@ -39,6 +44,75 @@ function post(base, body = request, path = '/api/v1/systemone') {
   return fetch(new URL(path, base), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
 }
 
+test('averages all live UI replies and keeps the caller waiting after the first', async () => {
+  const base = app(); const first = connect(base); const second = connect(base);
+  await first.next(m => m.type === 'queue'); await second.next(m => m.type === 'queue');
+  const response = post(base);
+  const item = (await first.next(m => m.requests?.length === 1)).requests[0];
+  await second.next(m => m.requests?.length === 1);
+  first.send({ type: 'submit', id: item.id, values: { urgent: 0.25, department: { billing: 0.5, support: 0 }, mood: 0 } });
+  const waiting = await first.next(m => m.type === 'queue');
+  expect(waiting.requests).toHaveLength(1);
+  expect(waiting.requests[0].received).toBe(1);
+  expect(waiting.requests[0].expected).toBe(2);
+  first.send({ type: 'submit', id: item.id, values: { urgent: 1, department: { billing: 0, support: 1 }, mood: 2 } });
+  expect((await first.next(m => m.type === 'error')).message).toBe('You already answered this request');
+  second.send({ type: 'submit', id: item.id, values: { urgent: 0.75, department: { billing: 0, support: 1 }, mood: 2 } });
+  const result = await (await response).json();
+  expect(result.answers.urgent).toEqual({ type: 'noul', noul: 0.5 });
+  expect(result.answers.department).toEqual({ type: 'choice', choice: 'billing', probabilities: { billing: 0.5, support: 0.5 }, confidence: 0.75 });
+  expect(result.answers.mood).toEqual({ type: 'score', score: 1, legend: { 0: 'Sad', 1: 'Neutral', 2: { label: 'Happy' } }, probabilities: { 0: 0.5, 1: 0, 2: 0.5 }, confidence: 1 });
+  const completed = await second.next(m => m.results?.[0]?.human);
+  expect(completed.requests).toEqual([]);
+  expect(completed.results[0].human).toEqual(result);
+  expect(completed.results[0].answerCount).toBe(2);
+});
+
+test('only visible UIs participate, and newly visible UIs join pending requests', async () => {
+  const base = app(); const first = connect(base); const hidden = connect(base, { active: false });
+  await first.next(m => m.type === 'queue'); await hidden.next(m => m.type === 'queue');
+  const response = post(base);
+  const item = (await first.next(m => m.requests?.length)).requests[0];
+  expect(item.expected).toBe(1);
+  hidden.send({ type: 'submit', id: item.id, values: { urgent: 1, department: { billing: 1, support: 0 }, mood: 2 } });
+  expect((await hidden.next(m => m.type === 'error')).message).toBe('The answering screen must be visible');
+  hidden.send({ type: 'presence', active: true });
+  await first.next(m => m.requests?.[0]?.expected === 2);
+  first.send({ type: 'submit', id: item.id, values: { urgent: 0.25, department: { billing: 1, support: 0 }, mood: 1 } });
+  await first.next(m => m.requests?.[0]?.received === 1);
+  hidden.send({ type: 'presence', active: false });
+  expect((await (await response).json()).answers.urgent.noul).toBe(0.25);
+});
+
+test('disconnecting an unanswered UI releases the remaining replies', async () => {
+  const base = app(); const first = connect(base); const second = connect(base);
+  await first.next(m => m.type === 'queue'); await second.next(m => m.type === 'queue');
+  const response = post(base);
+  const item = (await first.next(m => m.requests?.length)).requests[0];
+  first.send({ type: 'submit', id: item.id, values: { urgent: 0.75, department: { billing: 1, support: 0 }, mood: 1 } });
+  await first.next(m => m.requests?.[0]?.received === 1);
+  second.ws.close();
+  expect((await (await response).json()).answers.urgent.noul).toBe(0.75);
+});
+
+test('saved replies count after disconnect and the deadline averages available answers', async () => {
+  const base = app({ timeoutMs: 100 }); const first = connect(base); const second = connect(base); const unanswered = connect(base);
+  await Promise.all([first.next(m => m.type === 'queue'), second.next(m => m.type === 'queue'), unanswered.next(m => m.type === 'queue')]);
+  const response = post(base);
+  const item = (await first.next(m => m.requests?.length)).requests[0];
+  first.send({ type: 'submit', id: item.id, values: { urgent: 0, department: { billing: 1, support: 0 }, mood: 0 } });
+  await first.next(m => m.requests?.[0]?.received === 1);
+  first.ws.close();
+  second.send({ type: 'submit', id: item.id, values: { urgent: 1, department: { billing: 0, support: 1 }, mood: 2 } });
+  await second.next(m => m.requests?.[0]?.received === 2);
+  const result = await response;
+  expect(result.status).toBe(200);
+  expect((await result.json()).answers.urgent.noul).toBe(0.5);
+  const completed = await unanswered.next(m => m.results?.[0]?.human);
+  expect(completed.results[0].answerCount).toBe(2);
+  expect(completed.results[0].late).toBe(false);
+});
+
 test('holds the API connection, accepts all primitives, and skips JEV without credentials', async () => {
   const base = app(); const client = connect(base);
   expect((await client.next(m => m.type === 'queue')).requests).toEqual([]);
@@ -49,7 +123,7 @@ test('holds the API connection, accepts all primitives, and skips JEV without cr
   expect(item.request).toEqual(request);
   expect(item.deadline - item.createdAt).toBe(30_000);
   expect(settled).toBe(false);
-  const reconnected = connect(base);
+  const reconnected = connect(base, { active: false });
   expect((await reconnected.next(m => m.requests?.length === 1)).requests[0].id).toBe(item.id);
   client.send({ type: 'submit', id: item.id, values: { urgent: 0.85, department: { billing: 0.75, support: 0.25 }, mood: 1.25 } });
   const result = await (await response).json();
@@ -106,7 +180,7 @@ test('expires the API call but retains questions for late answers and comparison
   expect((await response).status).toBe(504);
   const expired = await client.next(m => m.requests?.[0]?.timedOut);
   expect(expired.requests[0].id).toBe(item.id);
-  const reconnected = connect(base);
+  const reconnected = connect(base, { active: false });
   expect((await reconnected.next(m => m.requests?.[0]?.timedOut)).requests[0].request).toEqual(request);
   client.send({ type: 'submit', id: item.id, compare: true, values: { urgent: 0.75, department: { billing: 1, support: 0 }, mood: 1.5 } });
   const completed = await client.next(m => m.results?.[0]?.human);
@@ -147,12 +221,14 @@ test('serves the page and assets and blocks cross-origin requests', async () => 
   expect((await fetch(new URL('/api/v1/systemone', base), { method: 'POST', headers: { Origin: 'https://elsewhere.example', 'Content-Type': 'application/json' }, body: JSON.stringify(request) })).status).toBe(403);
 });
 
-test('opted-in comparison is delegated only to the submitting browser, after answering the caller', async () => {
+test('one opted-in browser compares the aggregate after answering the caller', async () => {
   const base = app(); const client = connect(base); const observer = connect(base);
   await client.next(m => m.type === 'queue'); await observer.next(m => m.type === 'queue');
   const response = post(base);
   const item = (await client.next(m => m.requests?.length)).requests[0];
   client.send({ type: 'submit', id: item.id, compare: true, values: { urgent: 1, department: { billing: 1, support: 0 }, mood: 1 } });
+  await client.next(m => m.requests?.[0]?.received === 1);
+  observer.send({ type: 'submit', id: item.id, compare: false, values: { urgent: 0, department: { billing: 0, support: 1 }, mood: 1 } });
   expect((await response).status).toBe(200);
   const comparison = await client.next(m => m.type === 'compare');
   expect(comparison).toEqual({ type: 'compare', id: item.id, request });
@@ -160,7 +236,7 @@ test('opted-in comparison is delegated only to the submitting browser, after ans
   expect((await observer.next(m => m.type === 'error')).message).toBe('This comparison is no longer waiting');
   client.send({ type: 'comparison', id: item.id, error: 'Comparison stopped or timed out' });
   const finished = await client.next(m => m.results?.[0]?.status === 'Comparison stopped or timed out');
-  expect(finished.results[0].human.answers.urgent.noul).toBe(1);
+  expect(finished.results[0].human.answers.urgent.noul).toBe(0.5);
   expect(finished.results[0].jev).toBeUndefined();
 });
 
