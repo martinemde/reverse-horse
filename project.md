@@ -30,7 +30,10 @@ recorded JEV runs. Training never submits to the queue or calls OpenRouter;
 practice pauses while it is open, and live requests keep their deadlines. Any
 exit (Exit training, Escape, Enter the site) sets
 `reverse-horse.training-completed = 1` in local storage. Remove that key to see
-the first visit again. **Training** in the nav reopens it.
+the first visit again. **Training** in the nav reopens it. **Help** (`/help`, static
+`public/help.html`) holds the detail training leaves out: request and response
+JSON, each type's fields, averaging, and JEV matching. Keep its examples in step
+with `answerRequest`.
 
 ## Practice
 

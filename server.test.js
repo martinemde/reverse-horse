@@ -216,7 +216,7 @@ test('practice is not controlled through the shared websocket', async () => {
 
 test('serves the page and assets and blocks cross-origin requests', async () => {
   const base = app();
-  for (const path of ['/', '/request', '/builder.js', '/builder-data.js', '/auth/openrouter/callback?code=example', '/app.js', '/training.js', '/examples.js', '/example-results.json', '/protocol.js', '/auth.js', '/compare.js', '/style.css']) expect((await fetch(new URL(path, base))).status).toBe(200);
+  for (const path of ['/', '/request', '/help', '/builder.js', '/builder-data.js', '/auth/openrouter/callback?code=example', '/app.js', '/training.js', '/examples.js', '/example-results.json', '/protocol.js', '/auth.js', '/compare.js', '/style.css']) expect((await fetch(new URL(path, base))).status).toBe(200);
   expect((await fetch(new URL('/ws', base), { headers: { Origin: 'https://elsewhere.example' } })).status).toBe(403);
   expect((await fetch(new URL('/api/v1/systemone', base), { method: 'POST', headers: { Origin: 'https://elsewhere.example', 'Content-Type': 'application/json' }, body: JSON.stringify(request) })).status).toBe(403);
 });

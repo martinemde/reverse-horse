@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#131718">
+  <title>Help · reverse.horse</title>
+  <meta name="description" content="How reverse.horse works: requests, the three question types, and what goes back to the caller.">
+  <link rel="canonical" href="https://reverse.horse/help">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="reverse.horse">
+  <meta property="og:url" content="https://reverse.horse/help">
+  <meta property="og:title" content="Help · reverse.horse">
+  <meta property="og:description" content="How requests, questions, and answers work.">
+  <meta property="og:image" content="https://reverse.horse/unfurl.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="reverse.horse: The AI outsourced this to you. Human intelligence. Artificial working conditions. A lime horse head on charcoal.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Help · reverse.horse">
+  <meta name="twitter:description" content="How requests, questions, and answers work.">
+  <meta name="twitter:image" content="https://reverse.horse/unfurl.png">
+  <meta name="twitter:image:alt" content="reverse.horse: The AI outsourced this to you. Human intelligence. Artificial working conditions. A lime horse head on charcoal.">
+  <link rel="icon" href="/horse.svg" type="image/svg+xml" sizes="any">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header><a class="brand" href="/"><img src="/horse.svg" alt="" width="36" height="36">reverse.horse</a><nav aria-label="Main"><a href="/">Answer</a><a href="/request">Question</a><a href="/help" aria-current="page">Help</a></nav></header>
+  <main class="help">
+    <div class="toolbar"><div><h1>Help</h1><p>The employee handbook. Nobody reads it, which is why it’s here.</p></div></div>
+
+    <section>
+      <h2>What happens to a request</h2>
+      <p>Some software posts a request to <code>/api/v1/systemone</code>. It shows up on the Answer screen of everyone who has the site open. Each person answers once. When everyone has answered, the caller gets the average.</p>
+      <p>A request has 30 seconds from the moment it arrives, including any time it spends waiting in line. At the deadline the caller gets the average of whatever answers are in. If nobody answered, it gets a 504. You can still answer late and compare with JEV, but the caller never sees it.</p>
+      <p>Only visible answering pages count. If you switch tabs or close the page, you stop holding requests open, but an answer you already sent still counts.</p>
+    </section>
+
+    <section>
+      <h2>System One</h2>
+      <p>Daniel Kahneman split thinking into two systems. System One is fast, automatic, and intuitive: you read a sentence and already know how it feels. System Two is slow and deliberate: you work out 17 × 24. JEV is a System One model. It gives quick, calibrated gut reactions instead of reasoning step by step, and that’s the job you’re doing here.</p>
+    </section>
+
+    <section>
+      <h2>The request</h2>
+      <p>A request has <code>state</code>, the thing to judge (text or JSON), and <code>questions</code>, keyed by an ID the caller picks. Each question has a <code>type</code>, <code>instructions</code>, and, for Choice and Score, <code>criteria</code>.</p>
+      <pre class="help-code">{
+  "model": "jev-latest",
+  "state": "Subject: Charged twice\nHi, I see two $49 charges for the same order. Could you refund the extra charge? The product itself works great.",
+  "questions": {
+    "happy": { "type": "noul", "instructions": "Is the customer happy?" },
+    "team": {
+      "type": "choice",
+      "instructions": "Which team should handle this email?",
+      "criteria": {
+        "billing": "Payments and refunds",
+        "technical": "Problems using the product",
+        "sales": "Questions about buying"
+      }
+    },
+    "urgency": {
+      "type": "score",
+      "instructions": "How soon does this email need attention?",
+      "criteria": ["Can wait a few days", "Needs attention today", "Needs attention now"]
+    }
+  }
+}</pre>
+    </section>
+
+    <section>
+      <h2>The three question types</h2>
+      <h3>Noul</h3>
+      <p>A yes/no question answered as a probability. <code>noul</code> runs from 0 (definitely no) to 1 (definitely yes), and 0.5 means you can’t tell. There’s no separate confidence. The name comes from a Bernoulli trial.</p>
+      <h3>Choice</h3>
+      <p>Pick between named options. Each bar fills independently from 0 to 100%. Your fullest bar is your <code>confidence</code>. Each bar divided by the total is its probability, so <code>probabilities</code> always sums to 1. <code>choice</code> is the option with the highest probability, and ties go to the first one.</p>
+      <p>Two full bars give 50/50 with confidence 1: you’re sure it’s one of the two. Two half-full bars give the same 50/50 with confidence 0.5: you’re unsure about everything. Leaving every bar empty isn’t allowed.</p>
+      <p>Good questions include an “unknown” or “none of these” option. Without one, the answer is forced into an option that doesn’t fit.</p>
+      <h3>Score</h3>
+      <p>A position on an ordered scale. The first level is 0, the next 1, and so on. The answer can land between levels: 1.75 is most of the way from “today” to “now”. <code>legend</code> maps each level to its label. <code>probabilities</code> splits the weight between the two nearest levels, and <code>confidence</code> is higher when the answer sits right on a level.</p>
+    </section>
+
+    <section>
+      <h2>The response</h2>
+      <p>Here’s what the caller gets back if one person answers 0.8 for happy, fills billing all the way and technical halfway, and slides urgency to 1.75. The response follows the TypeSafe System One API, with <code>model</code> set to <code>reverse-horse</code> and zero token usage.</p>
+      <pre class="help-code">{
+  "model": "reverse-horse",
+  "answers": {
+    "happy": { "type": "noul", "noul": 0.8 },
+    "team": {
+      "type": "choice",
+      "choice": "billing",
+      "probabilities": { "billing": 0.6666666666666666, "technical": 0.3333333333333333, "sales": 0 },
+      "confidence": 1
+    },
+    "urgency": {
+      "type": "score",
+      "score": 1.75,
+      "legend": { "0": "Can wait a few days", "1": "Needs attention today", "2": "Needs attention now" },
+      "probabilities": { "0": 0, "1": 0.25, "2": 0.75 },
+      "confidence": 0.4881404928570853
+    }
+  },
+  "usage": { "input_tokens": 0, "output_tokens": 0 }
+}</pre>
+    </section>
+
+    <section>
+      <h2>When several people answer</h2>
+      <p>Noul values, scores, probabilities, and confidence are averaged. For Choice, each person’s probabilities count equally, however full their bars were, and the option with the highest average wins.</p>
+    </section>
+
+    <section>
+      <h2>Matching JEV</h2>
+      <p>Pink markers show what JEV answered on the same control. Your answer turns green when it matches and pink when it doesn’t. A match means the same choice, the same side of 0.5 for Noul, or the same nearest level for Score (halfway rounds up).</p>
+      <p>Practice rounds compare against saved JEV answers. Live requests compare only when someone who answered has connected OpenRouter and turned on Compare with JEV. After everyone answers, one of their browsers asks JEV on that person’s OpenRouter credits.</p>
+    </section>
+  </main>
+  <footer>reverse.horse <span>Read the manual. Then don’t think.</span></footer>
+</body>
+</html>
