@@ -1,7 +1,7 @@
 [
   {
     "title": "The broken integration",
-    "recordedAt": "2026-10-01T05:23:57.241Z",
+    "recordedAt": "2026-10-02T04:06:37.373Z",
     "request": {
       "model": "jev-latest",
       "state": "Three days of trying and Stripe still will not connect. Customers cannot pay me. I need someone to fix this today.",
@@ -35,7 +35,7 @@
   },
   {
     "title": "The broken integration",
-    "recordedAt": "2026-10-01T05:23:57.493Z",
+    "recordedAt": "2026-10-02T04:06:37.556Z",
     "request": {
       "model": "jev-latest",
       "state": "Three days of trying and Stripe still will not connect. Customers cannot pay me. I need someone to fix this today.",
@@ -56,13 +56,13 @@
       "answers": {
         "frustration": {
           "type": "score",
-          "confidence": 0.58,
+          "confidence": 0.51,
           "probabilities": {
             "0": 0,
-            "1": 0.28,
-            "2": 0.72
+            "1": 0.32,
+            "2": 0.68
           },
-          "score": 1.72,
+          "score": 1.67,
           "legend": {
             "0": "Matter-of-fact",
             "1": "Annoyed but polite",
@@ -74,7 +74,7 @@
   },
   {
     "title": "A browser-specific bug",
-    "recordedAt": "2026-10-01T05:11:51.083Z",
+    "recordedAt": "2026-10-02T04:06:37.757Z",
     "request": {
       "model": "jev-latest",
       "state": "Exporting takes down the settings screen in Safari. Chrome exports successfully, but some customers rely entirely on Safari.",
@@ -95,13 +95,13 @@
       "answers": {
         "bug_severity": {
           "type": "score",
-          "confidence": 0.91,
+          "confidence": 0.9,
           "probabilities": {
             "0": 0,
-            "1": 0.94,
+            "1": 0.9400000000000001,
             "2": 0.06
           },
-          "score": 1.05,
+          "score": 1.06,
           "legend": {
             "0": "Appearance only; everything works",
             "1": "Functionality fails, with an alternative available",
@@ -113,7 +113,7 @@
   },
   {
     "title": "Can I talk to a person?",
-    "recordedAt": "2026-10-01T05:23:57.664Z",
+    "recordedAt": "2026-10-02T04:06:37.933Z",
     "request": {
       "model": "jev-latest",
       "state": "This is my third attempt to get help. Please connect me with an actual person.",
@@ -136,7 +136,7 @@
   },
   {
     "title": "Can I talk to a person?",
-    "recordedAt": "2026-10-01T05:23:58.017Z",
+    "recordedAt": "2026-10-02T04:06:39.097Z",
     "request": {
       "model": "jev-latest",
       "state": "This is my third attempt to get help. Please connect me with an actual person.",
@@ -163,7 +163,7 @@
   },
   {
     "title": "An invoice without “invoice”",
-    "recordedAt": "2026-10-01T05:11:51.560Z",
+    "recordedAt": "2026-10-02T04:06:39.330Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: September services\nHi Alex, attached is our bill for September: $240, due October 15. Thanks for working with us!",
@@ -195,7 +195,7 @@
   },
   {
     "title": "Already paid",
-    "recordedAt": "2026-10-01T05:11:51.866Z",
+    "recordedAt": "2026-10-02T04:06:39.529Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Your payment went through\nWe received your $24 payment for this month. This receipt is for your records. No action is needed.",
@@ -218,7 +218,7 @@
   },
   {
     "title": "The weekly newsletter",
-    "recordedAt": "2026-10-01T05:23:58.273Z",
+    "recordedAt": "2026-10-02T04:06:39.854Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: This week in gardening\nThree tips for happier tomatoes, a tour of our greenhouse, and 15% off seeds this weekend. You received this because you subscribed.",
@@ -252,7 +252,7 @@
   },
   {
     "title": "The weekly newsletter",
-    "recordedAt": "2026-10-01T05:23:58.544Z",
+    "recordedAt": "2026-10-02T04:06:40.047Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: This week in gardening\nThree tips for happier tomatoes, a tour of our greenhouse, and 15% off seeds this weekend. You received this because you subscribed.",
@@ -268,14 +268,14 @@
       "answers": {
         "reply_needed": {
           "type": "noul",
-          "noul": 0.04
+          "noul": 0.03
         }
       }
     }
   },
   {
     "title": "A suspicious account warning",
-    "recordedAt": "2026-10-01T05:11:52.390Z",
+    "recordedAt": "2026-10-02T04:06:40.378Z",
     "request": {
       "model": "jev-latest",
       "state": "From: security@account-check.example\nSubject: Mailbox deletion in 20 minutes\nReply with your email password immediately to keep your account. Do not contact your IT team; they cannot stop this process.",
@@ -298,7 +298,7 @@
   },
   {
     "title": "A duplicate charge",
-    "recordedAt": "2026-10-01T05:11:52.568Z",
+    "recordedAt": "2026-10-02T04:06:40.562Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Charged twice\nHi, I see two $49 charges for the same order. Could you refund the extra charge? The product itself works great.",
@@ -332,7 +332,7 @@
   },
   {
     "title": "Before the meeting",
-    "recordedAt": "2026-10-01T05:23:58.710Z",
+    "recordedAt": "2026-10-02T04:06:40.745Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Slides for the 2 pm meeting\nIt is 1:30 pm now. Could you send me the final slides before our client meeting at 2? I cannot present without them.",
@@ -353,7 +353,7 @@
       "answers": {
         "urgency": {
           "type": "score",
-          "confidence": 0.99,
+          "confidence": 1,
           "probabilities": {
             "0": 0,
             "1": 0,
@@ -371,7 +371,7 @@
   },
   {
     "title": "Before the meeting",
-    "recordedAt": "2026-10-01T05:23:58.903Z",
+    "recordedAt": "2026-10-02T04:06:40.937Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Slides for the 2 pm meeting\nIt is 1:30 pm now. Could you send me the final slides before our client meeting at 2? I cannot present without them.",
@@ -394,7 +394,7 @@
   },
   {
     "title": "A lukewarm thank-you",
-    "recordedAt": "2026-10-01T05:11:53.079Z",
+    "recordedAt": "2026-10-02T04:06:41.131Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Re: Replacement delivered\nThanks for sending another one. It works, although waiting three weeks was frustrating. I suppose we can close this now.",
@@ -433,7 +433,7 @@
   },
   {
     "title": "Just keeping you posted",
-    "recordedAt": "2026-10-01T05:23:59.111Z",
+    "recordedAt": "2026-10-02T04:06:41.427Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Friday delivery\nQuick update: your replacement keyboard will arrive Friday instead of Thursday. The tracking link will update tonight. No need to reply unless Friday is a problem.",
@@ -467,7 +467,7 @@
   },
   {
     "title": "Just keeping you posted",
-    "recordedAt": "2026-10-01T05:23:59.341Z",
+    "recordedAt": "2026-10-02T04:06:41.669Z",
     "request": {
       "model": "jev-latest",
       "state": "Subject: Friday delivery\nQuick update: your replacement keyboard will arrive Friday instead of Thursday. The tracking link will update tonight. No need to reply unless Friday is a problem.",
@@ -490,7 +490,7 @@
   },
   {
     "title": "Another castle · Mario",
-    "recordedAt": "2026-10-01T05:26:04.890Z",
+    "recordedAt": "2026-10-02T04:06:41.952Z",
     "request": {
       "model": "jev-latest",
       "state": "Mario reaches the end of the castle. Toad tells him the princess is somewhere else.",
@@ -506,14 +506,14 @@
       "answers": {
         "another_castle": {
           "type": "noul",
-          "noul": 0.86
+          "noul": 0.84
         }
       }
     }
   },
   {
     "title": "Mind the gap · Mario",
-    "recordedAt": "2026-10-01T05:26:05.111Z",
+    "recordedAt": "2026-10-02T04:06:42.141Z",
     "request": {
       "model": "jev-latest",
       "state": "Mario is running toward a pit. The next platform is close enough to jump to.",
@@ -547,7 +547,7 @@
   },
   {
     "title": "One heart left · Zelda",
-    "recordedAt": "2026-10-01T05:26:05.417Z",
+    "recordedAt": "2026-10-02T04:06:42.474Z",
     "request": {
       "model": "jev-latest",
       "state": "Link has one heart left. Another hit could defeat him. He has food that restores health.",
@@ -568,13 +568,13 @@
       "answers": {
         "healing": {
           "type": "score",
-          "confidence": 0.65,
+          "confidence": 0.78,
           "probabilities": {
             "0": 0.01,
-            "1": 0.22,
-            "2": 0.77
+            "1": 0.14,
+            "2": 0.85
           },
-          "score": 1.76,
+          "score": 1.85,
           "legend": {
             "0": "No hurry",
             "1": "Soon",
@@ -586,7 +586,7 @@
   },
   {
     "title": "Pick an attack · Pokémon",
-    "recordedAt": "2026-10-01T05:26:05.682Z",
+    "recordedAt": "2026-10-02T04:06:42.676Z",
     "request": {
       "model": "jev-latest",
       "state": "The opponent is weak to water. Your Pokémon can use either Water Gun or a weaker normal attack.",
@@ -618,7 +618,7 @@
   },
   {
     "title": "That hissing sound · Minecraft",
-    "recordedAt": "2026-10-01T05:26:05.940Z",
+    "recordedAt": "2026-10-02T04:06:43.006Z",
     "request": {
       "model": "jev-latest",
       "state": "A creeper beside you is hissing and about to explode. There is open space behind you.",
@@ -634,14 +634,14 @@
       "answers": {
         "retreat": {
           "type": "noul",
-          "noul": 0.87
+          "noul": 0.89
         }
       }
     }
   },
   {
     "title": "The ghosts turned blue · Pac-Man",
-    "recordedAt": "2026-10-01T05:26:06.159Z",
+    "recordedAt": "2026-10-02T04:06:43.189Z",
     "request": {
       "model": "jev-latest",
       "state": "Pac-Man just ate a power pellet. The ghosts are blue and can briefly be eaten for bonus points.",
@@ -664,7 +664,7 @@
   },
   {
     "title": "Favorite color · Holy Grail",
-    "recordedAt": "2026-10-01T05:23:59.585Z",
+    "recordedAt": "2026-10-02T04:06:43.364Z",
     "request": {
       "model": "jev-latest",
       "state": "You are Sir Lancelot at the Bridge of Death. Answer as he does in Monty Python and the Holy Grail.",
@@ -685,11 +685,11 @@
       "answers": {
         "color": {
           "type": "choice",
-          "confidence": 0.47,
+          "confidence": 0.44,
           "probabilities": {
-            "blue": 0.64,
-            "yellow": 0.24,
-            "red": 0.12
+            "blue": 0.63,
+            "yellow": 0.26,
+            "red": 0.11
           },
           "choice": "blue"
         }
@@ -698,7 +698,7 @@
   },
   {
     "title": "Airspeed of a swallow · Holy Grail",
-    "recordedAt": "2026-10-01T05:23:59.762Z",
+    "recordedAt": "2026-10-02T04:06:43.555Z",
     "request": {
       "model": "jev-latest",
       "state": "You are King Arthur at the Bridge of Death. Give his response from Monty Python and the Holy Grail.",
@@ -719,11 +719,11 @@
       "answers": {
         "swallow": {
           "type": "choice",
-          "confidence": 0.77,
+          "confidence": 0.69,
           "probabilities": {
-            "species": 0.85,
-            "speed": 0.12,
-            "impossible": 0.03
+            "species": 0.8,
+            "speed": 0.18,
+            "impossible": 0.02
           },
           "choice": "species"
         }
@@ -732,7 +732,7 @@
   },
   {
     "title": "The Black Knight · Holy Grail",
-    "recordedAt": "2026-10-01T05:29:48.786Z",
+    "recordedAt": "2026-10-02T04:06:43.742Z",
     "request": {
       "model": "jev-latest",
       "state": "King Arthur has bested the Black Knight. Both of the Black Knight’s arms have been cut off.",
@@ -748,14 +748,14 @@
       "answers": {
         "flesh_wound": {
           "type": "noul",
-          "noul": 0.07
+          "noul": 0.06
         }
       }
     }
   },
   {
     "title": "A shrubbery · Holy Grail",
-    "recordedAt": "2026-10-01T05:24:00.473Z",
+    "recordedAt": "2026-10-02T04:06:44.048Z",
     "request": {
       "model": "jev-latest",
       "state": "Arthur brings the knights the shrubbery they asked for. They immediately demand another one.",
@@ -771,14 +771,14 @@
       "answers": {
         "satisfied": {
           "type": "noul",
-          "noul": 0.06
+          "noul": 0.07
         }
       }
     }
   },
   {
     "title": "The killer rabbit · Holy Grail",
-    "recordedAt": "2026-10-01T05:24:00.739Z",
+    "recordedAt": "2026-10-02T04:06:44.262Z",
     "request": {
       "model": "jev-latest",
       "state": "A cute white rabbit guards a cave. It has just attacked and killed several armed knights.",
@@ -817,7 +817,7 @@
   },
   {
     "title": "The wooden rabbit · Holy Grail",
-    "recordedAt": "2026-10-01T05:24:00.909Z",
+    "recordedAt": "2026-10-02T04:06:44.573Z",
     "request": {
       "model": "jev-latest",
       "state": "The knights send a giant wooden rabbit into the enemy castle. They forgot to hide inside it.",
@@ -833,14 +833,14 @@
       "answers": {
         "ready": {
           "type": "noul",
-          "noul": 0.1
+          "noul": 0.08
         }
       }
     }
   },
   {
     "title": "The wooden rabbit · Holy Grail",
-    "recordedAt": "2026-10-01T05:24:01.157Z",
+    "recordedAt": "2026-10-02T04:06:44.786Z",
     "request": {
       "model": "jev-latest",
       "state": "The knights send a giant wooden rabbit into the enemy castle. They forgot to hide inside it.",
@@ -874,7 +874,7 @@
   },
   {
     "title": "The Holy Hand Grenade · Holy Grail",
-    "recordedAt": "2026-10-01T05:24:01.318Z",
+    "recordedAt": "2026-10-02T04:06:45.096Z",
     "request": {
       "model": "jev-latest",
       "state": "Arthur must count to three. He counts one, two, five.",
