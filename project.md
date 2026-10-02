@@ -20,11 +20,13 @@ dealing the next round, even after its timer expires.
 
 ```sh
 mise install
-bun start
+pnpm install --frozen-lockfile
+pnpm start
 ```
 
-Open http://127.0.0.1:3000. Set `PORT` to change the port. No dependencies to install.
-`bun dev` restarts on server changes; refresh the page after UI edits.
+Open http://127.0.0.1:3000. Set `PORT` to change the port. pnpm manages dependencies;
+Bun runs the local server and tests. `pnpm dev` restarts on server changes; refresh
+the page after UI edits.
 
 First-time visitors enter an untimed training walkthrough: induction, Noul,
 Choice, Score, and certification. Each exercise uses the answering screen's
@@ -154,15 +156,15 @@ score. Restarting the server clears requests and results.
 Verified deployment: https://reverse-horse.poblonko.workers.dev. The API is available at
 `https://reverse-horse.poblonko.workers.dev/api/v1/systemone`.
 
-`bun run dev:cloudflare` runs the Worker locally at http://127.0.0.1:8787.
-`bun run build` previews deployment with Wrangler's dry run; `bun run deploy`
+`pnpm run dev:cloudflare` runs the Worker locally at http://127.0.0.1:8787.
+`pnpm run build` previews deployment with Wrangler's dry run; `pnpm run deploy`
 publishes the `reverse-horse` Worker to the Cloudflare account used by martinemde.com.
 The `reverse.horse` custom domain is configured in `wrangler.jsonc`. It requires
 an active `reverse.horse` zone in the Poblonko account. The custom-domain binding
 was accepted on 2026-10-01; public DNS still returned ENOTFOUND when checked.
 The workers.dev address is verified for assets and WebSockets. If deployment
 reports error 10083, check that the zone exists in the same account.
-`bun run deploy` creates or updates the domain binding and certificate.
+`pnpm run deploy` creates or updates the domain binding and certificate.
 
 The public brand is reverse.horse; the project, Worker, and API model are
 `reverse-horse`, and the Durable Object class is `ReverseHorseRoom`.
@@ -181,7 +183,10 @@ SVG, regenerate the PNG with `rsvg-convert public/unfurl.svg -o public/unfurl.pn
 and inspect it before building. Keep the image in `http.js`'s asset allowlist so
 both the Bun server and Worker serve it to link crawlers without JavaScript.
 
-Wrangler is pinned through mise. Static assets and the OpenRouter callback route
+Wrangler is pinned in `devDependencies` and `pnpm-lock.yaml`. Package scripts call
+the installed Wrangler directly, so CI does not need mise. Cloudflare Workers
+Builds can use `pnpm run build` and `pnpm run deploy`; dependency installation uses
+the pnpm lockfile. mise pins pnpm and Bun for local development. Static assets and the OpenRouter callback route
 are served by the Worker; WebSockets and API calls go to one `ReverseHorseRoom`
 Durable Object named `shared`. The Bun and Cloudflare adapters use the same
 queue implementation in `room.js`.
