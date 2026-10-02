@@ -84,11 +84,19 @@ WebSocket queue in either mode. Reloading the page clears local practice.
 
 ## Call it
 
-Use **Make a request** (`/request`) to compose the state and add Noul, Choice,
+Use **Question** (`/request`) to compose the state and add Noul, Choice,
 and Score questions in a form. Choice options have unique keys and optional
 descriptions; Score levels run from lowest to highest. Text and structured JSON
 state are supported. The preview is the exact body posted to `/api/v1/systemone`.
-The screen shows the actual HTTP status and response JSON. Keep it open while
+Typing automatically preserves the current draft, including incomplete fields,
+in `reverse-horse.questions` in local storage. **Save** moves the complete request
+into the list below and starts a fresh editor. **Edit** opens the same editor in
+the saved card; typing there also persists edits, and Save collapses it again.
+**Send** saves a new request before submitting it. Saved cards can be sent again
+without creating duplicates. Questions stay in this browser and survive reloads;
+they are not synced to the server. Unreadable stored data is left unchanged and
+reported on the page. Storage write failures keep the editor open.
+Each card shows the actual HTTP status and response JSON. Keep it open while
 someone answers, or open the answering screen in another tab. A 504 ends the
 builder's API call even though the answering screen still accepts late answers.
 
@@ -190,6 +198,12 @@ requests, checks two participating sockets averaging their answers, and waits th
 to verify a 504 followed by a saved late answer. It does not call OpenRouter.
 
 ## Verify
+
+`bun scripts/check-questions.js /path/to/playwright-core/index.mjs` verifies draft
+autosave, all three question types, Save, inline Edit, reload persistence, real
+API Send/Send again, corrupt-data preservation, and desktop/mobile layout in an
+isolated Chromium browser. Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to use an existing
+browser. Screenshots go to `/tmp/reverse-horse-questions-*`.
 
 `bun scripts/check-training.js /path/to/playwright-core/index.mjs` runs the course
 through Chromium at desktop and phone widths, checks complete response JSON and

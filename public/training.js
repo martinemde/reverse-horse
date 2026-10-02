@@ -133,7 +133,7 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
         node('p', 'You can now emit a probability, select an option, and locate a feeling on a numbered scale. Please return to your inference duties.'),
         node('h2', 'Operational requirements'),
         node('p', 'On the Answer screen, practice starts automatically. Pause stops practice and freezes its timer. Live API requests still arrive and have 30 seconds from arrival, including time in the queue. Answer every question and submit to return JSON to the caller.'),
-        node('p', 'Saved JEV comparisons work without an account. Connect OpenRouter only if you want to compare live requests with JEV using your credits. “Make a request” lets you build and send the same API shape you just answered.'),
+        node('p', 'Saved JEV comparisons work without an account. Connect OpenRouter only if you want to compare live requests with JEV using your credits. “Question” lets you build, save, and send the same API shape you just answered.'),
         node('p', 'Enter the site to save your certificate in this browser. You can revisit Training whenever management requires retraining.', 'training-note'));
       actions.append(button('Back', () => go(3), 'secondary'), button('Enter the site', () => close(true)));
     } else {
