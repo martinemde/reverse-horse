@@ -6,7 +6,7 @@ import { resolve } from 'node:path';
 import { startServer } from '../server.js';
 import { examples } from '../public/examples.js';
 import recordings from '../public/example-results.json';
-import { answerRequest } from '../public/protocol.js';
+import { answerRequest, choiceWeights } from '../public/protocol.js';
 import { matchesJev } from '../public/compare.js';
 
 if (!process.argv[2]) throw new Error('Pass the path to an installed playwright-core/index.mjs');
@@ -15,6 +15,7 @@ const browser = await webkit.launch({ headless: true });
 const app = startServer({ port: 0, timeoutMs: 100 });
 try {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await page.addInitScript(() => localStorage.setItem('reverse-horse.training-completed', '1'));
   const errors = [], externalRequests = [], dealt = [];
   page.on('request', request => { if (new URL(request.url()).origin !== app.server.url.origin) externalRequests.push(request.url()); });
   page.on('pageerror', error => errors.push(error.message));
@@ -51,21 +52,22 @@ try {
     const title = run.title;
     const question = run.request.questions[id], jev = run.jev.answers[id];
     dealt.push(JSON.stringify(run.request));
-    const choices = active.locator('input[type=radio]');
-    if (await choices.count()) {
-      assert.equal(await active.locator('input[type=radio]:checked').count(), 0);
+    const choices = active.locator('input[type=range]');
+    assert.equal(await active.locator('input[type=radio]').count(), 0);
+    if (question.type === 'choice') {
       assert.equal(await active.locator('button').isDisabled(), true);
       assert.deepEqual(await active.locator('input[type=range]').evaluateAll(inputs => inputs.map(input => Number(input.value))), Array(await choices.count()).fill(0));
-      await choices.first().check();
+      await setRange(choices.first(), 0.5);
       assert.equal(await active.locator('button').isEnabled(), true);
+      await setRange(choices.first(), 0);
       const keys = Object.keys(question.criteria);
       const chosen = i % 2 ? keys.find(key => key !== jev.choice) : jev.choice;
-      await choices.nth(keys.indexOf(chosen)).check();
-      // Add a second option, and verify both sliders are actual probabilities.
+      await setRange(choices.nth(keys.indexOf(chosen)), 0.5);
+      // Adding a second bar changes the distribution without changing the first.
       await setRange(active.locator('input[type=range]').nth((keys.indexOf(chosen) + 1) % keys.length), 0.2);
-      const probabilities = await active.locator('input[type=range]').evaluateAll(inputs => inputs.map(input => Number(input.value)));
-      assert.ok(Math.abs(probabilities.reduce((a, b) => a + b, 0) - 1) < 0.001);
-      assert.ok(probabilities.includes(0.2));
+      const weights = await active.locator('input[type=range]').evaluateAll(inputs => inputs.map(input => Number(input.value)));
+      assert.equal(weights[keys.indexOf(chosen)], 0.5);
+      assert.equal(weights[(keys.indexOf(chosen) + 1) % keys.length], 0.2);
     } else {
       const matching = question.type === 'noul' ? (jev.noul >= 0.5 ? 0.8 : 0.2) : Math.round(jev.score);
       const different = question.type === 'noul' ? (jev.noul >= 0.5 ? 0.2 : 0.8) : (Math.round(jev.score) === 0 ? question.criteria.length - 1 : 0);
@@ -87,7 +89,7 @@ try {
     assert.equal(await card.locator('fieldset').getAttribute('class'), `question ${matched ? 'answer-match' : 'answer-miss'}`);
     assert.equal(await card.locator('.question-feedback').textContent(), matched ? 'Matched JEV' : 'Different from JEV');
     const markers = await card.locator('.jev-marker').evaluateAll(markers => markers.map(marker => ({ hidden: marker.hidden, percent: parseFloat(marker.style.left) })));
-    const expected = question.type === 'choice' ? Object.keys(question.criteria).map(key => jev.probabilities[key] * 100) : [question.type === 'noul' ? jev.noul * 100 : jev.score / (question.criteria.length - 1) * 100];
+    const expected = question.type === 'choice' ? Object.values(choiceWeights(jev)).map(weight => weight * 100) : [question.type === 'noul' ? jev.noul * 100 : jev.score / (question.criteria.length - 1) * 100];
     markers.forEach((marker, index) => { assert.equal(marker.hidden, false); assert.ok(Math.abs(marker.percent - expected[index]) < 0.001); });
     assert.equal(await card.locator('input:enabled').count(), 0);
     assert.equal(await page.locator('#history').count(), 0);
@@ -105,7 +107,7 @@ try {
   const nextState = await active.locator('.state pre').textContent(), nextId = await active.locator('fieldset').getAttribute('data-question');
   const next = recordings.find(run => run.request.state === nextState && Object.hasOwn(run.request.questions, nextId));
   assert.notEqual(JSON.stringify(next.request), dealt.at(-1));
-  if (await active.locator('input[type=radio]').count()) await active.locator('input[type=radio]').first().check();
+  await setRange(active.locator('input[type=range]').first(), 0.5);
   const off = await active.elementHandle();
   await active.locator('button').click({ delay: 350 });
   assert.match(await off.textContent(), /Answered · comparison off/);

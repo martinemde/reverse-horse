@@ -24,6 +24,18 @@ bun start
 Open http://127.0.0.1:3000. Set `PORT` to change the port. No dependencies to install.
 `bun dev` restarts on server changes; refresh the page after UI edits.
 
+First-time visitors enter an untimed training walkthrough: induction, Noul,
+Choice, Score, and certification. Each exercise uses the answering screen's
+controls and shows its request JSON, human response, and actual recorded JEV
+response. Training does not submit to the shared queue or call OpenRouter.
+Practice pauses while training is open; exiting restores the previous play state.
+Live requests still arrive and keep their original deadlines.
+**Exit training** and Escape return to the site from any step. Only **Enter the
+site** on the certification step saves `reverse-horse.training-completed = 1`
+in local storage. To verify first-visit behavior again, remove that key and reload.
+**Training** in the navigation reopens the course without clearing certification.
+Blocked storage permits training but cannot remember completion.
+
 Click **Connect OpenRouter** to authorize your own key. **Compare with JEV** is
 enabled on your first connection. Turn it off whenever you like; your choice is
 saved in this browser and survives refreshes and reconnects. Built-in practice rounds use recorded JEV answers even without a connection;
@@ -57,7 +69,8 @@ dealing another. Each shuffle uses every round once and avoids an immediate repe
 at the boundary between shuffles. Practice requests, answers, and history stay in the current tab;
 practice comparisons reuse the real runs in `public/example-results.json` with no
 API call or key required. Submitted cards stay in place with their sliders locked. Pink markers show JEV on
-the same scale, and the human slider and feedback turn green for a match or pink
+the same scale (Choice markers reconstruct bar fullness from JEV's distribution
+and confidence), and the human slider and feedback turn green for a match or pink
 for a mismatch. Matching uses the same choice, yes/no side (0.5 counts as yes), or
 nearest score level (halfway rounds up). Exact values remain visible. New rounds
 appear above completed cards; results no longer move into a separate history panel. Saved runs match the complete request, so
@@ -89,21 +102,27 @@ key and binds to loopback. Invalid requests return 400; unanswered requests retu
 disconnects before the deadline remove their request. A maximum of 100 unanswered
 requests (including timed-out ones) is accepted.
 
-Noul maps to 0–1. Choice rounds start with zero weights and no selection.
-Pick an option to give it full weight, then optionally add weight to others.
-Choice radio buttons select one option outright. Sliders show actual probabilities;
-changing one redistributes the remainder among the other weighted options. This
-keeps the human and JEV markers on the same scale without moving sliders on submit
-(all-zero weights are rejected).
-Ties choose the first option. Score sliders permit fractional values with visible
+Noul maps to 0–1. Choice rounds start with empty bars. Fill each independently
+from 0–100%; the fullest bar sets confidence, and each weight divided by the total
+sets its probability. Changing a bar readjusts the probabilities, preserving the
+other bars' fullness. Two full bars give confidence 1 and probabilities 0.5/0.5;
+two half-full bars give confidence 0.5 with the same distribution. One half-full
+bar gives confidence 0.5 and probability 1. All-zero weights are rejected.
+Submitted bars retain their original fullness, including when reconstructed on
+reload: scale each probability by `confidence / max(probabilities)`.
+JEV's pink markers reconstruct equivalent bar fullness using the same procedure;
+their numeric labels still show JEV's actual probabilities. There are no radios.
+Ties choose the first option. Training teaches and uses this same control.
+Score sliders permit fractional values with visible
 integer stops; probabilities interpolate between the two adjacent stops.
 Structured state, instructions, and criteria are displayed as JSON.
 
 Responses identify the human as `model: "reverse-horse"` and report zero token usage.
 The answer schema follows the [API reference](https://docs.typesafe.ai/api).
 TypeSafe's [confidence documentation](https://docs.typesafe.ai/confidence) does
-not specify its formula; human Choice/Score confidence uses one minus normalized
-Shannon entropy. It is not numerically equivalent to JEV's confidence.
+not specify its formula; human Score confidence uses one minus normalized Shannon
+entropy. Human Choice confidence is the maximum submitted bar weight, a loose
+proxy for overall confidence. Neither formula is numerically equivalent to JEV's.
 
 The queue and latest 20 results live in memory. Reconnecting gets a fresh snapshot;
 draft slider values survive a connection interruption while the page stays open,
@@ -151,6 +170,16 @@ requests, checks two sockets racing to answer, and waits the actual 30 seconds
 to verify a 504 followed by a saved late answer. It does not call OpenRouter.
 
 ## Verify
+
+`bun scripts/check-training.js /path/to/playwright-core/index.mjs` runs the course
+through Chromium at desktop and phone widths, checks complete response JSON and
+recorded comparisons, and verifies Back, exit at every step, Escape, completion
+across reloads, replay, and blocked storage. It also verifies the Choice confidence
+examples through both training controls and live API submissions, including
+preserved bar fullness after reload. It uses only an ephemeral local
+server and refuses external network requests. Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE`
+to use an existing Chromium executable; otherwise install the matching browser
+with Playwright's CLI. Screenshots are written to `/tmp/reverse-horse-training-*`.
 
 `bun test` exercises real local HTTP/WebSocket connections, all three answer types,
 reconnection, duplicate submission, validation, expiration, auto mode, and static
