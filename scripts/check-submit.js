@@ -146,7 +146,7 @@ try {
   peer.send(JSON.stringify({ type: 'comparison', id: requestId, jev: run.jev }));
   await page.waitForFunction(el => !el.querySelector('.jev-marker').hidden, live);
   assert.equal(await live.evaluate(el => el.isConnected), true);
-  assert.equal(await live.$eval('.actions p', el => el.textContent), '');
+  assert.equal(await live.$eval('.actions p', el => el.textContent), 'Average of 2 answers');
   peer.close();
   await page.reload();
   await page.waitForFunction(() => document.querySelector('form.answered .jev-marker:not([hidden])'));
