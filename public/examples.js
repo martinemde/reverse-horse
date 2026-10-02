@@ -203,46 +203,21 @@ const scenarios = [
     } },
   },
   {
-    title: 'Favorite color · Holy Grail', source: grailDialogue,
-    request: { model: 'jev-latest', state: 'You are Sir Lancelot at the Bridge of Death. Answer as he does in Monty Python and the Holy Grail.', questions: {
-      color: { type: 'choice', instructions: 'What is your favorite color?', criteria: { blue: 'Blue', yellow: 'Yellow', red: 'Red' } },
-    } },
-  },
-  {
-    title: 'Airspeed of a swallow · Holy Grail', source: grailDialogue,
-    request: { model: 'jev-latest', state: 'You are King Arthur at the Bridge of Death. Give his response from Monty Python and the Holy Grail.', questions: {
-      swallow: { type: 'choice', instructions: 'What is the airspeed velocity of an unladen swallow?', criteria: { species: 'African or European?', speed: '24 miles per hour', impossible: 'Swallows cannot fly' } },
-    } },
-  },
-  {
     title: 'The Black Knight · Holy Grail', source: grailDialogue,
     request: { model: 'jev-latest', state: 'King Arthur has bested the Black Knight. Both of the Black Knight’s arms have been cut off.', questions: {
       flesh_wound: { type: 'noul', instructions: 'Is this but a flesh wound?' },
     } },
   },
   {
-    title: 'A shrubbery · Holy Grail', source: grailSource,
-    request: { model: 'jev-latest', state: 'Arthur brings the knights the shrubbery they asked for. They immediately demand another one.', questions: {
+    title: 'A shrubbery', source: grailSource,
+    request: { model: 'jev-latest', state: 'Arthur brings the knights who say Nee the shrubbery they asked for. They immediately demand another one.', questions: {
       satisfied: { type: 'noul', instructions: 'Are the knights satisfied with what Arthur brought?' },
     } },
   },
   {
-    title: 'The killer rabbit · Holy Grail', source: grailSource,
+    title: 'The killer rabbit', source: grailSource,
     request: { model: 'jev-latest', state: 'A cute white rabbit guards a cave. It has just attacked and killed several armed knights.', questions: {
       risk: { type: 'score', instructions: 'How dangerous is this rabbit?', criteria: ['Harmless', 'Dangerous', 'Deadly'] },
-    } },
-  },
-  {
-    title: 'The wooden rabbit · Holy Grail', source: grailSource,
-    request: { model: 'jev-latest', state: 'The knights send a giant wooden rabbit into the enemy castle. They forgot to hide inside it.', questions: {
-      ready: { type: 'noul', instructions: 'Can any knights now sneak out of the rabbit?' },
-      failure: { type: 'choice', instructions: 'What went wrong?', criteria: { empty: 'Nobody climbed inside', small: 'The rabbit was too small', refused: 'The castle refused delivery' } },
-    } },
-  },
-  {
-    title: 'The Holy Hand Grenade · Holy Grail', source: grailDialogue,
-    request: { model: 'jev-latest', state: 'Arthur must count to three. He counts one, two, five.', questions: {
-      compliant: { type: 'noul', instructions: 'Did Arthur count correctly?' },
     } },
   },
 ];
