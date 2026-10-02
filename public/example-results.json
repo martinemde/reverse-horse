@@ -489,6 +489,2389 @@
     }
   },
   {
+    "title": "Exclamation Act · cake at 3",
+    "recordedAt": "2026-10-02T04:17:28.417Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Launch!\nThanks! Great work on the launch! Cake in the kitchen at 3!",
+      "questions": {
+        "exclamation_act": {
+          "type": "noul",
+          "instructions": "Does this email violate the Exclamation Point Act: no more than one \"!\" per email, unless something is actually on fire?",
+          "criteria": {
+            "true": "More than one \"!\" and nothing is on fire",
+            "false": "One \"!\" or fewer, or a genuine emergency"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "exclamation_act": {
+          "type": "noul",
+          "noul": 0.94
+        }
+      }
+    }
+  },
+  {
+    "title": "Exclamation Act · one cake",
+    "recordedAt": "2026-10-02T04:17:28.650Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Launch\nThanks, and great work on the launch. Cake in the kitchen at 3!",
+      "questions": {
+        "exclamation_act": {
+          "type": "noul",
+          "instructions": "Does this email violate the Exclamation Point Act: no more than one \"!\" per email, unless something is actually on fire?",
+          "criteria": {
+            "true": "More than one \"!\" and nothing is on fire",
+            "false": "One \"!\" or fewer, or a genuine emergency"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "exclamation_act": {
+          "type": "noul",
+          "noul": 0.39
+        }
+      }
+    }
+  },
+  {
+    "title": "Exclamation Act · actual smoke",
+    "recordedAt": "2026-10-02T04:17:28.928Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Server room\nThe server room is filling with smoke! Everyone out now! Do not take the elevator!",
+      "questions": {
+        "exclamation_act": {
+          "type": "noul",
+          "instructions": "Does this email violate the Exclamation Point Act: no more than one \"!\" per email, unless something is actually on fire?",
+          "criteria": {
+            "true": "More than one \"!\" and nothing is on fire",
+            "false": "One \"!\" or fewer, or a genuine emergency"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "exclamation_act": {
+          "type": "noul",
+          "noul": 0.52
+        }
+      }
+    }
+  },
+  {
+    "title": "Exclamation Act · mild warmth",
+    "recordedAt": "2026-10-02T04:17:29.128Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Server room\nThe server room is a little warm today! Facilities is on it! No action needed!",
+      "questions": {
+        "exclamation_act": {
+          "type": "noul",
+          "instructions": "Does this email violate the Exclamation Point Act: no more than one \"!\" per email, unless something is actually on fire?",
+          "criteria": {
+            "true": "More than one \"!\" and nothing is on fire",
+            "false": "One \"!\" or fewer, or a genuine emergency"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "exclamation_act": {
+          "type": "noul",
+          "noul": 0.96
+        }
+      }
+    }
+  },
+  {
+    "title": "Quick question · Postgres",
+    "recordedAt": "2026-10-02T04:17:29.451Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Quick question\nQuick question: are we still using Postgres?",
+      "questions": {
+        "quick_question": {
+          "type": "noul",
+          "instructions": "Does this email violate the ban on \"quick question\": an email may only open with \"quick question\" if it can be answered in one word?",
+          "criteria": {
+            "true": "Opens with \"quick question\" but needs more than a one-word answer",
+            "false": "The question can honestly be answered in one word"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "quick_question": {
+          "type": "noul",
+          "noul": 0.22
+        }
+      }
+    }
+  },
+  {
+    "title": "Quick question · the 3 pm review",
+    "recordedAt": "2026-10-02T04:17:29.618Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Quick question\nQuick question: is the 3 pm review still on?",
+      "questions": {
+        "quick_question": {
+          "type": "noul",
+          "instructions": "Does this email violate the ban on \"quick question\": an email may only open with \"quick question\" if it can be answered in one word?",
+          "criteria": {
+            "true": "Opens with \"quick question\" but needs more than a one-word answer",
+            "false": "The question can honestly be answered in one word"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "quick_question": {
+          "type": "noul",
+          "noul": 0.25
+        }
+      }
+    }
+  },
+  {
+    "title": "Quick question · migration plan",
+    "recordedAt": "2026-10-02T04:17:29.977Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Quick question\nQuick question: how should we migrate off Postgres, and who should own it?",
+      "questions": {
+        "quick_question": {
+          "type": "noul",
+          "instructions": "Does this email violate the ban on \"quick question\": an email may only open with \"quick question\" if it can be answered in one word?",
+          "criteria": {
+            "true": "Opens with \"quick question\" but needs more than a one-word answer",
+            "false": "The question can honestly be answered in one word"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "quick_question": {
+          "type": "noul",
+          "noul": 0.96
+        }
+      }
+    }
+  },
+  {
+    "title": "Quick question · Postgres, sort of",
+    "recordedAt": "2026-10-02T04:17:30.200Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Quick question\nQuick question: are we still using Postgres? The onboarding doc says MongoDB, billing says Postgres, and the CTO said \"both, sort of\" last week.",
+      "questions": {
+        "quick_question": {
+          "type": "noul",
+          "instructions": "Does this email violate the ban on \"quick question\": an email may only open with \"quick question\" if it can be answered in one word?",
+          "criteria": {
+            "true": "Opens with \"quick question\" but needs more than a one-word answer",
+            "false": "The question can honestly be answered in one word"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "quick_question": {
+          "type": "noul",
+          "noul": 0.73
+        }
+      }
+    }
+  },
+  {
+    "title": "Reply-All Tribunal · 200 congrats",
+    "recordedAt": "2026-10-02T04:17:30.500Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "To: all-staff (200 recipients)\nSubject: Re: Please welcome Dana as VP of Engineering\nCongrats!!",
+      "questions": {
+        "reply_all": {
+          "type": "noul",
+          "instructions": "Does the Reply-All Tribunal permit this reply-all? Reply-all is allowed only if every recipient needs to read the reply.",
+          "criteria": {
+            "true": "Every recipient needs to read it",
+            "false": "Some recipients did not need this"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "reply_all": {
+          "type": "noul",
+          "noul": 0.15
+        }
+      }
+    }
+  },
+  {
+    "title": "Reply-All Tribunal · 3 congrats",
+    "recordedAt": "2026-10-02T04:17:30.699Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "To: Dana, Sam, Lee (3 recipients)\nSubject: Re: Please welcome Dana as VP of Engineering\nCongrats!!",
+      "questions": {
+        "reply_all": {
+          "type": "noul",
+          "instructions": "Does the Reply-All Tribunal permit this reply-all? Reply-all is allowed only if every recipient needs to read the reply.",
+          "criteria": {
+            "true": "Every recipient needs to read it",
+            "false": "Some recipients did not need this"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "reply_all": {
+          "type": "noul",
+          "noul": 0.36
+        }
+      }
+    }
+  },
+  {
+    "title": "Reply-All Tribunal · wrong time",
+    "recordedAt": "2026-10-02T04:17:31.025Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "To: all-staff (200 recipients)\nSubject: Re: Office closed Friday\nCorrection: the office reopens Monday at 9, not 10 as stated above.",
+      "questions": {
+        "reply_all": {
+          "type": "noul",
+          "instructions": "Does the Reply-All Tribunal permit this reply-all? Reply-all is allowed only if every recipient needs to read the reply.",
+          "criteria": {
+            "true": "Every recipient needs to read it",
+            "false": "Some recipients did not need this"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "reply_all": {
+          "type": "noul",
+          "noul": 0.51
+        }
+      }
+    }
+  },
+  {
+    "title": "Reply-All Tribunal · me too",
+    "recordedAt": "2026-10-02T04:17:31.216Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "To: all-staff (200 recipients)\nSubject: Re: Office closed Friday\nThanks, enjoy the long weekend everyone!",
+      "questions": {
+        "reply_all": {
+          "type": "noul",
+          "instructions": "Does the Reply-All Tribunal permit this reply-all? Reply-all is allowed only if every recipient needs to read the reply.",
+          "criteria": {
+            "true": "Every recipient needs to read it",
+            "false": "Some recipients did not need this"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "reply_all": {
+          "type": "noul",
+          "noul": 0.3
+        }
+      }
+    }
+  },
+  {
+    "title": "Oxford comma · the interns",
+    "recordedAt": "2026-10-02T04:17:31.550Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Offsite\nAttendees: the interns, Dave and Priya.",
+      "questions": {
+        "oxford_comma": {
+          "type": "noul",
+          "instructions": "Under the Mandatory Oxford Comma rule, should this email be returned to sender?",
+          "criteria": {
+            "true": "A list is missing its Oxford comma",
+            "false": "Every list is properly punctuated"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "oxford_comma": {
+          "type": "noul",
+          "noul": 0.58
+        }
+      }
+    }
+  },
+  {
+    "title": "Oxford comma · the interns, comma",
+    "recordedAt": "2026-10-02T04:17:31.797Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Offsite\nAttendees: the interns, Dave, and Priya.",
+      "questions": {
+        "oxford_comma": {
+          "type": "noul",
+          "instructions": "Under the Mandatory Oxford Comma rule, should this email be returned to sender?",
+          "criteria": {
+            "true": "A list is missing its Oxford comma",
+            "false": "Every list is properly punctuated"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "oxford_comma": {
+          "type": "noul",
+          "noul": 0.6
+        }
+      }
+    }
+  },
+  {
+    "title": "Oxford comma · just two",
+    "recordedAt": "2026-10-02T04:17:32.073Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Offsite\nAttendees: Dave and Priya.",
+      "questions": {
+        "oxford_comma": {
+          "type": "noul",
+          "instructions": "Under the Mandatory Oxford Comma rule, should this email be returned to sender?",
+          "criteria": {
+            "true": "A list is missing its Oxford comma",
+            "false": "Every list is properly punctuated"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "oxford_comma": {
+          "type": "noul",
+          "noul": 0.35
+        }
+      }
+    }
+  },
+  {
+    "title": "Oxford comma · both interns",
+    "recordedAt": "2026-10-02T04:17:32.259Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Offsite\nAttendees: the interns, Dave and Priya (both of whom are interns).",
+      "questions": {
+        "oxford_comma": {
+          "type": "noul",
+          "instructions": "Under the Mandatory Oxford Comma rule, should this email be returned to sender?",
+          "criteria": {
+            "true": "A list is missing its Oxford comma",
+            "false": "Every list is properly punctuated"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "oxford_comma": {
+          "type": "noul",
+          "noul": 0.4
+        }
+      }
+    }
+  },
+  {
+    "title": "Thanks in advance · TIA to a report",
+    "recordedAt": "2026-10-02T04:17:32.598Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "To: Jordan (your direct report)\nSubject: Q3 numbers\nCan you send the Q3 numbers by Friday? TIA!",
+      "questions": {
+        "thanks_in_advance": {
+          "type": "noul",
+          "instructions": "Under the Thanks-in-Advance Prohibition, is this email rude for presuming compliance?",
+          "criteria": {
+            "true": "Thanks the recipient for something they have not agreed to do",
+            "false": "Does not presume the recipient will comply"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "thanks_in_advance": {
+          "type": "noul",
+          "noul": 0.66
+        }
+      }
+    }
+  },
+  {
+    "title": "Thanks in advance · thanks to a report",
+    "recordedAt": "2026-10-02T04:17:32.823Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "To: Jordan (your direct report)\nSubject: Q3 numbers\nCan you send the Q3 numbers by Friday? Thanks!",
+      "questions": {
+        "thanks_in_advance": {
+          "type": "noul",
+          "instructions": "Under the Thanks-in-Advance Prohibition, is this email rude for presuming compliance?",
+          "criteria": {
+            "true": "Thanks the recipient for something they have not agreed to do",
+            "false": "Does not presume the recipient will comply"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "thanks_in_advance": {
+          "type": "noul",
+          "noul": 0.54
+        }
+      }
+    }
+  },
+  {
+    "title": "Thanks in advance · up the chain",
+    "recordedAt": "2026-10-02T04:17:33.126Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "To: Morgan (the CFO)\nSubject: Q3 budget\nCould you approve my Q3 budget by Friday? Thanks in advance!",
+      "questions": {
+        "thanks_in_advance": {
+          "type": "noul",
+          "instructions": "Under the Thanks-in-Advance Prohibition, is this email rude for presuming compliance?",
+          "criteria": {
+            "true": "Thanks the recipient for something they have not agreed to do",
+            "false": "Does not presume the recipient will comply"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "thanks_in_advance": {
+          "type": "noul",
+          "noul": 0.71
+        }
+      }
+    }
+  },
+  {
+    "title": "Thanks in advance · either way",
+    "recordedAt": "2026-10-02T04:17:33.314Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "To: Jordan (your direct report)\nSubject: Q3 draft\nNo pressure, and feel free to say no: could you skim my Q3 draft if you have time? Thanks in advance either way!",
+      "questions": {
+        "thanks_in_advance": {
+          "type": "noul",
+          "instructions": "Under the Thanks-in-Advance Prohibition, is this email rude for presuming compliance?",
+          "criteria": {
+            "true": "Thanks the recipient for something they have not agreed to do",
+            "false": "Does not presume the recipient will comply"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "thanks_in_advance": {
+          "type": "noul",
+          "noul": 0.43
+        }
+      }
+    }
+  },
+  {
+    "title": "Sign-off · Best",
+    "recordedAt": "2026-10-02T04:17:33.488Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Re: Updated timeline\nGot it. I will send the revised draft by Thursday.\n\nBest,\nSam",
+      "questions": {
+        "sign_off": {
+          "type": "choice",
+          "instructions": "What is this sign-off really saying?",
+          "criteria": {
+            "warm": "Friendly and glad to be talking",
+            "neutral": "Just closing the email",
+            "cold": "Keeping you at arm’s length",
+            "hostile": "Quietly furious"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "sign_off": {
+          "type": "choice",
+          "confidence": 0.99,
+          "probabilities": {
+            "warm": 0.01,
+            "neutral": 0.99,
+            "cold": 0,
+            "hostile": 0
+          },
+          "choice": "neutral"
+        }
+      }
+    }
+  },
+  {
+    "title": "Sign-off · Thanks",
+    "recordedAt": "2026-10-02T04:17:33.700Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Re: Updated timeline\nGot it. I will send the revised draft by Thursday.\n\nThanks,\nSam",
+      "questions": {
+        "sign_off": {
+          "type": "choice",
+          "instructions": "What is this sign-off really saying?",
+          "criteria": {
+            "warm": "Friendly and glad to be talking",
+            "neutral": "Just closing the email",
+            "cold": "Keeping you at arm’s length",
+            "hostile": "Quietly furious"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "sign_off": {
+          "type": "choice",
+          "confidence": 0.98,
+          "probabilities": {
+            "warm": 0.01,
+            "neutral": 0.99,
+            "cold": 0,
+            "hostile": 0
+          },
+          "choice": "neutral"
+        }
+      }
+    }
+  },
+  {
+    "title": "Sign-off · Regards",
+    "recordedAt": "2026-10-02T04:17:33.916Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Re: Updated timeline\nGot it. I will send the revised draft by Thursday.\n\nRegards,\nSam",
+      "questions": {
+        "sign_off": {
+          "type": "choice",
+          "instructions": "What is this sign-off really saying?",
+          "criteria": {
+            "warm": "Friendly and glad to be talking",
+            "neutral": "Just closing the email",
+            "cold": "Keeping you at arm’s length",
+            "hostile": "Quietly furious"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "sign_off": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "warm": 0,
+            "neutral": 1,
+            "cold": 0,
+            "hostile": 0
+          },
+          "choice": "neutral"
+        }
+      }
+    }
+  },
+  {
+    "title": "Sign-off · Cheers",
+    "recordedAt": "2026-10-02T04:17:34.171Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Re: Updated timeline\nGot it. I will send the revised draft by Thursday.\n\nCheers,\nSam",
+      "questions": {
+        "sign_off": {
+          "type": "choice",
+          "instructions": "What is this sign-off really saying?",
+          "criteria": {
+            "warm": "Friendly and glad to be talking",
+            "neutral": "Just closing the email",
+            "cold": "Keeping you at arm’s length",
+            "hostile": "Quietly furious"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "sign_off": {
+          "type": "choice",
+          "confidence": 0.46,
+          "probabilities": {
+            "warm": 0.4,
+            "neutral": 0.6,
+            "cold": 0,
+            "hostile": 0
+          },
+          "choice": "neutral"
+        }
+      }
+    }
+  },
+  {
+    "title": "Sign-off · iPhone",
+    "recordedAt": "2026-10-02T04:17:34.336Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Re: Updated timeline\nGot it. I will send the revised draft by Thursday.\n\nSent from my iPhone",
+      "questions": {
+        "sign_off": {
+          "type": "choice",
+          "instructions": "What is this sign-off really saying?",
+          "criteria": {
+            "warm": "Friendly and glad to be talking",
+            "neutral": "Just closing the email",
+            "cold": "Keeping you at arm’s length",
+            "hostile": "Quietly furious"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "sign_off": {
+          "type": "choice",
+          "confidence": 0.98,
+          "probabilities": {
+            "warm": 0,
+            "neutral": 0.99,
+            "cold": 0.01,
+            "hostile": 0
+          },
+          "choice": "neutral"
+        }
+      }
+    }
+  },
+  {
+    "title": "Sign-off · nothing",
+    "recordedAt": "2026-10-02T04:17:34.531Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Re: Updated timeline\nGot it. I will send the revised draft by Thursday.",
+      "questions": {
+        "sign_off": {
+          "type": "choice",
+          "instructions": "What is this sign-off really saying?",
+          "criteria": {
+            "warm": "Friendly and glad to be talking",
+            "neutral": "Just closing the email",
+            "cold": "Keeping you at arm’s length",
+            "hostile": "Quietly furious"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "sign_off": {
+          "type": "choice",
+          "confidence": 0.98,
+          "probabilities": {
+            "warm": 0,
+            "neutral": 0.99,
+            "cold": 0.01,
+            "hostile": 0
+          },
+          "choice": "neutral"
+        }
+      }
+    }
+  },
+  {
+    "title": "Which crime · per my last email",
+    "recordedAt": "2026-10-02T04:17:34.782Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Re: Re: Deadline\nPer my last email (attached again for convenience), the deadline is Friday.",
+      "questions": {
+        "email_crime": {
+          "type": "choice",
+          "instructions": "Which crime is this?",
+          "criteria": {
+            "passive_aggression": "Politeness used as a weapon",
+            "humblebrag": "A boast disguised as a complaint or aside",
+            "guilt_trip": "Makes you feel bad for the sender’s effort",
+            "innocent": "No crime committed"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "email_crime": {
+          "type": "choice",
+          "confidence": 0.37,
+          "probabilities": {
+            "passive_aggression": 0.53,
+            "humblebrag": 0,
+            "guilt_trip": 0.13,
+            "innocent": 0.34
+          },
+          "choice": "passive_aggression"
+        }
+      }
+    }
+  },
+  {
+    "title": "Which crime · probably buried",
+    "recordedAt": "2026-10-02T04:17:34.990Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Re: Re: Deadline\nAttaching this again in case it got buried. The deadline is Friday.",
+      "questions": {
+        "email_crime": {
+          "type": "choice",
+          "instructions": "Which crime is this?",
+          "criteria": {
+            "passive_aggression": "Politeness used as a weapon",
+            "humblebrag": "A boast disguised as a complaint or aside",
+            "guilt_trip": "Makes you feel bad for the sender’s effort",
+            "innocent": "No crime committed"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "email_crime": {
+          "type": "choice",
+          "confidence": 0.7,
+          "probabilities": {
+            "passive_aggression": 0.16,
+            "humblebrag": 0,
+            "guilt_trip": 0.07,
+            "innocent": 0.77
+          },
+          "choice": "innocent"
+        }
+      }
+    }
+  },
+  {
+    "title": "Which crime · after the keynote",
+    "recordedAt": "2026-10-02T04:17:35.218Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Re: Re: Deadline\nAttaching this again. I finished it on the flight home from my keynote, so excuse any typos. The deadline is Friday.",
+      "questions": {
+        "email_crime": {
+          "type": "choice",
+          "instructions": "Which crime is this?",
+          "criteria": {
+            "passive_aggression": "Politeness used as a weapon",
+            "humblebrag": "A boast disguised as a complaint or aside",
+            "guilt_trip": "Makes you feel bad for the sender’s effort",
+            "innocent": "No crime committed"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "email_crime": {
+          "type": "choice",
+          "confidence": 0.93,
+          "probabilities": {
+            "passive_aggression": 0.01,
+            "humblebrag": 0.94,
+            "guilt_trip": 0.01,
+            "innocent": 0.04
+          },
+          "choice": "humblebrag"
+        }
+      }
+    }
+  },
+  {
+    "title": "Which crime · until midnight",
+    "recordedAt": "2026-10-02T04:17:35.383Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Re: Re: Deadline\nAttaching this again. I stayed until midnight finishing it, but no worries if you have not had a chance to look. The deadline is Friday.",
+      "questions": {
+        "email_crime": {
+          "type": "choice",
+          "instructions": "Which crime is this?",
+          "criteria": {
+            "passive_aggression": "Politeness used as a weapon",
+            "humblebrag": "A boast disguised as a complaint or aside",
+            "guilt_trip": "Makes you feel bad for the sender’s effort",
+            "innocent": "No crime committed"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "email_crime": {
+          "type": "choice",
+          "confidence": 0.64,
+          "probabilities": {
+            "passive_aggression": 0.14,
+            "humblebrag": 0.1,
+            "guilt_trip": 0.74,
+            "innocent": 0.02
+          },
+          "choice": "guilt_trip"
+        }
+      }
+    }
+  },
+  {
+    "title": "Meeting invite · Sync",
+    "recordedAt": "2026-10-02T04:17:35.744Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Invite: Sync\nRecurring weekly · 30 minutes · 11 attendees\nNo agenda.",
+      "questions": {
+        "meeting_want": {
+          "type": "choice",
+          "instructions": "What does this meeting invite actually want?",
+          "criteria": {
+            "decision": "Someone needs to decide something",
+            "information": "Someone needs to tell people something",
+            "status_theater": "Looking busy and aligned",
+            "loneliness": "The organizer wants company"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "meeting_want": {
+          "type": "choice",
+          "confidence": 0.87,
+          "probabilities": {
+            "decision": 0,
+            "information": 0.03,
+            "status_theater": 0.91,
+            "loneliness": 0.06
+          },
+          "choice": "status_theater"
+        }
+      }
+    }
+  },
+  {
+    "title": "Meeting invite · pick a date",
+    "recordedAt": "2026-10-02T04:17:35.913Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Invite: Sync\nOne time · 30 minutes · 3 attendees\nAgenda: choose October 14 or October 21 for launch.",
+      "questions": {
+        "meeting_want": {
+          "type": "choice",
+          "instructions": "What does this meeting invite actually want?",
+          "criteria": {
+            "decision": "Someone needs to decide something",
+            "information": "Someone needs to tell people something",
+            "status_theater": "Looking busy and aligned",
+            "loneliness": "The organizer wants company"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "meeting_want": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "decision": 1,
+            "information": 0,
+            "status_theater": 0,
+            "loneliness": 0
+          },
+          "choice": "decision"
+        }
+      }
+    }
+  },
+  {
+    "title": "Meeting invite · Q3 numbers",
+    "recordedAt": "2026-10-02T04:17:36.268Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Invite: Sync\nOne time · 30 minutes · 40 attendees · cameras optional\nAgenda: finance walks through Q3 results.",
+      "questions": {
+        "meeting_want": {
+          "type": "choice",
+          "instructions": "What does this meeting invite actually want?",
+          "criteria": {
+            "decision": "Someone needs to decide something",
+            "information": "Someone needs to tell people something",
+            "status_theater": "Looking busy and aligned",
+            "loneliness": "The organizer wants company"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "meeting_want": {
+          "type": "choice",
+          "confidence": 0.98,
+          "probabilities": {
+            "decision": 0,
+            "information": 0.98,
+            "status_theater": 0.02,
+            "loneliness": 0
+          },
+          "choice": "information"
+        }
+      }
+    }
+  },
+  {
+    "title": "Meeting invite · just us",
+    "recordedAt": "2026-10-02T04:17:36.435Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Invite: Sync\nRecurring weekly · 30 minutes · 2 attendees\nNo agenda. Notes: \"just to chat :)\"",
+      "questions": {
+        "meeting_want": {
+          "type": "choice",
+          "instructions": "What does this meeting invite actually want?",
+          "criteria": {
+            "decision": "Someone needs to decide something",
+            "information": "Someone needs to tell people something",
+            "status_theater": "Looking busy and aligned",
+            "loneliness": "The organizer wants company"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "meeting_want": {
+          "type": "choice",
+          "confidence": 0.97,
+          "probabilities": {
+            "decision": 0,
+            "information": 0,
+            "status_theater": 0.02,
+            "loneliness": 0.98
+          },
+          "choice": "loneliness"
+        }
+      }
+    }
+  },
+  {
+    "title": "Out of office · Patagonia",
+    "recordedAt": "2026-10-02T04:17:36.793Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Automatic reply\nI’m off grid in Patagonia until the 14th. If urgent, contact Steve. If very urgent, also contact Steve.",
+      "questions": {
+        "out_of_office": {
+          "type": "choice",
+          "instructions": "Which genre of out-of-office is this?",
+          "criteria": {
+            "professional": "Dates and a contact, nothing more",
+            "smug": "Wants you to know how great their time off is",
+            "too_much_information": "Shares details nobody asked for",
+            "cry_for_help": "The sender is not okay"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "out_of_office": {
+          "type": "choice",
+          "confidence": 0.3,
+          "probabilities": {
+            "professional": 0.36,
+            "smug": 0.48,
+            "too_much_information": 0.15,
+            "cry_for_help": 0.01
+          },
+          "choice": "smug"
+        }
+      }
+    }
+  },
+  {
+    "title": "Out of office · limited access",
+    "recordedAt": "2026-10-02T04:17:37.004Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Automatic reply\nI’m out of the office until the 14th with limited access to email. If urgent, contact Steve.",
+      "questions": {
+        "out_of_office": {
+          "type": "choice",
+          "instructions": "Which genre of out-of-office is this?",
+          "criteria": {
+            "professional": "Dates and a contact, nothing more",
+            "smug": "Wants you to know how great their time off is",
+            "too_much_information": "Shares details nobody asked for",
+            "cry_for_help": "The sender is not okay"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "out_of_office": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "professional": 1,
+            "smug": 0,
+            "too_much_information": 0,
+            "cry_for_help": 0
+          },
+          "choice": "professional"
+        }
+      }
+    }
+  },
+  {
+    "title": "Out of office · applesauce",
+    "recordedAt": "2026-10-02T04:17:37.316Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Automatic reply\nI’m out until the 14th recovering from having my wisdom teeth out. I can only eat applesauce. If urgent, contact Steve.",
+      "questions": {
+        "out_of_office": {
+          "type": "choice",
+          "instructions": "Which genre of out-of-office is this?",
+          "criteria": {
+            "professional": "Dates and a contact, nothing more",
+            "smug": "Wants you to know how great their time off is",
+            "too_much_information": "Shares details nobody asked for",
+            "cry_for_help": "The sender is not okay"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "out_of_office": {
+          "type": "choice",
+          "confidence": 0.99,
+          "probabilities": {
+            "professional": 0,
+            "smug": 0,
+            "too_much_information": 1,
+            "cry_for_help": 0
+          },
+          "choice": "too_much_information"
+        }
+      }
+    }
+  },
+  {
+    "title": "Out of office · will probably check",
+    "recordedAt": "2026-10-02T04:17:37.537Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Automatic reply\nI’m out until the 14th. I may check email. I will probably check email. Please do not make me check email. If urgent, contact Steve.",
+      "questions": {
+        "out_of_office": {
+          "type": "choice",
+          "instructions": "Which genre of out-of-office is this?",
+          "criteria": {
+            "professional": "Dates and a contact, nothing more",
+            "smug": "Wants you to know how great their time off is",
+            "too_much_information": "Shares details nobody asked for",
+            "cry_for_help": "The sender is not okay"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "out_of_office": {
+          "type": "choice",
+          "confidence": 0.74,
+          "probabilities": {
+            "professional": 0.11,
+            "smug": 0.02,
+            "too_much_information": 0.07,
+            "cry_for_help": 0.8
+          },
+          "choice": "cry_for_help"
+        }
+      }
+    }
+  },
+  {
+    "title": "Emoji · folded hands",
+    "recordedAt": "2026-10-02T04:17:37.841Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: PR review\nCan you review my pull request before lunch? 🙏",
+      "questions": {
+        "emoji_fit": {
+          "type": "score",
+          "instructions": "How appropriate is this emoji in a work email?",
+          "criteria": [
+            "Call HR",
+            "Inappropriate",
+            "Questionable",
+            "Fine",
+            "Perfectly appropriate"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "emoji_fit": {
+          "type": "score",
+          "confidence": 0.69,
+          "probabilities": {
+            "0": 0,
+            "1": 0,
+            "2": 0.07,
+            "3": 0.63,
+            "4": 0.3
+          },
+          "score": 3.22,
+          "legend": {
+            "0": "Call HR",
+            "1": "Inappropriate",
+            "2": "Questionable",
+            "3": "Fine",
+            "4": "Perfectly appropriate"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Emoji · melting face",
+    "recordedAt": "2026-10-02T04:17:38.017Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: PR review\nCan you review my pull request before lunch? 🫠",
+      "questions": {
+        "emoji_fit": {
+          "type": "score",
+          "instructions": "How appropriate is this emoji in a work email?",
+          "criteria": [
+            "Call HR",
+            "Inappropriate",
+            "Questionable",
+            "Fine",
+            "Perfectly appropriate"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "emoji_fit": {
+          "type": "score",
+          "confidence": 0.59,
+          "probabilities": {
+            "0": 0,
+            "1": 0.01,
+            "2": 0.42,
+            "3": 0.52,
+            "4": 0.05
+          },
+          "score": 2.6,
+          "legend": {
+            "0": "Call HR",
+            "1": "Inappropriate",
+            "2": "Questionable",
+            "3": "Fine",
+            "4": "Perfectly appropriate"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Emoji · skull",
+    "recordedAt": "2026-10-02T04:17:38.366Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: PR review\nCan you review my pull request before lunch? 💀",
+      "questions": {
+        "emoji_fit": {
+          "type": "score",
+          "instructions": "How appropriate is this emoji in a work email?",
+          "criteria": [
+            "Call HR",
+            "Inappropriate",
+            "Questionable",
+            "Fine",
+            "Perfectly appropriate"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "emoji_fit": {
+          "type": "score",
+          "confidence": 0.71,
+          "probabilities": {
+            "0": 0,
+            "1": 0.05,
+            "2": 0.67,
+            "3": 0.27,
+            "4": 0.01
+          },
+          "score": 2.25,
+          "legend": {
+            "0": "Call HR",
+            "1": "Inappropriate",
+            "2": "Questionable",
+            "3": "Fine",
+            "4": "Perfectly appropriate"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Emoji · eggplant",
+    "recordedAt": "2026-10-02T04:17:38.536Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: PR review\nCan you review my pull request before lunch? 🍆",
+      "questions": {
+        "emoji_fit": {
+          "type": "score",
+          "instructions": "How appropriate is this emoji in a work email?",
+          "criteria": [
+            "Call HR",
+            "Inappropriate",
+            "Questionable",
+            "Fine",
+            "Perfectly appropriate"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "emoji_fit": {
+          "type": "score",
+          "confidence": 0.77,
+          "probabilities": {
+            "0": 0.06,
+            "1": 0.76,
+            "2": 0.17,
+            "3": 0.01,
+            "4": 0
+          },
+          "score": 1.15,
+          "legend": {
+            "0": "Call HR",
+            "1": "Inappropriate",
+            "2": "Questionable",
+            "3": "Fine",
+            "4": "Perfectly appropriate"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Passive aggression · following up",
+    "recordedAt": "2026-10-02T04:17:38.709Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Re: Contract review\nJust following up!\nThe signed contract is still needed by Friday.",
+      "questions": {
+        "passive_aggression": {
+          "type": "score",
+          "instructions": "Rate the passive aggression in this email.",
+          "criteria": [
+            "Sincere",
+            "Breezy",
+            "Polite nudge",
+            "Mild impatience",
+            "Pointed",
+            "Clearly annoyed",
+            "Barely contained",
+            "Weaponized politeness",
+            "Open hostility",
+            "Scorched earth"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "passive_aggression": {
+          "type": "score",
+          "confidence": 0.81,
+          "probabilities": {
+            "0": 0,
+            "1": 0,
+            "2": 0.41,
+            "3": 0.53,
+            "4": 0.06,
+            "5": 0,
+            "6": 0,
+            "7": 0,
+            "8": 0,
+            "9": 0
+          },
+          "score": 2.65,
+          "legend": {
+            "0": "Sincere",
+            "1": "Breezy",
+            "2": "Polite nudge",
+            "3": "Mild impatience",
+            "4": "Pointed",
+            "5": "Clearly annoyed",
+            "6": "Barely contained",
+            "7": "Weaponized politeness",
+            "8": "Open hostility",
+            "9": "Scorched earth"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Passive aggression · circling back",
+    "recordedAt": "2026-10-02T04:17:38.933Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Re: Contract review\nJust circling back on this.\nThe signed contract is still needed by Friday.",
+      "questions": {
+        "passive_aggression": {
+          "type": "score",
+          "instructions": "Rate the passive aggression in this email.",
+          "criteria": [
+            "Sincere",
+            "Breezy",
+            "Polite nudge",
+            "Mild impatience",
+            "Pointed",
+            "Clearly annoyed",
+            "Barely contained",
+            "Weaponized politeness",
+            "Open hostility",
+            "Scorched earth"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "passive_aggression": {
+          "type": "score",
+          "confidence": 0.81,
+          "probabilities": {
+            "0": 0,
+            "1": 0,
+            "2": 0.42,
+            "3": 0.54,
+            "4": 0.04,
+            "5": 0,
+            "6": 0,
+            "7": 0,
+            "8": 0,
+            "9": 0
+          },
+          "score": 2.63,
+          "legend": {
+            "0": "Sincere",
+            "1": "Breezy",
+            "2": "Polite nudge",
+            "3": "Mild impatience",
+            "4": "Pointed",
+            "5": "Clearly annoyed",
+            "6": "Barely contained",
+            "7": "Weaponized politeness",
+            "8": "Open hostility",
+            "9": "Scorched earth"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Passive aggression · bumping",
+    "recordedAt": "2026-10-02T04:17:39.096Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Re: Contract review\nBumping this to the top of your inbox.\nThe signed contract is still needed by Friday.",
+      "questions": {
+        "passive_aggression": {
+          "type": "score",
+          "instructions": "Rate the passive aggression in this email.",
+          "criteria": [
+            "Sincere",
+            "Breezy",
+            "Polite nudge",
+            "Mild impatience",
+            "Pointed",
+            "Clearly annoyed",
+            "Barely contained",
+            "Weaponized politeness",
+            "Open hostility",
+            "Scorched earth"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "passive_aggression": {
+          "type": "score",
+          "confidence": 0.85,
+          "probabilities": {
+            "0": 0,
+            "1": 0,
+            "2": 0.06,
+            "3": 0.66,
+            "4": 0.23,
+            "5": 0.05,
+            "6": 0,
+            "7": 0,
+            "8": 0,
+            "9": 0
+          },
+          "score": 3.27,
+          "legend": {
+            "0": "Sincere",
+            "1": "Breezy",
+            "2": "Polite nudge",
+            "3": "Mild impatience",
+            "4": "Pointed",
+            "5": "Clearly annoyed",
+            "6": "Barely contained",
+            "7": "Weaponized politeness",
+            "8": "Open hostility",
+            "9": "Scorched earth"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Passive aggression · last three emails",
+    "recordedAt": "2026-10-02T04:17:39.418Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Re: Contract review\nPer my last three emails:\nThe signed contract is still needed by Friday.",
+      "questions": {
+        "passive_aggression": {
+          "type": "score",
+          "instructions": "Rate the passive aggression in this email.",
+          "criteria": [
+            "Sincere",
+            "Breezy",
+            "Polite nudge",
+            "Mild impatience",
+            "Pointed",
+            "Clearly annoyed",
+            "Barely contained",
+            "Weaponized politeness",
+            "Open hostility",
+            "Scorched earth"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "passive_aggression": {
+          "type": "score",
+          "confidence": 0.78,
+          "probabilities": {
+            "0": 0,
+            "1": 0,
+            "2": 0,
+            "3": 0.13,
+            "4": 0.48,
+            "5": 0.38,
+            "6": 0.01,
+            "7": 0,
+            "8": 0,
+            "9": 0
+          },
+          "score": 4.29,
+          "legend": {
+            "0": "Sincere",
+            "1": "Breezy",
+            "2": "Polite nudge",
+            "3": "Mild impatience",
+            "4": "Pointed",
+            "5": "Clearly annoyed",
+            "6": "Barely contained",
+            "7": "Weaponized politeness",
+            "8": "Open hostility",
+            "9": "Scorched earth"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Passive aggression · your manager",
+    "recordedAt": "2026-10-02T04:17:39.599Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Re: Contract review\nLooping in your manager for visibility.\nThe signed contract is still needed by Friday.",
+      "questions": {
+        "passive_aggression": {
+          "type": "score",
+          "instructions": "Rate the passive aggression in this email.",
+          "criteria": [
+            "Sincere",
+            "Breezy",
+            "Polite nudge",
+            "Mild impatience",
+            "Pointed",
+            "Clearly annoyed",
+            "Barely contained",
+            "Weaponized politeness",
+            "Open hostility",
+            "Scorched earth"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "passive_aggression": {
+          "type": "score",
+          "confidence": 0.72,
+          "probabilities": {
+            "0": 0,
+            "1": 0,
+            "2": 0,
+            "3": 0.05,
+            "4": 0.54,
+            "5": 0.27,
+            "6": 0.05,
+            "7": 0.09,
+            "8": 0,
+            "9": 0
+          },
+          "score": 4.61,
+          "legend": {
+            "0": "Sincere",
+            "1": "Breezy",
+            "2": "Polite nudge",
+            "3": "Mild impatience",
+            "4": "Pointed",
+            "5": "Clearly annoyed",
+            "6": "Barely contained",
+            "7": "Weaponized politeness",
+            "8": "Open hostility",
+            "9": "Scorched earth"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Lowercase · the CEO",
+    "recordedAt": "2026-10-02T04:17:39.751Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Priya Shah, CEO\nSubject: Re: My four-page proposal to rework onboarding\nsounds good",
+      "questions": {
+        "lowercase_energy": {
+          "type": "score",
+          "instructions": "Rate the energy of this lowercase reply.",
+          "criteria": [
+            "Sloppy",
+            "Casual",
+            "Neutral",
+            "Confident",
+            "Ominous"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "lowercase_energy": {
+          "type": "score",
+          "confidence": 0.88,
+          "probabilities": {
+            "0": 0.05,
+            "1": 0.88,
+            "2": 0.06,
+            "3": 0.01,
+            "4": 0
+          },
+          "score": 1.04,
+          "legend": {
+            "0": "Sloppy",
+            "1": "Casual",
+            "2": "Neutral",
+            "3": "Confident",
+            "4": "Ominous"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Lowercase · the intern",
+    "recordedAt": "2026-10-02T04:17:39.935Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Priya Shah, summer intern\nSubject: Re: My four-page proposal to rework onboarding\nsounds good",
+      "questions": {
+        "lowercase_energy": {
+          "type": "score",
+          "instructions": "Rate the energy of this lowercase reply.",
+          "criteria": [
+            "Sloppy",
+            "Casual",
+            "Neutral",
+            "Confident",
+            "Ominous"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "lowercase_energy": {
+          "type": "score",
+          "confidence": 0.88,
+          "probabilities": {
+            "0": 0.05,
+            "1": 0.87,
+            "2": 0.08,
+            "3": 0,
+            "4": 0
+          },
+          "score": 1.04,
+          "legend": {
+            "0": "Sloppy",
+            "1": "Casual",
+            "2": "Neutral",
+            "3": "Confident",
+            "4": "Ominous"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Lowercase · CEO lunch",
+    "recordedAt": "2026-10-02T04:17:40.093Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: Priya Shah, CEO\nSubject: Re: Lunch at noon?\nsounds good",
+      "questions": {
+        "lowercase_energy": {
+          "type": "score",
+          "instructions": "Rate the energy of this lowercase reply.",
+          "criteria": [
+            "Sloppy",
+            "Casual",
+            "Neutral",
+            "Confident",
+            "Ominous"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "lowercase_energy": {
+          "type": "score",
+          "confidence": 0.93,
+          "probabilities": {
+            "0": 0.02,
+            "1": 0.91,
+            "2": 0.07,
+            "3": 0,
+            "4": 0
+          },
+          "score": 1.05,
+          "legend": {
+            "0": "Sloppy",
+            "1": "Casual",
+            "2": "Neutral",
+            "3": "Confident",
+            "4": "Ominous"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Newsletter · the 2019 conference",
+    "recordedAt": "2026-10-02T04:17:56.517Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: DevSummit 2019\nSubject: This week at DevSummit\nYou are receiving this weekly update because you registered for DevSummit 2019.",
+      "questions": {
+        "newsletter_spam": {
+          "type": "score",
+          "instructions": "How spammy is this newsletter you technically signed up for?",
+          "criteria": [
+            "Eagerly awaited",
+            "Welcome",
+            "Fine",
+            "Tolerable",
+            "Skimmed at best",
+            "Ignored",
+            "Annoying",
+            "Unsubscribe-worthy",
+            "Basically spam",
+            "Pure spam"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "newsletter_spam": {
+          "type": "score",
+          "confidence": 0.74,
+          "probabilities": {
+            "0": 0.01,
+            "1": 0.17,
+            "2": 0.52,
+            "3": 0.18,
+            "4": 0.1,
+            "5": 0.02,
+            "6": 0,
+            "7": 0,
+            "8": 0,
+            "9": 0
+          },
+          "score": 2.26,
+          "legend": {
+            "0": "Eagerly awaited",
+            "1": "Welcome",
+            "2": "Fine",
+            "3": "Tolerable",
+            "4": "Skimmed at best",
+            "5": "Ignored",
+            "6": "Annoying",
+            "7": "Unsubscribe-worthy",
+            "8": "Basically spam",
+            "9": "Pure spam"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Newsletter · the annual reminder",
+    "recordedAt": "2026-10-02T04:17:56.717Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: DevSummit\nSubject: DevSummit 2027 registration is open\nYou are receiving this once a year because you registered for DevSummit 2019.",
+      "questions": {
+        "newsletter_spam": {
+          "type": "score",
+          "instructions": "How spammy is this newsletter you technically signed up for?",
+          "criteria": [
+            "Eagerly awaited",
+            "Welcome",
+            "Fine",
+            "Tolerable",
+            "Skimmed at best",
+            "Ignored",
+            "Annoying",
+            "Unsubscribe-worthy",
+            "Basically spam",
+            "Pure spam"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "newsletter_spam": {
+          "type": "score",
+          "confidence": 0.26,
+          "probabilities": {
+            "0": 0,
+            "1": 0.01,
+            "2": 0.1,
+            "3": 0.28,
+            "4": 0.19,
+            "5": 0.06,
+            "6": 0.16,
+            "7": 0.09,
+            "8": 0.11,
+            "9": 0
+          },
+          "score": 4.6,
+          "legend": {
+            "0": "Eagerly awaited",
+            "1": "Welcome",
+            "2": "Fine",
+            "3": "Tolerable",
+            "4": "Skimmed at best",
+            "5": "Ignored",
+            "6": "Annoying",
+            "7": "Unsubscribe-worthy",
+            "8": "Basically spam",
+            "9": "Pure spam"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Newsletter · last week’s signup",
+    "recordedAt": "2026-10-02T04:17:56.909Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: DevSummit\nSubject: This week at DevSummit\nYou are receiving this weekly update because you subscribed last Tuesday.",
+      "questions": {
+        "newsletter_spam": {
+          "type": "score",
+          "instructions": "How spammy is this newsletter you technically signed up for?",
+          "criteria": [
+            "Eagerly awaited",
+            "Welcome",
+            "Fine",
+            "Tolerable",
+            "Skimmed at best",
+            "Ignored",
+            "Annoying",
+            "Unsubscribe-worthy",
+            "Basically spam",
+            "Pure spam"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "newsletter_spam": {
+          "type": "score",
+          "confidence": 0.72,
+          "probabilities": {
+            "0": 0,
+            "1": 0.1,
+            "2": 0.56,
+            "3": 0.17,
+            "4": 0.11,
+            "5": 0.04,
+            "6": 0.01,
+            "7": 0,
+            "8": 0,
+            "9": 0
+          },
+          "score": 2.48,
+          "legend": {
+            "0": "Eagerly awaited",
+            "1": "Welcome",
+            "2": "Fine",
+            "3": "Tolerable",
+            "4": "Skimmed at best",
+            "5": "Ignored",
+            "6": "Annoying",
+            "7": "Unsubscribe-worthy",
+            "8": "Basically spam",
+            "9": "Pure spam"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Newsletter · last chance, again",
+    "recordedAt": "2026-10-02T04:17:57.242Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "From: DevSummit 2019\nSubject: LAST CHANCE: 40% off ends tonight\nYou are receiving this daily update because you registered for DevSummit 2019.",
+      "questions": {
+        "newsletter_spam": {
+          "type": "score",
+          "instructions": "How spammy is this newsletter you technically signed up for?",
+          "criteria": [
+            "Eagerly awaited",
+            "Welcome",
+            "Fine",
+            "Tolerable",
+            "Skimmed at best",
+            "Ignored",
+            "Annoying",
+            "Unsubscribe-worthy",
+            "Basically spam",
+            "Pure spam"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "newsletter_spam": {
+          "type": "score",
+          "confidence": 0.55,
+          "probabilities": {
+            "0": 0,
+            "1": 0,
+            "2": 0.02,
+            "3": 0.14,
+            "4": 0.12,
+            "5": 0.02,
+            "6": 0.42,
+            "7": 0.2,
+            "8": 0.08,
+            "9": 0
+          },
+          "score": 5.6,
+          "legend": {
+            "0": "Eagerly awaited",
+            "1": "Welcome",
+            "2": "Fine",
+            "3": "Tolerable",
+            "4": "Skimmed at best",
+            "5": "Ignored",
+            "6": "Annoying",
+            "7": "Unsubscribe-worthy",
+            "8": "Basically spam",
+            "9": "Pure spam"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Hope this finds you well · invoice",
+    "recordedAt": "2026-10-02T04:17:57.426Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Invoice #4471\nHope this finds you well. I’m writing about your overdue invoice.",
+      "questions": {
+        "hope_sincerity": {
+          "type": "score",
+          "instructions": "How sincere is \"Hope this finds you well\" in this email?",
+          "criteria": [
+            "Pure boilerplate",
+            "Mostly filler",
+            "Neutral",
+            "Somewhat sincere",
+            "Genuinely sincere"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "hope_sincerity": {
+          "type": "score",
+          "confidence": 0.8,
+          "probabilities": {
+            "0": 0.79,
+            "1": 0.19,
+            "2": 0.01,
+            "3": 0.01,
+            "4": 0
+          },
+          "score": 0.25,
+          "legend": {
+            "0": "Pure boilerplate",
+            "1": "Mostly filler",
+            "2": "Neutral",
+            "3": "Somewhat sincere",
+            "4": "Genuinely sincere"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Hope this finds you well · surgery",
+    "recordedAt": "2026-10-02T04:17:57.766Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Checking in\nHope this finds you well. I heard about your surgery and wanted to see how recovery is going.",
+      "questions": {
+        "hope_sincerity": {
+          "type": "score",
+          "instructions": "How sincere is \"Hope this finds you well\" in this email?",
+          "criteria": [
+            "Pure boilerplate",
+            "Mostly filler",
+            "Neutral",
+            "Somewhat sincere",
+            "Genuinely sincere"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "hope_sincerity": {
+          "type": "score",
+          "confidence": 0.24,
+          "probabilities": {
+            "0": 0.06,
+            "1": 0.25,
+            "2": 0.06,
+            "3": 0.45,
+            "4": 0.18
+          },
+          "score": 2.46,
+          "legend": {
+            "0": "Pure boilerplate",
+            "1": "Mostly filler",
+            "2": "Neutral",
+            "3": "Somewhat sincere",
+            "4": "Genuinely sincere"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Hope this finds you well · agenda",
+    "recordedAt": "2026-10-02T04:17:57.950Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Tuesday\nHope this finds you well. Attached is the agenda for Tuesday.",
+      "questions": {
+        "hope_sincerity": {
+          "type": "score",
+          "instructions": "How sincere is \"Hope this finds you well\" in this email?",
+          "criteria": [
+            "Pure boilerplate",
+            "Mostly filler",
+            "Neutral",
+            "Somewhat sincere",
+            "Genuinely sincere"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "hope_sincerity": {
+          "type": "score",
+          "confidence": 0.84,
+          "probabilities": {
+            "0": 0.85,
+            "1": 0.12,
+            "2": 0.03,
+            "3": 0,
+            "4": 0
+          },
+          "score": 0.19,
+          "legend": {
+            "0": "Pure boilerplate",
+            "1": "Mostly filler",
+            "2": "Neutral",
+            "3": "Somewhat sincere",
+            "4": "Genuinely sincere"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Hope this finds you well · Lisbon",
+    "recordedAt": "2026-10-02T04:17:58.134Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Long time\nHope this finds you well. It has been three years since Lisbon, and I still think about your talk.",
+      "questions": {
+        "hope_sincerity": {
+          "type": "score",
+          "instructions": "How sincere is \"Hope this finds you well\" in this email?",
+          "criteria": [
+            "Pure boilerplate",
+            "Mostly filler",
+            "Neutral",
+            "Somewhat sincere",
+            "Genuinely sincere"
+          ]
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "hope_sincerity": {
+          "type": "score",
+          "confidence": 0.07,
+          "probabilities": {
+            "0": 0.1,
+            "1": 0.32,
+            "2": 0.12,
+            "3": 0.4,
+            "4": 0.06
+          },
+          "score": 2.01,
+          "legend": {
+            "0": "Pure boilerplate",
+            "1": "Mostly filler",
+            "2": "Neutral",
+            "3": "Somewhat sincere",
+            "4": "Genuinely sincere"
+          }
+        }
+      }
+    }
+  },
+  {
+    "title": "Folded hands · cover my shift",
+    "recordedAt": "2026-10-02T04:17:58.342Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Saturday\nAny chance you could cover my shift Saturday? 🙏",
+      "questions": {
+        "pray_emoji": {
+          "type": "choice",
+          "instructions": "What does the 🙏 mean here?",
+          "criteria": {
+            "please": "Asking for something",
+            "thank_you": "Thanking for something"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "pray_emoji": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "please": 1,
+            "thank_you": 0
+          },
+          "choice": "please"
+        }
+      }
+    }
+  },
+  {
+    "title": "Folded hands · you covered",
+    "recordedAt": "2026-10-02T04:17:58.539Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Saturday\nThanks for covering my shift Saturday 🙏",
+      "questions": {
+        "pray_emoji": {
+          "type": "choice",
+          "instructions": "What does the 🙏 mean here?",
+          "criteria": {
+            "please": "Asking for something",
+            "thank_you": "Thanking for something"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "pray_emoji": {
+          "type": "choice",
+          "confidence": 1,
+          "probabilities": {
+            "please": 0,
+            "thank_you": 1
+          },
+          "choice": "thank_you"
+        }
+      }
+    }
+  },
+  {
+    "title": "Folded hands · just Saturday",
+    "recordedAt": "2026-10-02T04:17:58.813Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Saturday\nSaturday 🙏",
+      "questions": {
+        "pray_emoji": {
+          "type": "choice",
+          "instructions": "What does the 🙏 mean here?",
+          "criteria": {
+            "please": "Asking for something",
+            "thank_you": "Thanking for something"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "pray_emoji": {
+          "type": "choice",
+          "confidence": 0.7,
+          "probabilities": {
+            "please": 0.15,
+            "thank_you": 0.85
+          },
+          "choice": "thank_you"
+        }
+      }
+    }
+  },
+  {
+    "title": "iPhone · tomorrow",
+    "recordedAt": "2026-10-02T04:17:58.993Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Re: Budget\nok will do tmrw\n\nSent from my iPhone",
+      "questions": {
+        "iphone_signature": {
+          "type": "choice",
+          "instructions": "Is \"Sent from my iPhone\" honest or lazy here?",
+          "criteria": {
+            "honest": "Fairly explains a short or typo-prone reply",
+            "lazy": "Nobody bothered to delete the default"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "iphone_signature": {
+          "type": "choice",
+          "confidence": 0.15,
+          "probabilities": {
+            "honest": 0.42,
+            "lazy": 0.58
+          },
+          "choice": "lazy"
+        }
+      }
+    }
+  },
+  {
+    "title": "iPhone · five paragraphs",
+    "recordedAt": "2026-10-02T04:17:59.337Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "Subject: Re: Budget\nThanks for the detailed breakdown. I have gone through each line item and have notes in three areas: headcount, tooling, and travel. On headcount, I think we should phase the two hires across Q1 and Q2 rather than front-loading them. On tooling, the observability contract renews in March and we should renegotiate before then. On travel, I would cap offsites at two per year. Happy to walk through any of this live.\n\nSent from my iPhone",
+      "questions": {
+        "iphone_signature": {
+          "type": "choice",
+          "instructions": "Is \"Sent from my iPhone\" honest or lazy here?",
+          "criteria": {
+            "honest": "Fairly explains a short or typo-prone reply",
+            "lazy": "Nobody bothered to delete the default"
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "iphone_signature": {
+          "type": "choice",
+          "confidence": 0.11,
+          "probabilities": {
+            "honest": 0.45,
+            "lazy": 0.55
+          },
+          "choice": "lazy"
+        }
+      }
+    }
+  },
+  {
     "title": "Another castle · Mario",
     "recordedAt": "2026-10-02T04:06:41.952Z",
     "request": {
