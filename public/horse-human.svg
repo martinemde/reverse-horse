@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="4 0 40 40" fill="none" stroke="#d6fa69" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-<!-- Horse head adapted from Lucide Lab, ISC license; see horse-human.LICENSE.txt. -->
-<g transform="translate(13.6 -1) scale(1.2)" stroke-width="1.6667">
-<path d="M11.5 12H11"/>
-<path d="M5 15a4 4 0 0 0 4 4h7.8l.3.3a3 3 0 0 0 4-4.46L12 7c0-3-1-5-1-5S8 3 8 7c-4 1-6 3-6 3"/>
-<path d="M2 10v10.8333"/>
-</g>
-<path d="M16 24v2l6 4 6-4v-3M16 26l-3 2a6 6 0 0 0-3 5v4h24v-4a6 6 0 0 0-3-5l-3-2M22 30v7"/>
-</svg>

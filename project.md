@@ -150,12 +150,13 @@ Renaming the Worker creates a new deployment and room namespace. The old
 `meat-jev` Worker remains until explicitly retired; it is not renamed in place.
 Browser storage keys migrate on the same origin; a different domain requires
 connecting OpenRouter again because credentials never leave browser storage.
-The horse-headed human SVG adapts Lucide Lab’s horse-head; its ISC license is
-served alongside the asset as `horse-human.LICENSE.txt`.
+The logo uses Lucide Lab’s unmodified `horse-head` paths in `horse.svg`, colored
+with the site’s lime accent. Its ISC license is served as `horse.LICENSE.txt`.
+Upstream source: https://github.com/lucide-icons/lucide-lab/blob/main/icons/horse-head.svg.
 
 Both pages include Open Graph and large-image Twitter cards using the canonical
 `https://reverse.horse` origin and `public/unfurl.png` (1200 × 630). The editable
-source is `public/unfurl.svg`, which reuses `horse-human.svg`. After editing either
+source is `public/unfurl.svg`, which reuses `horse.svg`. After editing either
 SVG, regenerate the PNG with `rsvg-convert public/unfurl.svg -o public/unfurl.png`
 and inspect it before building. Keep the image in `http.js`'s asset allowlist so
 both the Bun server and Worker serve it to link crawlers without JavaScript.

@@ -93,7 +93,7 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
   function render() {
     const top = node('div', undefined, 'training-top');
     const brand = node('div', undefined, 'training-brand');
-    const horse = node('img'); horse.src = '/horse-human.svg'; horse.alt = ''; horse.width = 32; horse.height = 32;
+    const horse = node('img'); horse.src = '/horse.svg'; horse.alt = ''; horse.width = 32; horse.height = 32;
     brand.append(horse, node('span', 'reverse.horse / personnel development'));
     top.append(brand, button('Exit training', () => close(), 'secondary'));
     const progress = node('ol', undefined, 'training-progress');
