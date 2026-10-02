@@ -115,7 +115,7 @@ function makeForm(item, onTrainingSubmit) {
     return { wrapper, marker };
   }
   function mark(control, value, max, label) {
-    control.marker.style.left = `${100 * value / max}%`;
+    control.marker.style[control.vertical ? 'bottom' : 'left'] = `${100 * value / max}%`;
     control.marker.hidden = false;
     control.jev.textContent = `JEV ${label}`;
     control.jev.classList.remove('pending');
@@ -180,17 +180,23 @@ function makeForm(item, onTrainingSubmit) {
       row.append(node('span', q.type === 'noul' ? 'Probability of yes' : 'Your score'), numbers);
       const slider = range(id, max, values[id], value => { values[id] = value; output.textContent = value.toFixed(3); });
       const scale = track(slider);
-      field.append(row, scale.wrapper);
-      Object.assign(view, { slider, output, jev, max, marker: scale.marker });
+      Object.assign(view, { slider, output, jev, max, marker: scale.marker, vertical: q.type === 'score' });
       if (q.type === 'noul') {
+        field.append(row, scale.wrapper);
         const ends = node('div', undefined, 'ends');
         ends.append(node('span', `No · 0${q.criteria?.false !== undefined ? '\n' + text(q.criteria.false) : ''}`), node('span', `Yes · 1${q.criteria?.true !== undefined ? '\n' + text(q.criteria.true) : ''}`));
         field.append(ends);
       } else {
-        const ticks = node('div', undefined, 'scale');
-        const legend = node('div', undefined, 'legend');
-        q.criteria.forEach((label, i) => { const tick = node('span'); tick.append(node('b', i)); ticks.append(tick); const slot = node('span'); slot.append(node('span', text(label))); legend.append(slot); });
-        field.append(ticks, legend);
+        // Vertical, highest level on top, so labels read horizontally beside their level.
+        const levels = node('div', undefined, 'score-levels');
+        q.criteria.forEach((label, i) => {
+          const level = node('span'); level.style.bottom = `${100 * i / max}%`;
+          level.append(node('b', i), node('span', text(label)));
+          levels.append(level);
+        });
+        const vertical = node('div', undefined, 'score-scale'); vertical.style.setProperty('--steps', max);
+        vertical.append(scale.wrapper, levels);
+        field.append(row, vertical);
       }
     }
     field.append(feedback);
