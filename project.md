@@ -6,103 +6,66 @@ url: https://reverse-horse.poblonko.workers.dev
 
 # reverse-horse
 
-Be Jev: a Bun server or Cloudflare Worker accepts TypeSafe System One requests, shows their
-state and questions live over a WebSocket, and holds the HTTP connection while
-you answer. Each API call has 30 seconds from arrival, including time in the queue.
-The caller receives the average of the participating browsers' answers once
-everyone submits. At the deadline it receives the average submitted so far,
-or 504 if nobody answered. After a 504 the questions and your draft remain on
-the page. You can save late answers and optionally compare them with JEV; late
-answers cannot reach the expired caller. Auto mode waits for your answer before
-dealing the next round, even after its timer expires.
+Be Jev. A Bun server or Cloudflare Worker accepts TypeSafe System One requests,
+shows them live over a WebSocket, and holds the HTTP connection while humans
+answer. Each call has 30 seconds from arrival, queue time included. The caller
+gets the average of all participating browsers' answers, the average so far at
+the deadline, or 504 if nobody answered. Late answers can still be saved and
+compared with JEV but never reach the caller.
 
 ## Run
 
 ```sh
 mise install
 bun install --frozen-lockfile
-bun start
+bun start        # http://127.0.0.1:3000, PORT to change
+bun dev          # restarts on server changes; refresh for UI edits
 ```
 
-Open http://127.0.0.1:3000. Set `PORT` to change the port. Bun manages dependencies
-and runs the local server and tests. `bun dev` restarts on server changes; refresh
-the page after UI edits.
+## Training
 
-First-time visitors enter an untimed training walkthrough: induction, Noul,
-Choice, Score, and certification. The exercises classify emails: whether payment
-is required, which support team should handle a refund, and how urgently a meeting
-request needs attention. Each exercise uses the answering screen's
-controls and shows its request JSON, human response, and actual recorded JEV
-response. Training does not submit to the shared queue or call OpenRouter.
-Practice pauses while training is open; exiting restores the previous play state.
-Live requests still arrive and keep their original deadlines.
-**Exit training** and Escape return to the site from any step. Leaving training
-any way, including **Enter the site**, saves `reverse-horse.training-completed = 1`
-in local storage, so it auto-opens only once. To verify first-visit behavior again, remove that key and reload.
-**Training** in the navigation reopens the course without clearing certification.
-Blocked storage permits training but cannot remember completion.
+First visits open an untimed course: Induction, Noul, Choice, Score, Certified.
+Exercises classify emails using the real answering controls and compare against
+recorded JEV runs. Training never submits to the queue or calls OpenRouter;
+practice pauses while it is open, and live requests keep their deadlines. Any
+exit (Exit training, Escape, Enter the site) sets
+`reverse-horse.training-completed = 1` in local storage. Remove that key to see
+the first visit again. **Training** in the nav reopens it.
 
-Click **Connect OpenRouter** to authorize your own key. **Compare with JEV** is
-enabled on your first connection. Turn it off whenever you like; your choice is
-saved in this browser and survives refreshes and reconnects. Built-in practice rounds use recorded JEV answers even without a connection;
-the comparison toggle still lets you turn that off. Live comparisons require a connection. The OAuth flow follows the blog's browser-side PKCE implementation:
-a random verifier and state are kept in session storage, the callback exchanges
-the code directly with OpenRouter, and the key stays in this origin's local
-storage. Callbacks expire after ten minutes and must match the initiating tab.
+## Practice
 
-After all participating browsers submit, the caller receives their average. If comparison is
-enabled, one connected submitter who opted in sends the original request directly to
-`https://openrouter.ai/api/v1/systemone`. Only the comparison result returns to
-the local server for display and reconnects; the key is never sent to it or to
-another browser. Requests use the submitter's OpenRouter credits. No connection
-or an unchecked toggle means no JEV lookup. Disconnect removes the stored key;
-disconnecting or turning comparison off aborts outstanding browser lookups.
-Already sent requests may still incur usage. Disconnect does not revoke the key
-at OpenRouter. A failed comparison does not undo your human answer.
+Auto mode shuffles thirty single-question rounds: email classification, simple
+video game decisions, and Holy Grail scenes. Every round is used once per
+shuffle with no repeat across the boundary. A new round deals four seconds after
+the last one completes, and auto mode waits for your answer even after the timer.
+Practice pauses while live requests or comparisons are active and stays in the
+current tab. Comparisons come from `public/example-results.json`, matched on the
+complete request, so edited questions never reuse an old answer.
 
-The server no longer reads `TYPESAFE_API_KEY`. A live comparison requires the
-page to stay connected. OAuth and inference use the documented
-[PKCE flow](https://openrouter.ai/docs/guides/overview/auth/oauth) and
-[System One endpoint](https://openrouter.ai/docs/api/api-reference/systemone/submit-a-system-one-request).
+Submitted cards lock in place. Pink markers show JEV on the same control; green
+means a match, pink a mismatch. Matching uses the same choice, the same yes/no
+side (0.5 is yes), or the nearest score level (halfway rounds up). New rounds
+appear above completed cards.
 
-Auto mode shuffles thirty single-question rounds inspired by TypeSafe,
-[email classification use cases](https://hackernoon.com/101-real-world-examples-of-how-to-use-jev),
-six simple video game decisions, and recognizable Holy Grail scenes.
-Game rounds include the necessary context rather than testing obscure lore. Each judgment is a separate request, including
-questions split from a shared situation. It starts
-a round immediately, then waits four seconds after completion/comparison before
-dealing another. Each shuffle uses every round once and avoids an immediate repeat
-at the boundary between shuffles. Practice requests, answers, and history stay in the current tab;
-practice comparisons reuse the real runs in `public/example-results.json` with no
-API call or key required. Submitted cards stay in place with their sliders locked. Pink markers show JEV on
-the same scale (Choice markers reconstruct bar fullness from JEV's distribution
-and confidence), and the human slider and feedback turn green for a match or pink
-for a mismatch. Matching uses the same choice, yes/no side (0.5 counts as yes), or
-nearest score level (halfway rounds up). Exact values remain visible. New rounds
-appear above completed cards; results no longer move into a separate history panel. Saved runs match the complete request, so
-edited questions never reuse an old answer. Practice
-works without a WebSocket connection and pauses new rounds while live requests or
-comparisons are active. Turning it off stops future rounds; the current round
-remains answerable after its timer ends. Real API requests still use the shared
-WebSocket queue in either mode. Reloading the page clears local practice.
+## OpenRouter comparison
+
+**Connect OpenRouter** runs browser-side PKCE: verifier and state live in session
+storage, the callback must come from the initiating tab within ten minutes, and
+the key stays in this origin's local storage. It never reaches the server or
+other browsers. **Compare with JEV** defaults on at first connection and is
+remembered. After everyone submits, one opted-in submitter's browser posts the
+original request to `https://openrouter.ai/api/v1/systemone` on their credits and
+sends only the result back for display. Disconnect deletes the local key (it does
+not revoke it) and aborts pending lookups. A failed comparison leaves the human
+answer intact. The server does not read `TYPESAFE_API_KEY`.
 
 ## Call it
 
-Use **Question** (`/request`) to compose the state and add Noul, Choice,
-and Score questions in a form. Choice options have unique keys and optional
-descriptions; Score levels run from lowest to highest. Text and structured JSON
-state are supported. The preview is the exact body posted to `/api/v1/systemone`.
-Typing automatically preserves the current draft, including incomplete fields,
-in `reverse-horse.questions` in local storage. **Save** moves the complete request
-into the list below and starts a fresh editor. **Edit** opens the same editor in
-the saved card; typing there also persists edits, and Save collapses it again.
-**Send** saves a new request before submitting it. Saved cards can be sent again
-without creating duplicates. Questions stay in this browser and survive reloads;
-they are not synced to the server. Unreadable stored data is left unchanged and
-reported on the page. Storage write failures keep the editor open.
-Each card shows the actual HTTP status and response JSON. Keep it open while
-someone answers, or open the answering screen in another tab. A 504 ends the
-builder's API call even though the answering screen still accepts late answers.
+**Question** (`/request`) builds Noul, Choice, and Score questions over text or
+JSON state; the preview is the exact body posted. Drafts autosave to
+`reverse-horse.questions`. Save, Edit, Send, and Send again work on saved cards,
+which show the real HTTP status and response. Unreadable stored data is left
+untouched and reported.
 
 ```sh
 curl http://127.0.0.1:3000/api/v1/systemone \
@@ -110,164 +73,98 @@ curl http://127.0.0.1:3000/api/v1/systemone \
   -d '{"model":"jev-latest","state":"My package finally arrived!","questions":{"happy":{"type":"noul","instructions":"Is the customer happy?"},"mood":{"type":"score","instructions":"How does the customer feel?","criteria":["Sad","Neutral","Happy"]},"topic":{"type":"choice","instructions":"What is this about?","criteria":{"shipping":null,"billing":null,"support":null}}}}'
 ```
 
-`/v1/systemone` is also supported for SDK clients. The local endpoint needs no API
-key and binds to loopback. Invalid requests return 400; requests with no answers return
-504 after 30 seconds. Callers need an HTTP timeout longer than 30 seconds. Client
-disconnects before the deadline remove their request. A maximum of 100 unanswered
-requests (including timed-out ones) is accepted.
+`/v1/systemone` also works for SDK clients. No API key; binds to loopback.
+Invalid requests return 400. Callers need an HTTP timeout over 30 seconds.
+Disconnecting early removes the request. At most 100 unanswered requests,
+timed-out ones included.
 
-Noul maps to 0–1. Choice rounds start with empty bars. Fill each independently
-from 0–100%; the fullest bar sets confidence, and each weight divided by the total
-sets its probability. Changing a bar readjusts the probabilities, preserving the
-other bars' fullness. Two full bars give confidence 1 and probabilities 0.5/0.5;
-two half-full bars give confidence 0.5 with the same distribution. One half-full
-bar gives confidence 0.5 and probability 1. All-zero weights are rejected.
-Submitted bars retain their original fullness, including when reconstructed on
-reload: scale each probability by `confidence / max(probabilities)`.
-JEV's pink markers reconstruct equivalent bar fullness using the same procedure;
-their numeric labels still show JEV's actual probabilities. There are no radios.
-Ties choose the first option. Training teaches and uses this same control.
-Score sliders permit fractional values with visible
-integer stops; probabilities interpolate between the two adjacent stops.
-Structured state, instructions, and criteria are displayed as JSON.
+## Answers
 
-Responses identify the human as `model: "reverse-horse"` and report zero token usage.
-The answer schema follows the [API reference](https://docs.typesafe.ai/api).
-TypeSafe's [confidence documentation](https://docs.typesafe.ai/confidence) does
-not specify its formula; human Score confidence uses one minus normalized Shannon
-entropy. Human Choice confidence is the maximum submitted bar weight, a loose
-proxy for overall confidence. Neither formula is numerically equivalent to JEV's.
+Responses use `model: "reverse-horse"` and zero token usage, following the
+[API reference](https://docs.typesafe.ai/api).
 
-The queue and latest 20 results live in memory. Reconnecting gets a fresh snapshot;
-draft slider values survive a connection interruption while the page stays open,
-but not a page refresh. Multiple tabs see the same queue. Only visible answering
-pages outside training participate: they send `{type: "presence", active: true}`
-when available and `active: false` when hidden or in training. A newly available
-page joins pending requests. Each connection gets one submission per request;
-unanswered connections stop holding it open when hidden or disconnected, while
-saved replies remain in the average. Submitted controls lock while waiting, and
-the final card displays the average and answer count. Noul and Score values,
-probabilities, and confidence are arithmetic means; Choice selects the highest
-mean probability, with ties using the first option. Each person's normalized
-Choice distribution has equal weight regardless of bar fullness. Score averages
-preserve the submitted distributions rather than interpolating from the mean
-score. Restarting the server clears requests and results.
+Noul is 0–1. Score sliders allow fractional values; probabilities interpolate
+between the two adjacent levels, and confidence is one minus normalized Shannon
+entropy. Choice bars start empty and fill independently from 0–100%. The fullest
+bar is confidence; each bar divided by the total is its probability. Two full bars
+give confidence 1 at 0.5/0.5; two half bars give 0.5 at the same split. All-zero
+is rejected, ties pick the first option. To reconstruct fullness (on reload, and
+for JEV's markers), scale each probability by `confidence / max(probabilities)`.
+Neither confidence formula matches JEV's, which is undocumented.
+
+## Averaging and presence
+
+The queue and latest 20 results live in memory; restarts clear them. Only
+visible answering pages outside training participate, sending
+`{type: "presence", active}`. Each connection submits once per request. Hidden or
+disconnected pages stop holding a request open, but saved replies still count.
+Noul, Score, probabilities, and confidence are arithmetic means. Choice picks
+the highest mean probability, and each person's normalized distribution weighs
+equally regardless of fullness. Score averages keep the submitted distributions
+rather than interpolating from the mean score. Drafts survive a reconnect but
+not a refresh.
 
 ## Cloudflare
 
-Verified deployment: https://reverse-horse.poblonko.workers.dev. The API is available at
-`https://reverse-horse.poblonko.workers.dev/api/v1/systemone`.
+Deployed at https://reverse-horse.poblonko.workers.dev (API at
+`/api/v1/systemone`). `bun run dev:cloudflare` serves on :8787,
+`bun run build` is a Wrangler dry run, `bun run deploy` publishes and manages the
+`reverse.horse` custom domain from `wrangler.jsonc`. The binding was accepted
+2026-10-01 but DNS still returned ENOTFOUND then. Error 10083 means the zone is
+missing from the Poblonko account.
 
-`bun run dev:cloudflare` runs the Worker locally at http://127.0.0.1:8787.
-`bun run build` previews deployment with Wrangler's dry run; `bun run deploy`
-publishes the `reverse-horse` Worker to the Cloudflare account used by martinemde.com.
-The `reverse.horse` custom domain is configured in `wrangler.jsonc`. It requires
-an active `reverse.horse` zone in the Poblonko account. The custom-domain binding
-was accepted on 2026-10-01; public DNS still returned ENOTFOUND when checked.
-The workers.dev address is verified for assets and WebSockets. If deployment
-reports error 10083, check that the zone exists in the same account.
-`bun run deploy` creates or updates the domain binding and certificate.
+Static assets and the OAuth callback are served by the Worker. WebSockets and
+API calls go to one `ReverseHorseRoom` Durable Object named `shared`, using the
+same `room.js` queue as Bun. No hibernation, no persistence: deploys and object
+restarts clear the queue and interrupt waiting calls.
 
-The public brand is reverse.horse; the project, Worker, and API model are
-`reverse-horse`, and the Durable Object class is `ReverseHorseRoom`.
-Renaming the Worker creates a new deployment and room namespace. The old
-`meat-jev` Worker remains until explicitly retired; it is not renamed in place.
-Browser storage keys migrate on the same origin; a different domain requires
-connecting OpenRouter again because credentials never leave browser storage.
-The logo uses Lucide Lab’s unmodified `horse-head` paths in `horse.svg`, colored
-with the site’s lime accent. Its ISC license is served as `horse.LICENSE.txt`.
-Upstream source: https://github.com/lucide-icons/lucide-lab/blob/main/icons/horse-head.svg.
+Brand is reverse.horse; project, Worker, and model are `reverse-horse`. Renaming
+a Worker creates a new deployment and room namespace; the old `meat-jev` Worker
+stays until retired. A new domain means reconnecting OpenRouter, since keys live
+in per-origin storage.
 
-Both pages include Open Graph and large-image Twitter cards using the canonical
-`https://reverse.horse` origin and `public/unfurl.png` (1200 × 630). The editable
-source is `public/unfurl.svg`, which reuses `horse.svg`. After editing either
-SVG, regenerate the PNG with `rsvg-convert public/unfurl.svg -o public/unfurl.png`
-and inspect it before building. Keep the image in `http.js`'s asset allowlist so
-both the Bun server and Worker serve it to link crawlers without JavaScript.
+Bun is pinned to 1.2.15 to match Cloudflare's build image, which rejects newer
+`bun.lock` formats. Update the lockfile with `mise exec -- bun install` and check
+with `mise exec -- bun install --frozen-lockfile`. Package scripts call the pinned
+Wrangler directly so CI doesn't need mise.
 
-Wrangler is pinned in `devDependencies` and `bun.lock`. Package scripts call
-the installed Wrangler directly, so CI does not need mise. Cloudflare Workers
-Builds should use `bun run build` and `bun run deploy`. Bun is pinned locally to
-1.2.15, matching the Cloudflare build image; it generates a compatible lockfile.
-Bun 1.2.15 rejects v2 `bun.lock` files generated by newer Bun versions. Generate
-lockfile updates with `mise exec -- bun install` to keep the format compatible,
-and verify with `mise exec -- bun install --frozen-lockfile` before pushing.
-The original `mise: not found` failure came from requiring mise inside package
-scripts; changing package managers was not necessary. mise pins Bun for local
-development. Static assets and the OpenRouter callback route
-are served by the Worker; WebSockets and API calls go to one `ReverseHorseRoom`
-Durable Object named `shared`. The Bun and Cloudflare adapters use the same
-queue implementation in `room.js`.
-
-This is one shared room: every connected browser sees the same requests and
-results, and live answering pages contribute to one averaged response. Standard WebSockets keep that object
-active while browsers are connected (no hibernation). The queue is still in
-memory, not persisted; object restarts and deployments can clear it and interrupt
-waiting API calls. OpenRouter keys remain exclusively in each browser.
-
-Run `bun scripts/check-worker.js http://127.0.0.1:8787` against the local Worker,
-or pass the deployed HTTPS origin after publishing. It sends two labeled test
-requests, checks two participating sockets averaging their answers, and waits the actual 30 seconds
-to verify a 504 followed by a saved late answer. It does not call OpenRouter.
+The logo is Lucide Lab's unmodified
+[`horse-head`](https://github.com/lucide-icons/lucide-lab/blob/main/icons/horse-head.svg)
+in `horse.svg` (ISC, served as `horse.LICENSE.txt`). Social cards use
+`public/unfurl.png`, generated from `public/unfurl.svg` with
+`rsvg-convert public/unfurl.svg -o public/unfurl.png`. Keep it in `http.js`'s
+asset allowlist.
 
 ## Verify
 
-`bun scripts/check-questions.js /path/to/playwright-core/index.mjs` verifies draft
-autosave, all three question types, Save, inline Edit, reload persistence, real
-API Send/Send again, corrupt-data preservation, and desktop/mobile layout in an
-isolated Chromium browser. Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to use an existing
-browser. Screenshots go to `/tmp/reverse-horse-questions-*`.
+`bun test` covers HTTP/WebSocket, all answer types, averaging, presence,
+deadlines, reconnection, validation, auto mode, static assets, and auth. Tests
+never call a model.
 
-`bun scripts/check-training.js /path/to/playwright-core/index.mjs` runs the course
-through Chromium at desktop and phone widths, checks complete response JSON and
-recorded comparisons, and verifies Back, exit at every step, Escape, completion
-across reloads, replay, and blocked storage. It also verifies the Choice confidence
-examples through both training controls and live API submissions, including
-preserved bar fullness after reload. It uses only an ephemeral local
-server and refuses external network requests. Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE`
-to use an existing Chromium executable; otherwise install the matching browser
-with Playwright's CLI. Screenshots are written to `/tmp/reverse-horse-training-*`.
+Browser checks take a `playwright-core/index.mjs` path, refuse external
+requests, and write screenshots to `/tmp/reverse-horse-*`. Set
+`PLAYWRIGHT_CHROMIUM_EXECUTABLE` to use an existing Chromium.
 
-`bun scripts/check-average.js /path/to/playwright-core/index.mjs` runs two live
-answering pages and a training page through Chromium, verifies waiting and locked
-controls, the averaged HTTP response and displayed sliders, and participation
-changes on entering/exiting training. It refuses external requests. Use
-`PLAYWRIGHT_CHROMIUM_EXECUTABLE` to select an existing Chromium executable.
-The screenshot is saved to `/tmp/reverse-horse-average.png`.
+- `scripts/check-training.js`: the full course at desktop and phone widths, exits, completion, blocked storage, and Choice confidence examples.
+- `scripts/check-questions.js`: the request builder, persistence, Send, and layout.
+- `scripts/check-average.js`: two live pages and a training page averaging and changing participation.
+- `scripts/check-submit.js`: WebKit (`install webkit` first) submit regression, markers, match colors, and a late recorded JEV answer.
+- `bun scripts/check-worker.js http://127.0.0.1:8787` (or the deployed origin): two-socket averaging and a real 30-second 504 followed by a late answer.
 
-`bun test` exercises real local HTTP/WebSocket connections, all three answer types,
-averaging, presence, disconnects, partial answers at the deadline,
-reconnection, duplicate submission, validation, expiration, auto mode, and static
-assets. Auth tests check PKCE, callback rejection, and browser key removal.
-Tests never call a model; there is no fake JEV. For a live comparison, connect
-OpenRouter in the page, check Compare with JEV, enable auto mode, answer a round,
-and check the You & JEV panel. Also submit with comparison off to verify it skips
-the lookup, and disconnect to forget the key. For UI verification, check a narrow
-viewport, keyboard sliders, and expiration without submitting.
+For live comparison, connect OpenRouter, answer an auto round, and check the
+You & JEV panel; repeat with comparison off and after disconnecting.
 
-Submit-button regression: `bun scripts/check-submit.js /path/to/playwright-core/index.mjs`
-runs an isolated WebKit browser against a local server, checks saved comparisons
-and the off switch, and verifies no external requests occur. Install
-WebKit through that Playwright installation's CLI (`install webkit`) first; set
-`PLAYWRIGHT_BROWSERS_PATH` when using a separate browser cache. The check holds each
-click for 350 ms across several clock ticks, checks card identity and slider
-positions on a mobile viewport, and delivers a recorded JEV answer after API
-timeout through the real WebSocket protocol. It also checks a full shuffled deck,
-marker positions, match colors, and the comparison-off behavior.
-Keep the submit button's text stable during clock updates: replacing its text node
-between pointer-down and pointer-up makes WebKit drop the click event even though
-the button remains enabled and the form is valid.
+To record practice answers, put `OPENROUTER_API_KEY` in the ignored `.env` and
+run `bun scripts/save-example-results.js`. It calls JEV once per missing request
+and saves each result immediately so retries are free. Remove the key afterward.
 
-To record built-in examples, set `OPENROUTER_API_KEY` in the ignored `.env` and run
-`bun scripts/save-example-results.js`. It calls real JEV through OpenRouter once
-per missing request, validates each response, and saves the request, answer, and
-recording timestamp. Successful calls are saved immediately so retries resume
-without another charge. Remove the temporary key from `.env` after generation.
+## Gotchas
 
-On API submission, the room removes the pending request and publishes its result
-in one queue snapshot. An intermediate empty snapshot would remove the original
-card before the result arrived. Older cards are trimmed when a new card arrives,
-not during submission, to avoid shifting the submitted card at the history limit.
-Result updates decorate the existing form; they
-must not rebuild or move it. Keep completed button dimensions and reserved marker
-space unchanged so mobile scroll anchoring cannot shift the submitted controls.
+Keep the submit button's text node stable during clock ticks. Replacing it
+between pointer-down and pointer-up makes WebKit drop the click.
+
+On submission the room removes the request and publishes its result in one
+snapshot. An empty intermediate snapshot removes the card before the result
+lands. Trim old cards when a new one arrives, not on submit, and decorate the
+existing form rather than rebuilding it. Keep completed button sizes and marker
+space fixed so mobile scroll anchoring doesn't shift the controls.
