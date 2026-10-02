@@ -2968,18 +2968,19 @@
     }
   },
   {
-    "title": "Pick an attack · Pokémon",
-    "recordedAt": "2026-10-02T04:06:42.676Z",
+    "title": "Brock's gym · Pokémon",
+    "recordedAt": "2026-10-02T04:37:44.399Z",
     "request": {
       "model": "jev-latest",
-      "state": "The opponent is weak to water. Your Pokémon can use either Water Gun or a weaker normal attack.",
+      "state": "You are about to enter the Pewter City gym to face Brock.",
       "questions": {
-        "attack": {
+        "starter": {
           "type": "choice",
-          "instructions": "Which attack takes advantage of the weakness?",
+          "instructions": "Which starter Pokémon is best to face off against this gym?",
           "criteria": {
-            "Water Gun": null,
-            "Normal attack": null
+            "Bulbasaur": null,
+            "Charmander": null,
+            "Squirtle": null
           }
         }
       }
@@ -2987,14 +2988,253 @@
     "jev": {
       "model": "typesafe/jev-1.13-20260917",
       "answers": {
-        "attack": {
+        "starter": {
           "type": "choice",
-          "confidence": 1,
+          "confidence": 0.35,
           "probabilities": {
-            "Water Gun": 1,
-            "Normal attack": 0
+            "Bulbasaur": 0.3,
+            "Charmander": 0.5599999999999999,
+            "Squirtle": 0.14
           },
-          "choice": "Water Gun"
+          "choice": "Charmander"
+        }
+      }
+    }
+  },
+  {
+    "title": "Misty's gym · Pokémon",
+    "recordedAt": "2026-10-02T04:37:44.757Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "You are about to enter the Cerulean City gym to face Misty.",
+      "questions": {
+        "starter": {
+          "type": "choice",
+          "instructions": "Which starter Pokémon is best to face off against this gym?",
+          "criteria": {
+            "Bulbasaur": null,
+            "Charmander": null,
+            "Squirtle": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "starter": {
+          "type": "choice",
+          "confidence": 0.09,
+          "probabilities": {
+            "Bulbasaur": 0.4,
+            "Charmander": 0.37,
+            "Squirtle": 0.23
+          },
+          "choice": "Bulbasaur"
+        }
+      }
+    }
+  },
+  {
+    "title": "Lt. Surge's gym · Pokémon",
+    "recordedAt": "2026-10-02T04:37:45.001Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "You are about to enter the Vermilion City gym to face Lt. Surge.",
+      "questions": {
+        "starter": {
+          "type": "choice",
+          "instructions": "Which starter Pokémon is best to face off against this gym?",
+          "criteria": {
+            "Bulbasaur": null,
+            "Charmander": null,
+            "Squirtle": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "starter": {
+          "type": "choice",
+          "confidence": 0.09,
+          "probabilities": {
+            "Bulbasaur": 0.4,
+            "Charmander": 0.25,
+            "Squirtle": 0.35
+          },
+          "choice": "Bulbasaur"
+        }
+      }
+    }
+  },
+  {
+    "title": "Erika's gym · Pokémon",
+    "recordedAt": "2026-10-02T04:37:46.444Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "You are about to enter the Celadon City gym to face Erika.",
+      "questions": {
+        "starter": {
+          "type": "choice",
+          "instructions": "Which starter Pokémon is best to face off against this gym?",
+          "criteria": {
+            "Bulbasaur": null,
+            "Charmander": null,
+            "Squirtle": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "starter": {
+          "type": "choice",
+          "confidence": 0.17,
+          "probabilities": {
+            "Bulbasaur": 0.45,
+            "Charmander": 0.44,
+            "Squirtle": 0.11
+          },
+          "choice": "Bulbasaur"
+        }
+      }
+    }
+  },
+  {
+    "title": "Koga's gym · Pokémon",
+    "recordedAt": "2026-10-02T04:37:46.856Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "You are about to enter the Fuchsia City gym to face Koga.",
+      "questions": {
+        "starter": {
+          "type": "choice",
+          "instructions": "Which starter Pokémon is best to face off against this gym?",
+          "criteria": {
+            "Bulbasaur": null,
+            "Charmander": null,
+            "Squirtle": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "starter": {
+          "type": "choice",
+          "confidence": 0.38,
+          "probabilities": {
+            "Bulbasaur": 0.59,
+            "Charmander": 0.26,
+            "Squirtle": 0.15
+          },
+          "choice": "Bulbasaur"
+        }
+      }
+    }
+  },
+  {
+    "title": "Sabrina's gym · Pokémon",
+    "recordedAt": "2026-10-02T04:37:47.072Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "You are about to enter the Saffron City gym to face Sabrina.",
+      "questions": {
+        "starter": {
+          "type": "choice",
+          "instructions": "Which starter Pokémon is best to face off against this gym?",
+          "criteria": {
+            "Bulbasaur": null,
+            "Charmander": null,
+            "Squirtle": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "starter": {
+          "type": "choice",
+          "confidence": 0.25,
+          "probabilities": {
+            "Bulbasaur": 0.5,
+            "Charmander": 0.31,
+            "Squirtle": 0.19
+          },
+          "choice": "Bulbasaur"
+        }
+      }
+    }
+  },
+  {
+    "title": "Blaine's gym · Pokémon",
+    "recordedAt": "2026-10-02T04:37:47.377Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "You are about to enter the Cinnabar Island gym to face Blaine.",
+      "questions": {
+        "starter": {
+          "type": "choice",
+          "instructions": "Which starter Pokémon is best to face off against this gym?",
+          "criteria": {
+            "Bulbasaur": null,
+            "Charmander": null,
+            "Squirtle": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "starter": {
+          "type": "choice",
+          "confidence": 0.12,
+          "probabilities": {
+            "Bulbasaur": 0.41,
+            "Charmander": 0.18,
+            "Squirtle": 0.41
+          },
+          "choice": "Squirtle"
+        }
+      }
+    }
+  },
+  {
+    "title": "Giovanni's gym · Pokémon",
+    "recordedAt": "2026-10-02T04:37:47.615Z",
+    "request": {
+      "model": "jev-latest",
+      "state": "You are about to enter the Viridian City gym to face Giovanni.",
+      "questions": {
+        "starter": {
+          "type": "choice",
+          "instructions": "Which starter Pokémon is best to face off against this gym?",
+          "criteria": {
+            "Bulbasaur": null,
+            "Charmander": null,
+            "Squirtle": null
+          }
+        }
+      }
+    },
+    "jev": {
+      "model": "typesafe/jev-1.13-20260917",
+      "answers": {
+        "starter": {
+          "type": "choice",
+          "confidence": 0.35,
+          "probabilities": {
+            "Bulbasaur": 0.57,
+            "Charmander": 0.22,
+            "Squirtle": 0.21
+          },
+          "choice": "Bulbasaur"
         }
       }
     }

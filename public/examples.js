@@ -93,6 +93,12 @@ const etiquetteScenarios = [
   ask('iPhone · tomorrow', 'iphone_signature', 'Subject: Re: Budget\nok will do tmrw\n\nSent from my iPhone'),
   ask('iPhone · five paragraphs', 'iphone_signature', 'Subject: Re: Budget\nThanks for the detailed breakdown. I have gone through each line item and have notes in three areas: headcount, tooling, and travel. On headcount, I think we should phase the two hires across Q1 and Q2 rather than front-loading them. On tooling, the observability contract renews in March and we should renegotiate before then. On travel, I would cap offsites at two per year. Happy to walk through any of this live.\n\nSent from my iPhone'),
 ];
+const pokemonSource = 'https://bulbapedia.bulbagarden.net/wiki/Gym';
+const starter = { type: 'choice', instructions: 'Which starter Pokémon is best to face off against this gym?', criteria: { Bulbasaur: null, Charmander: null, Squirtle: null } };
+const pokemonGym = (leader, place) => ({
+  title: `${leader}'s gym · Pokémon`, source: pokemonSource,
+  request: { model: 'jev-latest', state: `You are about to enter the ${place} gym to face ${leader}.`, questions: { starter } },
+});
 const scenarios = [
   {
     title: 'The broken integration', source: 'https://docs.typesafe.ai/introduction/quickstart',
@@ -184,12 +190,14 @@ const scenarios = [
       healing: { type: 'score', instructions: 'How urgently should Link heal?', criteria: ['No hurry', 'Soon', 'Right now'] },
     } },
   },
-  {
-    title: 'Pick an attack · Pokémon', source: 'https://diamondpearl.pokemon.com/en-us/trainersguide/fundamentals/battling/',
-    request: { model: 'jev-latest', state: 'The opponent is weak to water. Your Pokémon can use either Water Gun or a weaker normal attack.', questions: {
-      attack: { type: 'choice', instructions: 'Which attack takes advantage of the weakness?', criteria: { 'Water Gun': null, 'Normal attack': null } },
-    } },
-  },
+  pokemonGym('Brock', 'Pewter City'),
+  pokemonGym('Misty', 'Cerulean City'),
+  pokemonGym('Lt. Surge', 'Vermilion City'),
+  pokemonGym('Erika', 'Celadon City'),
+  pokemonGym('Koga', 'Fuchsia City'),
+  pokemonGym('Sabrina', 'Saffron City'),
+  pokemonGym('Blaine', 'Cinnabar Island'),
+  pokemonGym('Giovanni', 'Viridian City'),
   {
     title: 'That hissing sound · Minecraft', source: 'https://www.minecraft.net/en-us/article/minecraft-mobs',
     request: { model: 'jev-latest', state: 'A creeper beside you is hissing and about to explode. There is open space behind you.', questions: {
