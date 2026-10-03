@@ -7,19 +7,37 @@ export function validateRequest(body) {
   assert(description(body.state), 'state must be a string, object, or array');
   assert(typeof body.model === 'string' && body.model.length > 0, 'model is required');
   assert(object(body.questions) && Object.keys(body.questions).length > 0, 'questions must be a nonempty map');
+  assert(Object.keys(body.questions).length <= 32, 'At most 32 questions are allowed');
+  // JSON.parse accepts nesting that JSON.stringify and browser rendering cannot.
+  const stack = [[body, 0]];
+  let nodes = 1;
+  while (stack.length) {
+    const [value, depth] = stack.pop();
+    assert(depth <= 16, 'Request nesting exceeds 16 levels');
+    if (value && typeof value === 'object') for (const child of Object.values(value)) {
+      assert(++nodes <= 2048, 'Request complexity exceeds 2048 values');
+      stack.push([child, depth + 1]);
+    }
+  }
+  let controls = 0;
   for (const [id, q] of Object.entries(body.questions)) {
+    assert(id.length <= 64, 'Question IDs must be at most 64 characters');
     assert(object(q) && description(q.instructions), `${id}: instructions must be a string, object, or array`);
     assert(['noul', 'choice', 'score'].includes(q.type), `${id}: unknown question type`);
     if (q.type === 'choice') {
       assert(object(q.criteria), `${id}: choice criteria must be a map`);
       const options = Object.values(q.criteria);
       assert(options.length > 0 && options.length <= 255 && options.every(v => v === null || description(v)), `${id}: choice requires 1–255 options`);
+      assert(Object.keys(q.criteria).every(key => key.length <= 64), `${id}: option IDs must be at most 64 characters`);
+      controls += options.length;
     } else if (q.type === 'score') {
       assert(Array.isArray(q.criteria) && q.criteria.length >= 2 && q.criteria.length <= 10 && q.criteria.every(description), `${id}: score requires 2–10 levels`);
+      controls += q.criteria.length;
     } else if (q.criteria !== undefined) {
       assert(object(q.criteria) && Object.entries(q.criteria).every(([key, value]) => ['true', 'false'].includes(key) && description(value)), `${id}: noul criteria accepts true and false descriptions`);
     }
   }
+  assert(controls <= 512, 'At most 512 choice options and score levels are allowed');
   return body;
 }
 

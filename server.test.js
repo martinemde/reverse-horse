@@ -17,7 +17,7 @@ function connect(base, { active = true } = {}) {
   const ready = new Promise(resolve => { registered = resolve; });
   ws.addEventListener('open', () => ws.send(JSON.stringify({ type: 'presence', active })));
   ws.addEventListener('message', event => { if (JSON.parse(event.data).type === 'presence') registered(); });
-  ws.addEventListener('message', event => { const message = JSON.parse(event.data); messages.push(message); for (const waiter of [...waiters]) waiter(); });
+  ws.addEventListener('message', event => { const message = JSON.parse(event.data); if (message.type === 'queue') ws.send(JSON.stringify({ type: 'ack', version: message.version })); messages.push(message); for (const waiter of [...waiters]) waiter(); });
   resources.push(() => ws.close());
   async function next(predicate) {
     await ready;
@@ -30,7 +30,7 @@ function connect(base, { active = true } = {}) {
       waiters.add(check); check();
     });
   }
-  return { ws, next, send: message => ws.send(JSON.stringify(message)) };
+  return { ws, next, messages, send: message => ws.send(JSON.stringify(message)) };
 }
 const request = {
   model: 'jev-latest', state: { message: 'Please help with a refund' },
@@ -68,7 +68,7 @@ test('averages all live UI replies and keeps the caller waiting after the first'
   expect(completed.results[0].answerCount).toBe(2);
 });
 
-test('only visible UIs participate, and newly visible UIs join pending requests', async () => {
+test('only visible UIs participate and new arrivals do not enlarge an assigned panel', async () => {
   const base = app(); const first = connect(base); const hidden = connect(base, { active: false });
   await first.next(m => m.type === 'queue'); await hidden.next(m => m.type === 'queue');
   const response = post(base);
@@ -77,15 +77,16 @@ test('only visible UIs participate, and newly visible UIs join pending requests'
   hidden.send({ type: 'submit', id: item.id, values: { urgent: 1, department: { billing: 1, support: 0 }, mood: 2 } });
   expect((await hidden.next(m => m.type === 'error')).message).toBe('The answering screen must be visible');
   hidden.send({ type: 'presence', active: true });
-  await first.next(m => m.requests?.[0]?.expected === 2);
+  await hidden.next(m => m.type === 'presence' && m.active);
+  hidden.send({ type: 'submit', id: item.id, values: { urgent: 1, department: { billing: 1, support: 0 }, mood: 2 } });
+  expect((await hidden.next(m => m.type === 'error')).message).toBe('This request is not assigned to you');
   first.send({ type: 'submit', id: item.id, values: { urgent: 0.25, department: { billing: 1, support: 0 }, mood: 1 } });
-  await first.next(m => m.requests?.[0]?.received === 1);
-  hidden.send({ type: 'presence', active: false });
   expect((await (await response).json()).answers.urgent.noul).toBe(0.25);
+  expect(hidden.messages.some(m => m.requests?.length || m.results?.length)).toBe(false);
 });
 
-test('disconnecting an unanswered UI releases the remaining replies', async () => {
-  const base = app(); const first = connect(base); const second = connect(base);
+test('disconnecting an unanswered UI preserves saved votes until the deadline', async () => {
+  const base = app({ timeoutMs: 150 }); const first = connect(base); const second = connect(base);
   await first.next(m => m.type === 'queue'); await second.next(m => m.type === 'queue');
   const response = post(base);
   const item = (await first.next(m => m.requests?.length)).requests[0];
@@ -95,8 +96,8 @@ test('disconnecting an unanswered UI releases the remaining replies', async () =
   expect((await (await response).json()).answers.urgent.noul).toBe(0.75);
 });
 
-test('skipping a request hides it from that UI and releases the remaining replies', async () => {
-  const base = app(); const first = connect(base); const second = connect(base);
+test('skipping a request hides it from that UI and preserves saved votes', async () => {
+  const base = app({ timeoutMs: 150 }); const first = connect(base); const second = connect(base);
   await first.next(m => m.type === 'queue'); await second.next(m => m.type === 'queue');
   const response = post(base);
   const item = (await first.next(m => m.requests?.length)).requests[0];
@@ -120,6 +121,8 @@ test('saved replies count after disconnect and the deadline averages available a
   await second.next(m => m.requests?.[0]?.received === 2);
   const result = await response;
   expect(result.status).toBe(200);
+  expect(result.headers.get('X-Reverse-Horse-Answers')).toBe('2');
+  expect(result.headers.get('X-Reverse-Horse-Target')).toBe('3');
   expect((await result.json()).answers.urgent.noul).toBe(0.5);
   const completed = await unanswered.next(m => m.results?.[0]?.human);
   expect(completed.results[0].answerCount).toBe(2);
@@ -137,7 +140,7 @@ test('holds the API connection, accepts all primitives, and skips Jev without cr
   expect(item.deadline - item.createdAt).toBe(30_000);
   expect(settled).toBe(false);
   const reconnected = connect(base, { active: false });
-  expect((await reconnected.next(m => m.requests?.length === 1)).requests[0].id).toBe(item.id);
+  expect((await reconnected.next(m => m.type === 'queue')).requests).toEqual([]);
   client.send({ type: 'submit', id: item.id, values: { urgent: 0.85, department: { billing: 0.75, support: 0.25 }, mood: 1.25 } });
   const result = await (await response).json();
   expect(result.model).toBe('reverse-horse');
@@ -185,25 +188,22 @@ test('choice normalizes independent bar weights and returns tallest-bar confiden
   }
 });
 
-test('expires the API call but retains questions for late answers and comparison', async () => {
+test('expiry releases API capacity and transfers unfinished cards to their assigned browser', async () => {
   const base = app({ timeoutMs: 100 }); const client = connect(base);
   await client.next(m => m.type === 'queue');
   const response = post(base, request, '/api/v1/systemone');
   const item = (await client.next(m => m.requests?.length)).requests[0];
   expect((await response).status).toBe(504);
-  const expired = await client.next(m => m.requests?.[0]?.timedOut);
-  expect(expired.requests[0].id).toBe(item.id);
+  const expired = await client.next(m => m.retired?.length);
+  expect(expired.requests).toEqual([]);
+  expect(expired.retired[0]).toEqual({ id: item.id, request, deadline: item.deadline, late: true });
   const reconnected = connect(base, { active: false });
-  expect((await reconnected.next(m => m.requests?.[0]?.timedOut)).requests[0].request).toEqual(request);
+  expect((await reconnected.next(m => m.type === 'queue')).requests).toEqual([]);
   client.send({ type: 'submit', id: item.id, compare: true, values: { urgent: 0.75, department: { billing: 1, support: 0 }, mood: 1.5 } });
-  const completed = await client.next(m => m.results?.[0]?.human);
-  expect(completed.requests).toEqual([]);
-  expect(completed.results[0].late).toBe(true);
-  expect(completed.results[0].human.answers.mood.score).toBe(1.5);
-  expect((await client.next(m => m.type === 'compare')).id).toBe(item.id);
-  client.send({ type: 'comparison', id: item.id, error: 'Comparison skipped in local test' });
-  reconnected.send({ type: 'submit', id: item.id, values: {} });
-  expect((await reconnected.next(m => m.type === 'error')).message).toBe('This request is no longer waiting');
+  expect((await client.next(m => m.type === 'error')).message).toBe('This request is no longer waiting');
+  const next = post(base);
+  await client.next(m => m.requests?.[0]?.id !== item.id && m.requests?.length);
+  expect((await next).status).toBe(504);
 });
 
 test('invalid requests and invalid answers do not consume a waiting request', async () => {
@@ -260,12 +260,11 @@ test('concurrent requests remain isolated and disconnecting a caller removes its
   const abandoned = fetch(new URL('/v1/systemone', base), { method: 'POST', body: JSON.stringify({ ...request, state: 'Abandoned' }), signal: controller.signal }).catch(e => e.name);
   const first = (await client.next(m => m.requests?.length === 1)).requests[0];
   const response = post(base, { ...request, state: 'Still waiting' });
-  const both = await client.next(m => m.requests?.length === 2);
-  const second = both.requests.find(r => r.id !== first.id);
   controller.abort();
   expect(await abandoned).toBe('AbortError');
-  const remaining = await client.next(m => m.requests?.length === 1 && m.requests[0].id === second.id);
-  expect(remaining.requests[0].request.state).toBe('Still waiting');
+  const remaining = await client.next(m => m.requests?.[0]?.request.state === 'Still waiting');
+  const second = remaining.requests[0];
+  expect(remaining.requests).toHaveLength(1);
   client.send({ type: 'submit', id: second.id, values: { urgent: 1, department: { billing: 0, support: 1 }, mood: 0 } });
   expect((await (await response).json()).answers.department.choice).toBe('support');
 });
