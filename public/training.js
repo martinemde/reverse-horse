@@ -124,15 +124,14 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
       const example = examples.find(example => Object.hasOwn(example.request.questions, lesson.id));
       const saved = getSavedExample(example.request);
       heading.textContent = lesson.title;
-      body.append(node('div', `EXERCISE ${step - 1} / ${lesson.type.toUpperCase()}`, 'eyebrow'), heading);
       const grid = node('div', undefined, 'training-grid');
       const guide = node('div', undefined, 'training-guide');
-      guide.append(node('h2', lesson.type), node('p', lesson.concept), node('h3', 'Controls'), node('p', lesson.controls));
+      guide.append(node('div', `EXERCISE ${step - 1} / ${lesson.type.toUpperCase()}`, 'eyebrow'), heading, node('h2', lesson.type), node('p', lesson.concept), node('h3', 'Controls'), node('p', lesson.controls));
       if (lesson.type === 'choice') guide.append(fields([
         ['100 / 100 / 0', 'Confidence 100%, probabilities 50 / 50 / 0.'],
         ['50 / 50 / 0', 'Confidence 50%, same probabilities.'],
       ]));
-      const exercise = node('div');
+      const exercise = node('div', undefined, 'training-exercise');
       const result = answers.get(lesson.id);
       if (result && saved) result.jev = saved.jev;
       const status = node('p', result ? '' : 'Submit your answer to continue.');
