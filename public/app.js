@@ -3,15 +3,10 @@ import { compareWithJev, validateJevResponse, matchesJev } from './compare.js';
 import { answerRequest, choiceWeights } from './protocol.js';
 import { examples } from './examples.js';
 import { createTraining } from './training.js';
+import { node } from './dom.js';
 
 const $ = selector => document.querySelector(selector);
 const text = value => typeof value === 'string' ? value : JSON.stringify(value, null, 2);
-function node(tag, content, className) {
-  const el = document.createElement(tag);
-  if (content !== undefined) el.textContent = content;
-  if (className) el.className = className;
-  return el;
-}
 let socket;
 let reconnectAttempt = 0;
 const comparisons = new Map();

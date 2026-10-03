@@ -1,12 +1,7 @@
 import { buildRequest } from './builder-data.js';
+import { node } from './dom.js';
 
 const $ = selector => document.querySelector(selector);
-function node(tag, text, className) {
-  const element = document.createElement(tag);
-  if (text !== undefined) element.textContent = text;
-  if (className) element.className = className;
-  return element;
-}
 function field(label, value = '', multiline = false) {
   const wrapper = node('label', label, 'field');
   const input = node(multiline ? 'textarea' : 'input');

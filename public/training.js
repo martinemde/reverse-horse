@@ -1,4 +1,5 @@
 import { examples } from './examples.js';
+import { node } from './dom.js';
 
 const completionKey = 'reverse-horse.training-completed';
 const lessons = [
@@ -22,12 +23,6 @@ const lessons = [
   },
 ];
 
-function node(tag, text, className) {
-  const element = document.createElement(tag);
-  if (text !== undefined) element.textContent = text;
-  if (className) element.className = className;
-  return element;
-}
 function button(text, action, className) {
   const element = node('button', text, className);
   element.type = 'button';
