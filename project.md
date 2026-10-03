@@ -207,6 +207,11 @@ and saves each result immediately so retries are free. Remove the key afterward.
 
 ## Gotchas
 
+Every file in `public/` must be listed in `http.js`'s `assetFiles`, or both
+servers 404 it and the page fails to load its modules. Question cards live in
+`public/card.js`: each type in `questionTypes` builds its controls and returns
+`restore` (show a submitted answer) and `mark` (place Jev's answer).
+
 Keep the submit button's text node stable during clock ticks. Replacing it
 between pointer-down and pointer-up makes WebKit drop the click.
 
