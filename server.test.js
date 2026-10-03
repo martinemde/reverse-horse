@@ -40,7 +40,7 @@ const request = {
     mood: { type: 'score', instructions: 'How happy?', criteria: ['Sad', 'Neutral', { label: 'Happy' }] },
   },
 };
-function post(base, body = request, path = '/api/v1/systemone') {
+function post(base, body = request, path = '/v1/systemone') {
   return fetch(new URL(path, base), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
 }
 
@@ -175,7 +175,7 @@ test('choice normalizes independent bar weights and returns tallest-bar confiden
 test('expires the API call but retains questions for late answers and comparison', async () => {
   const base = app({ timeoutMs: 100 }); const client = connect(base);
   await client.next(m => m.type === 'queue');
-  const response = post(base, request, '/v1/systemone');
+  const response = post(base, request, '/api/v1/systemone');
   const item = (await client.next(m => m.requests?.length)).requests[0];
   expect((await response).status).toBe(504);
   const expired = await client.next(m => m.requests?.[0]?.timedOut);
@@ -218,7 +218,7 @@ test('serves the page and assets and blocks cross-origin requests', async () => 
   const base = app();
   for (const path of ['/', '/request', '/help', '/about', '/builder.js', '/builder-data.js', '/auth/openrouter/callback?code=example', '/app.js', '/training.js', '/examples.js', '/example-results.json', '/protocol.js', '/auth.js', '/compare.js', '/style.css']) expect((await fetch(new URL(path, base))).status).toBe(200);
   expect((await fetch(new URL('/ws', base), { headers: { Origin: 'https://elsewhere.example' } })).status).toBe(403);
-  expect((await fetch(new URL('/api/v1/systemone', base), { method: 'POST', headers: { Origin: 'https://elsewhere.example', 'Content-Type': 'application/json' }, body: JSON.stringify(request) })).status).toBe(403);
+  expect((await fetch(new URL('/v1/systemone', base), { method: 'POST', headers: { Origin: 'https://elsewhere.example', 'Content-Type': 'application/json' }, body: JSON.stringify(request) })).status).toBe(403);
 });
 
 test('one opted-in browser compares the aggregate after answering the caller', async () => {
@@ -244,7 +244,7 @@ test('concurrent requests remain isolated and disconnecting a caller removes its
   const base = app(); const client = connect(base);
   await client.next(m => m.type === 'queue');
   const controller = new AbortController();
-  const abandoned = fetch(new URL('/api/v1/systemone', base), { method: 'POST', body: JSON.stringify({ ...request, state: 'Abandoned' }), signal: controller.signal }).catch(e => e.name);
+  const abandoned = fetch(new URL('/v1/systemone', base), { method: 'POST', body: JSON.stringify({ ...request, state: 'Abandoned' }), signal: controller.signal }).catch(e => e.name);
   const first = (await client.next(m => m.requests?.length === 1)).requests[0];
   const response = post(base, { ...request, state: 'Still waiting' });
   const both = await client.next(m => m.requests?.length === 2);

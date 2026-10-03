@@ -219,7 +219,7 @@ function savedCard(record) {
     const updateClock = () => { const remaining = Math.max(0, 30 - (Date.now() - started) / 1000); status.textContent = remaining ? `Waiting for human answers · ${remaining.toFixed(0)}s` : 'Waiting for the API response…'; };
     updateClock(); const timer = setInterval(updateClock, 250);
     try {
-      const result = await fetch('/api/v1/systemone', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(request), signal: AbortSignal.timeout(40_000) });
+      const result = await fetch('/v1/systemone', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(request), signal: AbortSignal.timeout(40_000) });
       const answer = await result.json();
       clearInterval(timer);
       status.textContent = result.ok ? `HTTP ${result.status} · Answer received` : result.status === 504 ? 'HTTP 504 · No answer within 30 seconds. You can send this question again.' : `HTTP ${result.status} · Request failed`;
@@ -244,7 +244,7 @@ const exampleRequest = {
   }
 };
 function showCurlExample() {
-  const command = `curl '${location.origin}/api/v1/systemone' \\\n  -H 'Content-Type: application/json' \\\n  --data-binary @- <<'JSON'\n${JSON.stringify(exampleRequest, null, 2)}\nJSON`;
+  const command = `curl '${location.origin}/v1/systemone' \\\n  -H 'Content-Type: application/json' \\\n  --data-binary @- <<'JSON'\n${JSON.stringify(exampleRequest, null, 2)}\nJSON`;
   const input = node('textarea', undefined, 'curl-example');
   input.value = command;
   input.rows = 16;

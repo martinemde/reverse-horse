@@ -72,7 +72,7 @@ which show the real HTTP status and response. Unreadable stored data is left
 untouched and reported.
 
 ```sh
-curl http://127.0.0.1:3000/api/v1/systemone \
+curl http://127.0.0.1:3000/v1/systemone \
   -H 'Content-Type: application/json' \
   -d '{"model":"jev-latest","state":"My package finally arrived!","questions":{"happy":{"type":"noul","instructions":"Is the customer happy?"},"mood":{"type":"score","instructions":"How does the customer feel?","criteria":["Sad","Neutral","Happy"]},"topic":{"type":"choice","instructions":"What is this about?","criteria":{"shipping":null,"billing":null,"support":null}}}}'
 ```
@@ -111,7 +111,7 @@ not a refresh.
 ## Cloudflare
 
 Deployed at https://reverse-horse.poblonko.workers.dev (API at
-`/api/v1/systemone`). `bun run dev:cloudflare` serves on :8787,
+`/v1/systemone`, also `/api/v1/systemone`). `bun run dev:cloudflare` serves on :8787,
 `bun run build` is a Wrangler dry run, `bun run deploy` publishes and manages the
 `reverse.horse` custom domain from `wrangler.jsonc`. The binding was accepted
 2026-10-01 but DNS still returned ENOTFOUND then. Error 10083 means the zone is

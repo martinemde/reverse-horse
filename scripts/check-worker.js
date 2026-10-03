@@ -30,7 +30,7 @@ const request = buildRequest({ state: marker, stateFormat: 'text', questions: [
   { id: 'score', type: 'score', instructions: 'Rate progress.', levels: ['Starting', 'Working', 'Complete'] },
 ] });
 const values = { yes: 1, route: { testing: 1, support: 0 }, score: 1.5 };
-const post = state => fetch(new URL('/api/v1/systemone', base), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...request, state }), signal: abort.signal });
+const post = state => fetch(new URL('/v1/systemone', base), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...request, state }), signal: abort.signal });
 try {
   for (const path of ['/', '/request', '/builder.js', '/builder-data.js', '/auth/openrouter/callback?code=check', '/app.js', '/auth.js', '/compare.js', '/style.css']) {
     const response = await fetch(new URL(path, base));

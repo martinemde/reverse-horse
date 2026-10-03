@@ -153,7 +153,7 @@ try {
     pick: { type: 'choice', instructions: 'Which option?', criteria: { a: null, b: null, c: null } },
   } };
   for (const [weights, confidence, probabilities] of choiceCases) {
-    const response = fetch(new URL('/api/v1/systemone', app.server.url), { method: 'POST', body: JSON.stringify(request) });
+    const response = fetch(new URL('/v1/systemone', app.server.url), { method: 'POST', body: JSON.stringify(request) });
     const card = entry.page.locator('.live-request:not(.answered)');
     await card.waitFor();
     assert.equal(await card.getByRole('radio').count(), 0);

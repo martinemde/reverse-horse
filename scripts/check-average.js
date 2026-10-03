@@ -29,7 +29,7 @@ async function pageFor(trained = true) {
   if (trained) { await page.getByRole('button', { name: 'Pause practice', exact: true }).click(); await page.locator('#compare').uncheck(); }
   return page;
 }
-const post = () => fetch(new URL('/api/v1/systemone', app.server.url), { method: 'POST', body: JSON.stringify(request) });
+const post = () => fetch(new URL('/v1/systemone', app.server.url), { method: 'POST', body: JSON.stringify(request) });
 async function submit(card, values) {
   for (const [index, value] of values.entries()) await setRange(card.locator('input[type=range]').nth(index), value);
   await card.getByRole('button').click({ delay: 350 });

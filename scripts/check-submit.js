@@ -121,7 +121,7 @@ try {
   const run = recordings[0];
   let requestId;
   const comparison = new Promise(resolve => peer.addEventListener('message', event => { const message = JSON.parse(event.data); if (message.type === 'compare') resolve(message); }));
-  const response = fetch(new URL('/api/v1/systemone', app.server.url), { method: 'POST', body: JSON.stringify(run.request) });
+  const response = fetch(new URL('/v1/systemone', app.server.url), { method: 'POST', body: JSON.stringify(run.request) });
   await active.waitFor();
   const live = await active.elementHandle();
   requestId = await live.getAttribute('data-id');
