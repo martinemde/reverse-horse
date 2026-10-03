@@ -33,7 +33,8 @@ exit (Exit training, Escape, Enter the site) sets
 the first visit again. **Training** in the nav reopens it. **Help** (`/help`, static
 `public/help.html`) holds the detail training leaves out: request and response
 JSON, each type's fields, averaging, and JEV matching. Keep its examples in step
-with `answerRequest`.
+with `answerRequest`. **About** (`/about`, static `public/about.html`) is
+Martin's explanation of the project, in his words.
 
 ## Practice
 

@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <header class="player-header"><a class="brand" href="/"><img src="/horse.svg" alt="" width="36" height="36">reverse.horse</a><nav aria-label="Main"><a href="/">Answer</a><a href="/request">Question</a><a href="/help" aria-current="page">Help</a><a href="/#training">Training</a></nav><div class="player-controls"><a id="play" href="/" aria-label="Play practice"><span id="play-icon" aria-hidden="true">▶</span> <span id="play-label">Play</span></a></div></header>
+  <header class="player-header"><a class="brand" href="/"><img src="/horse.svg" alt="" width="36" height="36">reverse.horse</a><nav aria-label="Main"><a href="/">Answer</a><a href="/request">Question</a><a href="/help" aria-current="page">Help</a><a href="/about">About</a><a href="/#training">Training</a></nav><div class="player-controls"><a id="play" href="/" aria-label="Play practice"><span id="play-icon" aria-hidden="true">▶</span> <span id="play-label">Play</span></a></div></header>
   <main class="help">
     <div class="toolbar"><div><h1>Help</h1><p>The employee handbook. Nobody reads it, which is why it’s here.</p></div></div>
 
@@ -69,7 +69,7 @@
     </section>
 
     <section>
-      <h2>The three question types</h2>
+      <h2 id="types">The three question types</h2>
       <h3>Noul</h3>
       <p>A yes/no question answered as a probability. <code>noul</code> runs from 0 (definitely no) to 1 (definitely yes), and 0.5 means you can’t tell. There’s no separate confidence. The name comes from a Bernoulli trial.</p>
       <h3>Choice</h3>

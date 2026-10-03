@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#131718">
+  <title>About · reverse.horse</title>
+  <meta name="description" content="What reverse.horse is: a working System One API answered by humans, and a tutorial in what Jev does.">
+  <link rel="canonical" href="https://reverse.horse/about">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="reverse.horse">
+  <meta property="og:url" content="https://reverse.horse/about">
+  <meta property="og:title" content="About · reverse.horse">
+  <meta property="og:description" content="A working Jev-shaped API, answered by you. Slowly.">
+  <meta property="og:image" content="https://reverse.horse/unfurl.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="reverse.horse: The AI outsourced this to you. Human intelligence. Artificial working conditions. A lime horse head on charcoal.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="About · reverse.horse">
+  <meta name="twitter:description" content="A working Jev-shaped API, answered by you. Slowly.">
+  <meta name="twitter:image" content="https://reverse.horse/unfurl.png">
+  <meta name="twitter:image:alt" content="reverse.horse: The AI outsourced this to you. Human intelligence. Artificial working conditions. A lime horse head on charcoal.">
+  <link rel="icon" href="/horse.svg" type="image/svg+xml" sizes="any">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="player-header"><a class="brand" href="/"><img src="/horse.svg" alt="" width="36" height="36">reverse.horse</a><nav aria-label="Main"><a href="/">Answer</a><a href="/request">Question</a><a href="/help">Help</a><a href="/about" aria-current="page">About</a><a href="/#training">Training</a></nav><div class="player-controls"><a id="play" href="/" aria-label="Play practice"><span id="play-icon" aria-hidden="true">▶</span> <span id="play-label">Play</span></a></div></header>
+  <main class="help">
+    <div class="toolbar"><div><h1>What is this?</h1><p>The mission statement. Somebody has to have one.</p></div></div>
+
+    <section>
+      <p>Reverse.horse is something between a tutorial and an art project.</p>
+      <p>It is a functioning API that matches the <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev">Jev</a> <code>/v1/systemone</code> format. It presents the questions asked on the API to anyone that is connected, and their results become the answer to the API.</p>
+      <p>It’s also a tutorial intended to help you understand exactly what Jev is and what the <a href="/help#types">3 question types</a> do. By using your human brain to answer in place of the model, you get an intuitive sense of what Jev is doing.</p>
+      <p>It becomes immediately apparent that you suck at this. Jev can usually answer in under 1/10th of a second, and it can do thousands of questions like this in the time it takes you to answer a single one. You may even notice that for every answer that you carefully answer correctly, Jev is within a few points of what you answered. Remarkable, isn’t it?</p>
+    </section>
+
+    <section>
+      <h2>Why “Reverse Horse”?</h2>
+      <p>The name comes from Cory Doctorow’s <a href="https://pluralistic.net/2022/04/17/revenge-of-the-chickenized-reverse-centaurs/">reverse centaur</a>, a situation created by AI that places the human in the position of being a meat body that does what the AI tells it. Instead of a good centaur, a human brain controlling a powerful horse body, you have the opposite: an “unthinking” horse brain controlling the feeble human body.</p>
+      <p>The irony here is that I’ve inverted it. By using your feeble human brain to answer as the “unthinking” AI, I’m pointing out just how slow you are at it, and how impressively fast an accurate Jev is. When I started the project, the example questions were actually too complex to answer within a reasonable timeout, so I had to break them down.</p>
+    </section>
+
+    <section>
+      <h2>Why Jev?</h2>
+      <p><a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev">Jev</a> is based on the idea that if we make “good enough” intelligence <em>cheap</em> and <em>fast</em>, it will explode in usefulness, expanding the use of intelligence into more places than we ever thought practical. It’s a different direction than most LLMs have taken. ChatGPT and Claude try to be ever bigger and smarter to take over for your brain, while Jev asks only for ever-more-decomposed questions.</p>
+      <p>The API route <code>systemone</code> and the name show its two influences. System One comes from Daniel Kahneman’s <a href="https://en.wikipedia.org/wiki/Thinking,_Fast_and_Slow"><em>Thinking, Fast and Slow</em></a>, which defines it as quick, gut-reaction thinking. System Two is what almost all modern LLMs are doing: <em>Thinking…</em></p>
+    </section>
+
+    <section>
+      <h2>Why the 30 second timeout?</h2>
+      <p>It’s kind of stressful, right? It’s there for 2 reasons:</p>
+      <ol>
+        <li><p>I’m trying to make you give your gut reaction to the question. The timer makes it clear just how slow we are at this. 30 seconds is 300 times longer than Jev usually takes to respond.</p></li>
+        <li><p>This is a real, if impractical, API. You can actually <a href="/request">send a request to it</a> with curl. 30 seconds seemed like the longest reasonable timeout for a held-open request. I’m waiting for the moment when this 30 second timeout causes the poor server to get overloaded.</p></li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>How does it work?</h2>
+      <p>In theory, everyone answering questions is connected to a websocket and will be asked live the questions that arrive at the API. Their answers are assembled into the response (<a href="/help">the details</a>). That’s the goal, and it works across a small group, but it’s almost certainly bound to break if too many people visit. I look forward to finding out the strange new ways this can break.</p>
+    </section>
+  </main>
+  <footer>reverse.horse <span>Neigh.</span></footer>
+</body>
+</html>
