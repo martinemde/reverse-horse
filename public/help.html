@@ -32,15 +32,12 @@
 
     <section>
       <h2>What happens to a request</h2>
+      <p>In theory, everyone answering questions is connected to a websocket and will be asked live the questions that arrive at the API. Their answers are assembled into the response. That’s the goal, and it works across a small group, but it’s almost certainly bound to break if too many people visit. I look forward to finding out the strange new ways this can break.</p>
       <p>Some software posts a request to <code>/api/v1/systemone</code>. It shows up on the Answer screen of everyone who has the site open. Each person answers once. When everyone has answered, the caller gets the average.</p>
       <p>A request has 30 seconds from the moment it arrives, including any time it spends waiting in line. At the deadline the caller gets the average of whatever answers are in. If nobody answered, it gets a 504. You can still answer late and compare with JEV, but the caller never sees it.</p>
       <p>Only visible answering pages count. If you switch tabs or close the page, you stop holding requests open, but an answer you already sent still counts.</p>
     </section>
 
-    <section>
-      <h2>System One</h2>
-      <p>Daniel Kahneman split thinking into two systems. System One is fast, automatic, and intuitive: you read a sentence and already know how it feels. System Two is slow and deliberate: you work out 17 × 24. JEV is a System One model. It gives quick, calibrated gut reactions instead of reasoning step by step, and that’s the job you’re doing here.</p>
-    </section>
 
     <section>
       <h2>The request</h2>
