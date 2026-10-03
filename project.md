@@ -49,7 +49,9 @@ complete request, so edited questions never reuse an old answer.
 Submitted cards lock in place. Pink markers show Jev on the same control; green
 means a match, pink a mismatch. Matching uses the same choice, the same yes/no
 side (0.5 is yes), or the nearest score level (halfway rounds up). New rounds
-appear above completed cards.
+appear above completed cards. Unanswered cards always sit above submitted ones:
+a live request lands on top of a waiting example, and the example rises back
+to the top once the live request is answered.
 
 ## OpenRouter comparison
 

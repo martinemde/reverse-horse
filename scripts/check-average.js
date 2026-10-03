@@ -73,6 +73,21 @@ try {
   await submit(card(first), [0, 1, 0, 0]);
   await submit(card(trainee), [1, 0, 1, 2]);
   assert.equal((await (await joined).json()).answers.yes.noul, 0.5);
+
+  await Promise.all([first, second, trainee].map(page => page.close()));
+  const solo = await pageFor();
+  await solo.getByRole('button', { name: 'Play practice', exact: true }).click();
+  const example = solo.locator('form:not(.live-request):not(.answered)');
+  await example.waitFor({ timeout: 10_000 });
+  const exampleCard = await example.elementHandle();
+  const interrupted = post();
+  await card(solo).waitFor();
+  const topCard = () => solo.locator('#requests > form').first().elementHandle();
+  assert.equal(await (await topCard()).evaluate(el => el.classList.contains('live-request')), true, 'A live request goes above a waiting example');
+  await submit(card(solo), [1, 1, 0, 2]);
+  assert.equal((await interrupted).status, 200);
+  await solo.waitForFunction(el => el.parentElement.firstElementChild === el, exampleCard);
+  assert.equal(await exampleCard.evaluate(el => el.classList.contains('answered')), false, 'The waiting example rises back to the top unanswered');
   assert.deepEqual(errors, []); assert.deepEqual(externalRequests, []);
-  console.log('PASS: two live UIs average replies, lock submissions while waiting, display the mean, and exclude training.');
+  console.log('PASS: two live UIs average replies, lock submissions while waiting, display the mean, exclude training, and float a waiting example back above an answered live request.');
 } finally { await browser.close(); await app.stop(); }

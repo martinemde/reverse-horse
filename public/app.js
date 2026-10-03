@@ -291,6 +291,7 @@ function render() {
   const ids = new Set([...current, ...results].map(item => item.id));
   const newQuestion = current.findLast(item => !forms.has(item.id));
   const newCards = [...current, ...results].some(item => !forms.has(item.id));
+  let risen;
   // Trimming old history during submission moves the card the user just answered.
   for (const [id, form] of forms) if (!ids.has(id) && (newCards || !form.card.classList.contains('answered'))) { form.card.remove(); forms.delete(id); }
   if (ids.size) {
@@ -301,12 +302,20 @@ function render() {
     }
     for (const result of results) forms.get(result.id).finish(result);
     for (const item of serverQueue.requests) forms.get(item.id).progress(item);
+    // Unanswered questions stay above anything already submitted, so a waiting
+    // example rises back to the top once the live request above it is answered.
+    const pending = new Set(current.filter(item => item.local || !item.submitted).map(item => forms.get(item.id).card));
+    let slot = 0;
+    for (const card of [...$('#requests').children].filter(card => pending.has(card))) {
+      const target = $('#requests').children[slot++];
+      if (target !== card) { $('#requests').insertBefore(card, target); risen ??= card; }
+    }
   } else if (!$('#requests .empty')) {
     $('#requests').append(emptyState(playing));
   } else $('#requests .empty p').textContent = playing ? 'Next example coming up…' : 'Press play to answer questions. Live requests are always welcome.';
   tick();
-  if (newQuestion && !training.active) {
-    const card = forms.get(newQuestion.id).card;
+  if ((newQuestion || risen) && !training.active) {
+    const card = newQuestion ? forms.get(newQuestion.id).card : risen;
     const top = card.getBoundingClientRect().top + window.scrollY - $('header').getBoundingClientRect().height - 16;
     window.scrollTo({ top, behavior: 'instant' });
   }
