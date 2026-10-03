@@ -102,7 +102,17 @@ function makeForm(item, onTrainingSubmit) {
   const head = node('div', undefined, 'request-head');
   const label = node('div', item.training ? 'TRAINING EXERCISE' : item.source ? 'PRACTICE ROUND' : 'LIVE REQUEST', 'eyebrow');
   const clock = node('span', item.training ? 'Untimed' : '30.0s', 'clock'); clock.setAttribute('aria-label', item.training ? 'No time limit' : 'Time remaining');
-  head.append(label, clock);
+  const corner = node('div', undefined, 'request-corner');
+  corner.append(clock);
+  const skip = node('button', undefined, 'skip'); skip.type = 'button';
+  skip.setAttribute('aria-label', 'Skip this question'); skip.title = 'Skip';
+  skip.innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 8.5l7 7m0-7l-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  skip.addEventListener('click', () => {
+    skip.disabled = true;
+    if (item.local) skipPractice(item); else send({ type: 'skip', id: item.id });
+  });
+  if (!item.training) corner.append(skip);
+  head.append(label, corner);
   const state = node('div', undefined, 'state'); state.append(node('div', 'STATE', 'eyebrow'), node('pre', text(item.request.state)));
   const questions = node('div', undefined, 'questions');
   function track(slider) {
@@ -231,6 +241,7 @@ function makeForm(item, onTrainingSubmit) {
       actions.style.minHeight = `${actions.getBoundingClientRect().height}px`;
       button.style.minWidth = `${button.getBoundingClientRect().width}px`;
       card.classList.add('answered');
+      skip.remove();
       clock.style.width = `${clock.getBoundingClientRect().width}px`;
       clock.textContent = 'Done'; clock.classList.remove('urgent'); clock.setAttribute('aria-label', 'Answered');
       button.disabled = true; button.textContent = 'Submitted';
@@ -273,11 +284,17 @@ function makeForm(item, onTrainingSubmit) {
     const label = submitted ? 'Submitted' : 'Submit answers';
     if (button.textContent !== label) button.textContent = label;
     for (const view of views.values()) view.field.disabled = submitted;
-    if (submitted) submitting = false;
+    if (submitted) { submitting = false; skip.remove(); }
     hint.textContent = submitted ? `Waiting for answers · ${item.received}/${item.expected} received` : `${item.received}/${item.expected} answers received`;
     validity();
   }
-  return { card, clock, validity, finish, progress, reset() { if (!completed) { submitting = false; validity(); } } };
+  return { card, clock, validity, finish, progress, reset() { if (!completed) { submitting = false; skip.disabled = false; validity(); } } };
+}
+function skipPractice(item) {
+  if (practice?.id !== item.id) return;
+  practice = undefined;
+  render();
+  schedulePractice();
 }
 function update(message) {
   offset = message.serverTime - Date.now();

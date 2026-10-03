@@ -10,7 +10,7 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
   const comparisons = new Map();
   const json = (body, status = 200) => Response.json(body, { status });
   const error = (message, status) => json({ error: { message } }, status);
-  const snapshot = ws => JSON.stringify({ type: 'queue', serverTime: Date.now(), results, requests: [...pending.values()].map(({ id, request, createdAt, deadline, source, title, timedOut, participants, answers }) => ({ id, request, createdAt, deadline, source, title, timedOut, received: answers.size, expected: participants.size, submitted: answers.get(ws)?.response })) });
+  const snapshot = ws => JSON.stringify({ type: 'queue', serverTime: Date.now(), results, requests: [...pending.values()].filter(entry => !entry.skipped.has(ws)).map(({ id, request, createdAt, deadline, source, title, timedOut, participants, answers }) => ({ id, request, createdAt, deadline, source, title, timedOut, received: answers.size, expected: participants.size, submitted: answers.get(ws)?.response })) });
   const broadcast = () => { for (const ws of clients) ws.send(snapshot(ws)); };
   function complete(entry) {
     if (!entry.answers.size) return;
@@ -56,7 +56,7 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
       broadcast();
     };
     const timer = setTimeout(expire, timeoutMs);
-    pending.set(id, { id, request, createdAt, deadline: createdAt + timeoutMs, title: 'API request', timedOut: false, participants: new Set(active), answers: new Map(), timer, finish, expire });
+    pending.set(id, { id, request, createdAt, deadline: createdAt + timeoutMs, title: 'API request', timedOut: false, participants: new Set(active), skipped: new Set(), answers: new Map(), timer, finish, expire });
     signal?.addEventListener('abort', abort, { once: true });
     if (signal?.aborted) abort(); else broadcast();
   }
@@ -118,7 +118,7 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
             if (message.active === active.has(ws)) { ws.send(JSON.stringify({ type: 'presence', active: message.active })); return; }
             if (message.active) {
               active.add(ws);
-              for (const entry of pending.values()) entry.participants.add(ws);
+              for (const entry of pending.values()) if (!entry.skipped.has(ws)) entry.participants.add(ws);
             } else leave(ws);
             ws.send(JSON.stringify({ type: 'presence', active: message.active }));
             if (pending.size) broadcast();
@@ -134,6 +134,16 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
             else comparison.finish(typeof message.error === 'string' ? message.error.slice(0, 200) : 'Comparison failed');
             return;
           }
+          if (message.type === 'skip') {
+            const entry = pending.get(message.id);
+            if (!entry) throw new Error('This request is no longer waiting');
+            if (entry.answers.has(ws)) throw new Error('You already answered this request');
+            entry.skipped.add(ws);
+            entry.participants.delete(ws);
+            if (entry.answers.size && entry.answers.size === entry.participants.size) complete(entry);
+            else broadcast();
+            return;
+          }
           if (message.type !== 'submit') throw new Error('Unknown message type');
           const entry = pending.get(message.id);
           if (!entry) throw new Error('This request is no longer waiting');
@@ -141,6 +151,7 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
           if (!pending.has(entry.id)) throw new Error('This request is no longer waiting');
           if (!active.has(ws)) throw new Error('The answering screen must be visible');
           if (entry.answers.has(ws)) throw new Error('You already answered this request');
+          if (entry.skipped.has(ws)) throw new Error('You skipped this request');
           if (message.compare !== undefined && typeof message.compare !== 'boolean') throw new Error('Invalid comparison setting');
           const response = answerRequest(entry.request, message.values);
           ws.send(JSON.stringify({ type: 'submitted', id: message.id }));

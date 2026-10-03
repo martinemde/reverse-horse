@@ -55,10 +55,10 @@ try {
     const choices = active.locator('input[type=range]');
     assert.equal(await active.locator('input[type=radio]').count(), 0);
     if (question.type === 'choice') {
-      assert.equal(await active.locator('button').isDisabled(), true);
+      assert.equal(await active.locator('button[type=submit]').isDisabled(), true);
       assert.deepEqual(await active.locator('input[type=range]').evaluateAll(inputs => inputs.map(input => Number(input.value))), Array(await choices.count()).fill(0));
       await setRange(choices.first(), 0.5);
-      assert.equal(await active.locator('button').isEnabled(), true);
+      assert.equal(await active.locator('button[type=submit]').isEnabled(), true);
       await setRange(choices.first(), 0);
       const keys = Object.keys(question.criteria);
       const chosen = i % 2 ? keys.find(key => key !== jev.choice) : jev.choice;
@@ -73,10 +73,10 @@ try {
       const different = question.type === 'noul' ? (jev.noul >= 0.5 ? 0.2 : 0.8) : (Math.round(jev.score) === 0 ? question.criteria.length - 1 : 0);
       await setRange(active.locator('input[type=range]'), i % 2 ? different : matching);
     }
-    await active.locator('button').scrollIntoViewIfNeeded();
+    await active.locator('button[type=submit]').scrollIntoViewIfNeeded();
     const original = await active.elementHandle();
     const before = await original.evaluate(el => ({ top: el.getBoundingClientRect().top, values: [...el.querySelectorAll('input[type=range]')].map(input => input.value), sliders: [...el.querySelectorAll('input[type=range]')].map(input => input.getBoundingClientRect().top) }));
-    await active.locator('button').click({ delay: 350 });
+    await active.locator('button[type=submit]').click({ delay: 350 });
     await page.waitForFunction(el => el.isConnected && el.classList.contains('answered'), original);
     const after = await original.evaluate(el => ({ top: el.getBoundingClientRect().top, values: [...el.querySelectorAll('input[type=range]')].map(input => input.value), sliders: [...el.querySelectorAll('input[type=range]')].map(input => input.getBoundingClientRect().top) }));
     assert.deepEqual(after.values, before.values);
@@ -109,7 +109,7 @@ try {
   assert.notEqual(JSON.stringify(next.request), dealt.at(-1));
   await setRange(active.locator('input[type=range]').first(), 0.5);
   const off = await active.elementHandle();
-  await active.locator('button').click({ delay: 350 });
+  await active.locator('button[type=submit]').click({ delay: 350 });
   assert.match(await off.textContent(), /Answered · comparison off/);
   assert.equal(await off.$eval('.jev-marker', marker => marker.hidden), true);
 

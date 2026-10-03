@@ -95,6 +95,19 @@ test('disconnecting an unanswered UI releases the remaining replies', async () =
   expect((await (await response).json()).answers.urgent.noul).toBe(0.75);
 });
 
+test('skipping a request hides it from that UI and releases the remaining replies', async () => {
+  const base = app(); const first = connect(base); const second = connect(base);
+  await first.next(m => m.type === 'queue'); await second.next(m => m.type === 'queue');
+  const response = post(base);
+  const item = (await first.next(m => m.requests?.length)).requests[0];
+  await second.next(m => m.requests?.length);
+  first.send({ type: 'submit', id: item.id, values: { urgent: 0.75, department: { billing: 1, support: 0 }, mood: 1 } });
+  await first.next(m => m.requests?.[0]?.received === 1);
+  second.send({ type: 'skip', id: item.id });
+  expect((await second.next(m => m.type === 'queue' && !m.requests.length)).requests).toEqual([]);
+  expect((await (await response).json()).answers.urgent.noul).toBe(0.75);
+});
+
 test('saved replies count after disconnect and the deadline averages available answers', async () => {
   const base = app({ timeoutMs: 100 }); const first = connect(base); const second = connect(base); const unanswered = connect(base);
   await Promise.all([first.next(m => m.type === 'queue'), second.next(m => m.type === 'queue'), unanswered.next(m => m.type === 'queue')]);

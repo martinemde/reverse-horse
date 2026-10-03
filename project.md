@@ -51,7 +51,10 @@ means a match, pink a mismatch. Matching uses the same choice, the same yes/no
 side (0.5 is yes), or the nearest score level (halfway rounds up). New rounds
 appear above completed cards. Unanswered cards always sit above submitted ones:
 a live request lands on top of a waiting example, and the example rises back
-to the top once the live request is answered.
+to the top once the live request is answered. The circled X beside the clock
+skips a card: an example is dropped and the next one deals as usual; a live
+request sends `skip`, which removes that browser from its participants (presence
+changes never re-add it) and hides it from that browser's queue.
 
 ## OpenRouter comparison
 

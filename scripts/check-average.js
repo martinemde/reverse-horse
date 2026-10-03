@@ -32,7 +32,7 @@ async function pageFor(trained = true) {
 const post = () => fetch(new URL('/v1/systemone', app.server.url), { method: 'POST', body: JSON.stringify(request) });
 async function submit(card, values) {
   for (const [index, value] of values.entries()) await setRange(card.locator('input[type=range]').nth(index), value);
-  await card.getByRole('button').click({ delay: 350 });
+  await card.locator('button[type=submit]').click({ delay: 350 });
 }
 try {
   const first = await pageFor(), second = await pageFor(), trainee = await pageFor(false);
@@ -43,7 +43,7 @@ try {
   const firstCard = await card(first).elementHandle();
   await submit(card(first), [0.25, 0.5, 0, 0]);
   await first.waitForFunction(el => el.querySelector('.actions p').textContent === 'Waiting for answers · 1/2 received', firstCard);
-  assert.equal(await firstCard.$eval('button', el => el.disabled), true);
+  assert.equal(await firstCard.$eval('button[type=submit]', el => el.disabled), true);
   assert.equal(await firstCard.$$eval('input:enabled', inputs => inputs.length), 0);
   assert.equal(await firstCard.evaluate(el => el.classList.contains('answered')), false);
   await submit(card(second), [0.75, 0, 1, 2]);
@@ -88,6 +88,15 @@ try {
   assert.equal((await interrupted).status, 200);
   await solo.waitForFunction(el => el.parentElement.firstElementChild === el, exampleCard);
   assert.equal(await exampleCard.evaluate(el => el.classList.contains('answered')), false, 'The waiting example rises back to the top unanswered');
+  assert.equal(await solo.locator('form.answered .skip').count(), 0, 'Answered cards cannot be skipped');
+  await solo.locator(`form[data-id="${await exampleCard.getAttribute('data-id')}"] .skip`).click();
+  await solo.waitForFunction(el => !el.isConnected, exampleCard);
+  const skipped = post();
+  await card(solo).waitFor();
+  const liveCard = await card(solo).elementHandle();
+  await card(solo).locator('.skip').click();
+  await solo.waitForFunction(el => !el.isConnected, liveCard);
+  skipped.catch(() => {});
   assert.deepEqual(errors, []); assert.deepEqual(externalRequests, []);
   console.log('PASS: two live UIs average replies, lock submissions while waiting, display the mean, exclude training, and float a waiting example back above an answered live request.');
 } finally { await browser.close(); await app.stop(); }

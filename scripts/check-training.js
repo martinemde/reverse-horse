@@ -68,7 +68,7 @@ try {
       assert.equal(await dialog.locator('.training-actions button').last().isDisabled(), true);
       let values;
       if (id === 'team') {
-        assert.equal(await card.getByRole('button').isDisabled(), true, 'Choice needs a selection');
+        assert.equal(await card.locator('button[type=submit]').isDisabled(), true, 'Choice needs a selection');
         assert.equal(await card.getByRole('radio').count(), 0);
         for (const [weights, confidence, probabilities] of choiceCases) {
           for (let index = 0; index < weights.length; index++) await setRange(card.locator('input[type=range]').nth(index), weights[index]);
@@ -85,7 +85,7 @@ try {
       }
       await noOverflow(page);
       await page.screenshot({ path: `/tmp/reverse-horse-training-${viewport.width}-${id}.png` });
-      await card.getByRole('button').click();
+      await card.locator('button[type=submit]').click();
       const verdict = matchesJev(answerRequest(run.request, { [id]: values }).answers[id], run.jev.answers[id]) ? 'Matched Jev' : 'Different from Jev';
       assert.equal(await card.locator('.question-feedback').textContent(), verdict);
       assert.equal(await dialog.locator('pre').count(), 1, 'Only the state is shown, no JSON');
@@ -125,7 +125,7 @@ try {
     for (let step = 1; step < exitStep; step++) {
       const card = dialog.locator('form');
       await setRange(card.locator('input[type=range]').first(), 0.5);
-      await card.getByRole('button').click();
+      await card.locator('button[type=submit]').click();
       await dialog.locator('.training-actions button').last().click();
     }
     if (exitStep === 2) await page.keyboard.press('Escape');
@@ -161,10 +161,10 @@ try {
     const card = entry.page.locator('.live-request:not(.answered)');
     await card.waitFor();
     assert.equal(await card.getByRole('radio').count(), 0);
-    assert.equal(await card.getByRole('button').isDisabled(), true);
+    assert.equal(await card.locator('button[type=submit]').isDisabled(), true);
     for (let index = 0; index < weights.length; index++) await setRange(card.locator('input[type=range]').nth(index), weights[index]);
     const submitted = await card.elementHandle();
-    await card.getByRole('button').click({ delay: 350 });
+    await card.locator('button[type=submit]').click({ delay: 350 });
     const result = await response;
     assert.equal(result.status, 200);
     assert.deepEqual((await result.json()).answers.pick, {
