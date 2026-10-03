@@ -86,7 +86,7 @@ try {
       await noOverflow(page);
       await page.screenshot({ path: `/tmp/reverse-horse-training-${viewport.width}-${id}.png` });
       await card.getByRole('button').click();
-      const verdict = matchesJev(answerRequest(run.request, { [id]: values }).answers[id], run.jev.answers[id]) ? 'Matched JEV' : 'Different from JEV';
+      const verdict = matchesJev(answerRequest(run.request, { [id]: values }).answers[id], run.jev.answers[id]) ? 'Matched Jev' : 'Different from Jev';
       assert.equal(await card.locator('.question-feedback').textContent(), verdict);
       assert.equal(await dialog.locator('pre').count(), 1, 'Only the state is shown, no JSON');
       assert.equal(await card.locator('input:enabled').count(), 0);
@@ -183,7 +183,7 @@ try {
   assert.equal(submissions.length, choiceCases.length);
   assert.deepEqual(externalRequests, []);
   assert.deepEqual(errors, []);
-  console.log('Training: desktop/mobile, all API shapes, recorded JEV, back/completion/replay/exit/Escape, blocked storage, and all Choice confidence examples in training and live submissions passed.');
+  console.log('Training: desktop/mobile, all API shapes, recorded Jev, back/completion/replay/exit/Escape, blocked storage, and all Choice confidence examples in training and live submissions passed.');
 } finally {
   await browser.close();
   await app.stop();

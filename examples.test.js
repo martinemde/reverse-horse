@@ -5,7 +5,7 @@ import { validateRequest } from './public/protocol.js';
 import { validateJevResponse, matchesJev } from './public/compare.js';
 import { comparisonEnabled, setComparisonEnabled } from './public/auth.js';
 
-test('every built-in example has a matching, valid recorded JEV run', () => {
+test('every built-in example has a matching, valid recorded Jev run', () => {
   expect(results).toHaveLength(examples.length);
   for (const example of examples) {
     validateRequest(example.request);
@@ -27,7 +27,7 @@ test('saved comparisons work without a key and respect the off preference', () =
   expect(comparisonEnabled(storage, true)).toBe(false);
 });
 
-test('match feedback compares human answers against the recorded JEV answers', () => {
+test('match feedback compares human answers against the recorded Jev answers', () => {
   for (const run of results) for (const [id, jev] of Object.entries(run.jev.answers)) {
     expect(matchesJev(jev, jev)).toBe(true);
     const question = run.request.questions[id];

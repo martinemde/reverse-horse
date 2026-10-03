@@ -11,7 +11,7 @@ shows them live over a WebSocket, and holds the HTTP connection while humans
 answer. Each call has 30 seconds from arrival, queue time included. The caller
 gets the average of all participating browsers' answers, the average so far at
 the deadline, or 504 if nobody answered. Late answers can still be saved and
-compared with JEV but never reach the caller.
+compared with Jev but never reach the caller.
 
 ## Run
 
@@ -26,13 +26,13 @@ bun dev          # restarts on server changes; refresh for UI edits
 
 First visits open an untimed course: Induction, Noul, Choice, Score, Certified.
 Exercises classify emails using the real answering controls and compare against
-recorded JEV runs. Training never submits to the queue or calls OpenRouter;
+recorded Jev runs. Training never submits to the queue or calls OpenRouter;
 practice pauses while it is open, and live requests keep their deadlines. Any
 exit (Exit training, Escape, Enter the site) sets
 `reverse-horse.training-completed = 1` in local storage. Remove that key to see
 the first visit again. **Training** in the nav reopens it. **Help** (`/help`, static
 `public/help.html`) holds the detail training leaves out: request and response
-JSON, each type's fields, averaging, and JEV matching. Keep its examples in step
+JSON, each type's fields, averaging, and Jev matching. Keep its examples in step
 with `answerRequest`. **About** (`/about`, static `public/about.html`) is
 Martin's explanation of the project, in his words.
 
@@ -46,7 +46,7 @@ Practice pauses while live requests or comparisons are active and stays in the
 current tab. Comparisons come from `public/example-results.json`, matched on the
 complete request, so edited questions never reuse an old answer.
 
-Submitted cards lock in place. Pink markers show JEV on the same control; green
+Submitted cards lock in place. Pink markers show Jev on the same control; green
 means a match, pink a mismatch. Matching uses the same choice, the same yes/no
 side (0.5 is yes), or the nearest score level (halfway rounds up). New rounds
 appear above completed cards.
@@ -56,7 +56,7 @@ appear above completed cards.
 **Connect OpenRouter** runs browser-side PKCE: verifier and state live in session
 storage, the callback must come from the initiating tab within ten minutes, and
 the key stays in this origin's local storage. It never reaches the server or
-other browsers. **Compare with JEV** defaults on at first connection and is
+other browsers. **Compare with Jev** defaults on at first connection and is
 remembered. After everyone submits, one opted-in submitter's browser posts the
 original request to `https://openrouter.ai/api/v1/systemone` on their credits and
 sends only the result back for display. Disconnect deletes the local key (it does
@@ -93,8 +93,8 @@ entropy. Choice bars start empty and fill independently from 0–100%. The fulle
 bar is confidence; each bar divided by the total is its probability. Two full bars
 give confidence 1 at 0.5/0.5; two half bars give 0.5 at the same split. All-zero
 is rejected, ties pick the first option. To reconstruct fullness (on reload, and
-for JEV's markers), scale each probability by `confidence / max(probabilities)`.
-Neither confidence formula matches JEV's, which is undocumented.
+for Jev's markers), scale each probability by `confidence / max(probabilities)`.
+Neither confidence formula matches Jev's, which is undocumented.
 
 ## Averaging and presence
 
@@ -152,14 +152,14 @@ requests, and write screenshots to `/tmp/reverse-horse-*`. Set
 - `scripts/check-training.js`: the full course at desktop and phone widths, exits, completion, blocked storage, and Choice confidence examples.
 - `scripts/check-questions.js`: the request builder, persistence, Send, and layout.
 - `scripts/check-average.js`: two live pages and a training page averaging and changing participation.
-- `scripts/check-submit.js`: WebKit (`install webkit` first) submit regression, markers, match colors, and a late recorded JEV answer.
+- `scripts/check-submit.js`: WebKit (`install webkit` first) submit regression, markers, match colors, and a late recorded Jev answer.
 - `bun scripts/check-worker.js http://127.0.0.1:8787` (or the deployed origin): two-socket averaging and a real 30-second 504 followed by a late answer.
 
 For live comparison, connect OpenRouter, answer an auto round, and check the
-You & JEV panel; repeat with comparison off and after disconnecting.
+You & Jev panel; repeat with comparison off and after disconnecting.
 
 To record practice answers, put `OPENROUTER_API_KEY` in the ignored `.env` and
-run `bun scripts/save-example-results.js`. It calls JEV once per missing request
+run `bun scripts/save-example-results.js`. It calls Jev once per missing request
 and saves each result immediately so retries are free. Remove the key afterward.
 
 ## Gotchas

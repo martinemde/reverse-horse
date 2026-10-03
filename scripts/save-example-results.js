@@ -15,7 +15,7 @@ for (const example of examples) {
   } else {
     if (!apiKey) throw new Error('Set OPENROUTER_API_KEY in .env before recording missing examples.');
     const { jev } = await compareWithJev(example.request, apiKey, AbortSignal.timeout(30_000));
-    if (!jev) throw new Error(`No JEV response for ${example.title}`);
+    if (!jev) throw new Error(`No Jev response for ${example.title}`);
     const run = { title: example.title, recordedAt: new Date().toISOString(), request: example.request, jev };
     saved.push(run);
     results.push(run);
@@ -25,4 +25,4 @@ for (const example of examples) {
   }
 }
 await Bun.write(output, JSON.stringify(results, null, 2) + '\n');
-console.log(`Saved ${results.length} real JEV responses.`);
+console.log(`Saved ${results.length} real Jev responses.`);

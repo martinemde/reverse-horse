@@ -56,7 +56,7 @@ function schedulePractice() {
 function submitPractice(item, values, compare) {
   const human = answerRequest(item.request, values);
   const saved = compare && savedExample(item.request);
-  const result = { ...item, human, late: (item.pausedAt ?? Date.now()) >= item.deadline, status: saved ? `Compared with saved JEV run · ${new Date(saved.recordedAt).toLocaleDateString()}` : compare ? 'Asking JEV via OpenRouter…' : 'Answered · comparison off' };
+  const result = { ...item, human, late: (item.pausedAt ?? Date.now()) >= item.deadline, status: saved ? `Compared with saved Jev run · ${new Date(saved.recordedAt).toLocaleDateString()}` : compare ? 'Asking Jev via OpenRouter…' : 'Answered · comparison off' };
   if (saved) result.jev = saved.jev;
   practiceResults.unshift(result);
   practiceResults.splice(20);
@@ -76,7 +76,7 @@ function showError(message) { $('#error').textContent = message; $('#error').hid
 function refreshAuth() {
   const connected = Boolean(getKey());
   $('#auth').textContent = connected ? 'Disconnect' : 'Connect OpenRouter';
-  $('#auth-status').textContent = (savedExamples.length ? 'Practice uses saved JEV answers. ' : '') + (connected ? 'OpenRouter connected · live comparisons use your credits.' : 'Connect OpenRouter to compare live requests.');
+  $('#auth-status').textContent = (savedExamples.length ? 'Practice uses saved Jev answers. ' : '') + (connected ? 'OpenRouter connected · live comparisons use your credits.' : 'Connect OpenRouter to compare live requests.');
   $('#compare').disabled = !connected && !savedExamples.length;
   $('#compare').checked = comparisonEnabled(localStorage, savedExamples.length > 0);
 }
@@ -117,7 +117,7 @@ function makeForm(item, onTrainingSubmit) {
   function mark(control, value, max, label) {
     control.marker.style[control.vertical ? 'top' : 'left'] = `${100 * value / max}%`;
     control.marker.hidden = false;
-    control.jev.textContent = `JEV ${label}`;
+    control.jev.textContent = `Jev ${label}`;
     control.jev.classList.remove('pending');
   }
   for (const [id, q] of Object.entries(item.request.questions)) {
@@ -153,7 +153,7 @@ function makeForm(item, onTrainingSubmit) {
         if (q.criteria[key] !== null) label.append(node('span', `: ${text(q.criteria[key])}`, 'choice-description'));
         const fullness = node('output');
         const output = node('output', undefined, 'choice-probability');
-        const jev = node('span', 'JEV', 'jev-value pending');
+        const jev = node('span', 'Jev', 'jev-value pending');
         const numbers = node('div', undefined, 'range-values'); numbers.append(fullness);
         const slider = range(`${id}: ${key}`, 1, 0, value => {
           values[id][key] = value;
@@ -175,7 +175,7 @@ function makeForm(item, onTrainingSubmit) {
       values[id] = max / 2;
       const row = node('div', undefined, 'range-row');
       const output = node('output', values[id].toFixed(3));
-      const jev = node('span', 'JEV', 'jev-value pending');
+      const jev = node('span', 'Jev', 'jev-value pending');
       const numbers = node('div', undefined, 'range-values'); numbers.append(output, jev);
       row.append(node('span', q.type === 'noul' ? 'Probability of yes' : 'Your score'), numbers);
       const slider = range(id, max, values[id], value => { values[id] = value; output.textContent = value.toFixed(3); });
@@ -203,7 +203,7 @@ function makeForm(item, onTrainingSubmit) {
     questions.append(field);
   }
   const actions = node('div', undefined, 'actions');
-  const button = node('button', item.training ? 'Submit & see JEV’s answer' : 'Submit answers'); button.type = 'submit';
+  const button = node('button', item.training ? 'Submit & see Jev’s answer' : 'Submit answers'); button.type = 'submit';
   const hint = node('p', '');
   actions.append(hint, button); card.append(head, state, questions, actions);
   function validity() {
@@ -255,13 +255,13 @@ function makeForm(item, onTrainingSubmit) {
       view.field.classList.toggle('answer-match', match);
       view.field.classList.toggle('answer-miss', !match);
       const rule = human.type === 'choice' ? 'Same choice' : human.type === 'noul' ? 'Same yes/no side' : 'Same nearest level';
-      view.feedback.textContent = match ? 'Matched JEV' : 'Different from JEV';
+      view.feedback.textContent = match ? 'Matched Jev' : 'Different from Jev';
       view.feedback.title = `${rule} counts as a match`;
       if (human.type === 'choice') {
         const weights = choiceWeights(jev);
         for (const control of view.controls) {
           mark(control, weights[control.key], 1, `${(100 * jev.probabilities[control.key]).toFixed(1)}% chance`);
-          control.jev.title = 'Pink markers scale JEV probabilities so its tallest bar equals its confidence';
+          control.jev.title = 'Pink markers scale Jev probabilities so its tallest bar equals its confidence';
           control.option.classList.toggle('human-picked', human.choice === control.key);
           control.option.classList.toggle('jev-picked', jev.choice === control.key);
         }
@@ -395,7 +395,7 @@ async function initialize() {
     if (!response.ok) throw new Error('Saved examples unavailable');
     const runs = await response.json();
     savedExamples = runs.map(run => ({ ...run, jev: validateJevResponse(run.request, run.jev) }));
-  } catch { showError('Saved JEV answers could not be loaded. Refresh to try again.'); }
+  } catch { showError('Saved Jev answers could not be loaded. Refresh to try again.'); }
   training.refresh();
   try { refreshAuth(); } catch { showError('Browser storage is unavailable. Allow site storage to connect OpenRouter.'); }
   connect();

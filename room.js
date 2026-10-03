@@ -61,7 +61,7 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
     if (signal?.aborted) abort(); else broadcast();
   }
   function compare(entry, human, ws, enabled) {
-    const result = { id: entry.id, request: entry.request, title: entry.title, source: entry.source, human, answerCount: entry.answers.size, late: entry.timedOut, status: enabled ? 'Asking JEV via OpenRouter…' : 'Answered · comparison off' };
+    const result = { id: entry.id, request: entry.request, title: entry.title, source: entry.source, human, answerCount: entry.answers.size, late: entry.timedOut, status: enabled ? 'Asking Jev via OpenRouter…' : 'Answered · comparison off' };
     results.unshift(result);
     results.splice(20);
     broadcast();
@@ -73,7 +73,7 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
       if (jev) result.jev = jev;
       broadcast();
     };
-    const timer = setTimeout(() => finish('Comparison failed: JEV timed out'), 30_000);
+    const timer = setTimeout(() => finish('Comparison failed: Jev timed out'), 30_000);
     comparisons.set(entry.id, { ws, finish, request: entry.request });
     ws.send(JSON.stringify({ type: 'compare', id: entry.id, request: entry.request }));
   }
@@ -129,7 +129,7 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
             if (!comparison || comparison.ws !== ws) throw new Error('This comparison is no longer waiting');
             if (message.jev) {
               try { comparison.finish('Compared', validateJevResponse(comparison.request, message.jev)); }
-              catch { comparison.finish('Comparison failed: invalid JEV response'); }
+              catch { comparison.finish('Comparison failed: invalid Jev response'); }
             }
             else comparison.finish(typeof message.error === 'string' ? message.error.slice(0, 200) : 'Comparison failed');
             return;

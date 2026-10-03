@@ -54,7 +54,7 @@ test('disconnect forgets the browser key and any pending login', async () => {
   expect(session.getItem('reverse-horse.openrouter.login')).toBeNull();
 });
 
-test('no key skips the JEV call', async () => {
+test('no key skips the Jev call', async () => {
   expect(await compareWithJev({}, undefined)).toEqual({ error: 'Comparison skipped · OpenRouter not connected' });
 });
 

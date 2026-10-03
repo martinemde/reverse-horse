@@ -1,9 +1,9 @@
 export function validateJevResponse(request, jev) {
-  if (!jev?.answers) throw new Error('JEV returned an invalid answer');
+  if (!jev?.answers) throw new Error('Jev returned an invalid answer');
   const answers = Object.fromEntries(Object.entries(request.questions).map(([id, q]) => {
     const answer = jev.answers[id];
     const probability = n => Number.isFinite(n) && n >= 0 && n <= 1;
-    const invalid = () => { throw new Error('JEV returned an invalid answer'); };
+    const invalid = () => { throw new Error('Jev returned an invalid answer'); };
     if (!answer || answer.type !== q.type) invalid();
     if (q.type === 'noul') {
       if (!probability(answer.noul)) invalid();

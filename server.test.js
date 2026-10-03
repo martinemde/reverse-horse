@@ -113,7 +113,7 @@ test('saved replies count after disconnect and the deadline averages available a
   expect(completed.results[0].late).toBe(false);
 });
 
-test('holds the API connection, accepts all primitives, and skips JEV without credentials', async () => {
+test('holds the API connection, accepts all primitives, and skips Jev without credentials', async () => {
   const base = app(); const client = connect(base);
   expect((await client.next(m => m.type === 'queue')).requests).toEqual([]);
   let settled = false;

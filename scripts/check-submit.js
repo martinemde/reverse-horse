@@ -87,7 +87,7 @@ try {
     const human = answerRequest(run.request, { [id]: values }).answers[id];
     const matched = matchesJev(human, jev);
     assert.equal(await card.locator('fieldset').getAttribute('class'), `question ${matched ? 'answer-match' : 'answer-miss'}`);
-    assert.equal(await card.locator('.question-feedback').textContent(), matched ? 'Matched JEV' : 'Different from JEV');
+    assert.equal(await card.locator('.question-feedback').textContent(), matched ? 'Matched Jev' : 'Different from Jev');
     const markers = await card.locator('.jev-marker').evaluateAll(markers => markers.map(marker => ({ hidden: marker.hidden, percent: parseFloat(marker.style.left) })));
     const expected = question.type === 'choice' ? Object.values(choiceWeights(jev)).map(weight => weight * 100) : [question.type === 'noul' ? jev.noul * 100 : jev.score / (question.criteria.length - 1) * 100];
     markers.forEach((marker, index) => { assert.equal(marker.hidden, false); assert.ok(Math.abs(marker.percent - expected[index]) < 0.001); });
@@ -113,7 +113,7 @@ try {
   assert.match(await off.textContent(), /Answered · comparison off/);
   assert.equal(await off.$eval('.jev-marker', marker => marker.hidden), true);
 
-  // Deliver an actual recorded JEV response later through the real WebSocket
+  // Deliver an actual recorded Jev response later through the real WebSocket
   // protocol. No model is mocked and no external inference is made by this test.
   const peer = new WebSocket(new URL('/ws', app.server.url).href.replace('http:', 'ws:'), { headers: { Origin: app.server.url.origin } });
   await new Promise(resolve => peer.addEventListener('open', resolve, { once: true }));

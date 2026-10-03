@@ -6,19 +6,19 @@ const lessons = [
     id: 'payment_needed', type: 'noul', title: 'Does this email need a payment?',
     concept: 'Named after Jacob Bernoulli (not the Bernoulli Principle Bernoulli; that’s Daniel, his nephew). Jacob proved that as you repeat an experiment, the observed frequency of an outcome converges to its true probability: the law of large numbers. Noul is short for “Bernoulli trial”: a true/false outcome and how often it occurs.',
     controls: 'Slide toward 1 for yes, 0 for no. 0.5 means you can’t tell.',
-    explanation: 'The email says payment was received and nothing is needed. JEV says 0.02. The pink marker shows its answer.',
+    explanation: 'The email says payment was received and nothing is needed. Jev says 0.02. The pink marker shows its answer.',
   },
   {
     id: 'team', type: 'choice', title: 'Which team should handle this email?',
     concept: 'Jev picks between the choices you give it. Usually you want an “unknown” or “not available” choice too. Force “how will the coin land?” between heads and tails and it picks heads; offer “unknowable” and it honestly says it can’t be known.',
     controls: 'Fill each bar from 0 to 100%. Your fullest bar is your confidence; relative fullness sets each probability.',
-    explanation: 'A duplicate charge and refund belong with billing. JEV picks billing with probability 1 and confidence 1.',
+    explanation: 'A duplicate charge and refund belong with billing. Jev picks billing with probability 1 and confidence 1.',
   },
   {
     id: 'urgency', type: 'score', title: 'How urgent is this email?',
     concept: 'Picture one of those sliders from “Strongly Disagree” to “Strongly Agree.” A score isn’t discrete: the answer doesn’t have to land on a step. With five levels, Jev could return 1.3, between “disagree” and “neutral.”',
     controls: 'Slide along the levels. The first is 0, the next 1, and so on. Stop between them if that fits.',
-    explanation: 'The meeting is in 30 minutes and the slides are blocking. JEV scores it 2, “Needs attention now.”',
+    explanation: 'The meeting is in 30 minutes and the slides are blocking. Jev scores it 2, “Needs attention now.”',
   },
 ];
 
@@ -116,7 +116,7 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
       heading.textContent = 'You are now a qualified AI model.';
       body.append(heading,
         node('p', 'Your neural network was inside you all along.', 'training-lead'),
-        node('p', 'Practice rounds start on the Answer screen; Pause stops them. Live API requests have 30 seconds from arrival. Connect OpenRouter to compare live requests with JEV. Question lets you build and send your own.'),
+        node('p', 'Practice rounds start on the Answer screen; Pause stops them. Live API requests have 30 seconds from arrival. Connect OpenRouter to compare live requests with Jev. Question lets you build and send your own.'),
         node('p', 'Reopen Training from the navigation anytime.', 'training-note'));
       actions.append(button('Back', () => go(4), 'secondary'), button('Enter the site', () => close(true)));
     } else {
@@ -139,7 +139,7 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
       next.disabled = !result;
       const review = node('section', undefined, 'training-review');
       review.hidden = !result;
-      review.setAttribute('aria-label', 'What JEV said');
+      review.setAttribute('aria-label', 'What Jev said');
       review.tabIndex = -1;
       const item = { ...example, id: `training-${lesson.id}`, local: true, training: true };
       const form = makeForm(item, human => {
@@ -157,9 +157,9 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
       body.append(grid, review);
       function showReview() {
         review.hidden = false;
-        review.replaceChildren(node('h2', 'What JEV said'));
-        if (saved) review.append(node('p', lesson.explanation), node('p', `Actual JEV run · ${new Date(saved.recordedAt).toLocaleDateString()} · ${saved.jev.model}`, 'training-note'));
-        else review.append(node('p', 'The recorded JEV answer didn’t load. Refresh to retry, or continue.'));
+        review.replaceChildren(node('h2', 'What Jev said'));
+        if (saved) review.append(node('p', lesson.explanation), node('p', `Actual Jev run · ${new Date(saved.recordedAt).toLocaleDateString()} · ${saved.jev.model}`, 'training-note'));
+        else review.append(node('p', 'The recorded Jev answer didn’t load. Refresh to retry, or continue.'));
       }
       if (result) { form.finish(result); showReview(); }
       actions.append(button('Back', () => go(step - 1), 'secondary'), status, next);

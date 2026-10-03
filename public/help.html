@@ -34,7 +34,7 @@
       <h2>What happens to a request</h2>
       <p>In theory, everyone answering questions is connected to a websocket and will be asked live the questions that arrive at the API. Their answers are assembled into the response. That’s the goal, and it works across a small group, but it’s almost certainly bound to break if too many people visit. I look forward to finding out the strange new ways this can break.</p>
       <p>Some software posts a request to <code>/v1/systemone</code>. It shows up on the Answer screen of everyone who has the site open. Each person answers once. When everyone has answered, the caller gets the average.</p>
-      <p>A request has 30 seconds from the moment it arrives, including any time it spends waiting in line. At the deadline the caller gets the average of whatever answers are in. If nobody answered, it gets a 504. You can still answer late and compare with JEV, but the caller never sees it.</p>
+      <p>A request has 30 seconds from the moment it arrives, including any time it spends waiting in line. At the deadline the caller gets the average of whatever answers are in. If nobody answered, it gets a 504. You can still answer late and compare with Jev, but the caller never sees it.</p>
       <p>Only visible answering pages count. If you switch tabs or close the page, you stop holding requests open, but an answer you already sent still counts.</p>
     </section>
 
@@ -108,9 +108,9 @@
     </section>
 
     <section>
-      <h2>Matching JEV</h2>
-      <p>Pink markers show what JEV answered on the same control. Your answer turns green when it matches and pink when it doesn’t. A match means the same choice, the same side of 0.5 for Noul, or the same nearest level for Score (halfway rounds up).</p>
-      <p>Practice rounds compare against saved JEV answers. Live requests compare only when someone who answered has connected OpenRouter and turned on Compare with JEV. After everyone answers, one of their browsers asks JEV on that person’s OpenRouter credits.</p>
+      <h2>Matching Jev</h2>
+      <p>Pink markers show what Jev answered on the same control. Your answer turns green when it matches and pink when it doesn’t. A match means the same choice, the same side of 0.5 for Noul, or the same nearest level for Score (halfway rounds up).</p>
+      <p>Practice rounds compare against saved Jev answers. Live requests compare only when someone who answered has connected OpenRouter and turned on Compare with Jev. After everyone answers, one of their browsers asks Jev on that person’s OpenRouter credits.</p>
     </section>
   </main>
   <footer>reverse.horse <span>Read the manual. Then don’t think.</span></footer>
