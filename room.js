@@ -173,6 +173,49 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
     state.results = []; state.retired = []; state.retiredSent = []; state.job = undefined;
     wake();
   }
+  // Submit and skip only act on the request currently assigned to this socket.
+  function assigned(state, message) {
+    const entry = pending.get(message.id);
+    if (!entry) throw new Error('This request is no longer waiting');
+    if (Date.now() >= entry.deadline) { finish(entry, 'Timed out waiting for a human answer', 504); throw new Error('This request is no longer waiting'); }
+    if (!active.has(state)) throw new Error('The answering screen must be visible');
+    if (entry.answers.has(state)) throw new Error('You already answered this request');
+    if (state.job !== entry || !entry.participants.has(state)) throw new Error('This request is not assigned to you');
+    return entry;
+  }
+  const handlers = {
+    ack(state, message) {
+      if (message.version !== state.awaiting || !state.awaiting) return;
+      clearTimeout(state.ackTimer); state.awaiting = 0;
+      state.retired = state.retired.filter(item => !state.retiredSent.includes(item)); state.retiredSent = [];
+      wake();
+    },
+    ping(state) { send(state, { type: 'pong' }); },
+    presence(state, message) {
+      if (typeof message.active !== 'boolean') throw new Error('Invalid presence setting');
+      if (message.active) active.add(state);
+      else { active.delete(state); if (state.job) release(state.job, state); }
+      send(state, { type: 'presence', active: message.active }); wake();
+    },
+    comparison(state, message) {
+      const comparison = comparisons.get(message.id);
+      if (!comparison || comparison.state !== state) throw new Error('This comparison is no longer waiting');
+      if (message.jev) {
+        try { comparison.finish('Compared', validateJevResponse(comparison.request, message.jev)); }
+        catch { comparison.finish('Comparison failed: invalid Jev response'); }
+      } else comparison.finish(typeof message.error === 'string' ? message.error.slice(0, 200) : 'Comparison failed');
+    },
+    skip(state, message) { release(assigned(state, message), state); },
+    submit(state, message) {
+      const entry = assigned(state, message);
+      if (message.compare !== undefined && typeof message.compare !== 'boolean') throw new Error('Invalid comparison setting');
+      const response = answerRequest(entry.request, message.values);
+      // Store before sending anything. Retried submissions cannot count twice.
+      entry.answers.set(state, { response, compare: message.compare === true });
+      if (entry.answers.size === entry.target) finish(entry);
+      else { notify(entry); arm(entry); }
+    },
+  };
   async function request(req) {
     const url = new URL(req.url);
     if (req.method !== 'POST' || !apiPaths.has(url.pathname)) return error('Not found', 404);
@@ -247,42 +290,8 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
         state.tokens = Math.min(40, state.tokens + (now - state.refillAt) / 100); state.refillAt = now;
         if (state.tokens < 1) { drop(state, 'WebSocket message rate exceeded'); return; }
         state.tokens--;
-        if (message.type === 'ack') {
-          if (message.version !== state.awaiting || !state.awaiting) return;
-          clearTimeout(state.ackTimer); state.awaiting = 0;
-          state.retired = state.retired.filter(item => !state.retiredSent.includes(item)); state.retiredSent = [];
-          wake(); return;
-        }
-        if (message.type === 'ping') { send(state, { type: 'pong' }); return; }
-        if (message.type === 'presence') {
-          if (typeof message.active !== 'boolean') throw new Error('Invalid presence setting');
-          if (message.active) active.add(state);
-          else { active.delete(state); if (state.job) release(state.job, state); }
-          send(state, { type: 'presence', active: message.active }); wake(); return;
-        }
-        if (message.type === 'comparison') {
-          const comparison = comparisons.get(message.id);
-          if (!comparison || comparison.state !== state) throw new Error('This comparison is no longer waiting');
-          if (message.jev) {
-            try { comparison.finish('Compared', validateJevResponse(comparison.request, message.jev)); }
-            catch { comparison.finish('Comparison failed: invalid Jev response'); }
-          } else comparison.finish(typeof message.error === 'string' ? message.error.slice(0, 200) : 'Comparison failed');
-          return;
-        }
-        if (!['submit', 'skip'].includes(message.type)) throw new Error('Unknown message type');
-        const entry = pending.get(message.id);
-        if (!entry) throw new Error('This request is no longer waiting');
-        if (Date.now() >= entry.deadline) { finish(entry, 'Timed out waiting for a human answer', 504); throw new Error('This request is no longer waiting'); }
-        if (!active.has(state)) throw new Error('The answering screen must be visible');
-        if (entry.answers.has(state)) throw new Error('You already answered this request');
-        if (state.job !== entry || !entry.participants.has(state)) throw new Error('This request is not assigned to you');
-        if (message.type === 'skip') { release(entry, state); return; }
-        if (message.compare !== undefined && typeof message.compare !== 'boolean') throw new Error('Invalid comparison setting');
-        const response = answerRequest(entry.request, message.values);
-        // Store before sending anything. Retried submissions cannot count twice.
-        entry.answers.set(state, { response, compare: message.compare === true });
-        if (entry.answers.size === entry.target) finish(entry);
-        else { notify(entry); arm(entry); }
+        if (!Object.hasOwn(handlers, message.type)) throw new Error('Unknown message type');
+        handlers[message.type](state, message);
       } catch (e) { send(state, { type: 'error', message: e.message }); }
     },
     stats() { return { ...counters, pending: pending.size, readers: readers.size, pendingBytes, clients: clients.size, active: active.size, history: history.size, historyBytes, comparisons: comparisons.size }; },
