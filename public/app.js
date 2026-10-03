@@ -13,7 +13,9 @@ function node(tag, content, className) {
   return el;
 }
 let socket;
+let reconnectAttempt = 0;
 const comparisons = new Map();
+const lateDrafts = new Map();
 let offset = 0;
 let current = [];
 const forms = new Map();
@@ -44,23 +46,23 @@ function nextExample() {
   return lastExample;
 }
 function dealPractice() {
-  if (training.active || !playing || practice || serverQueue.requests.length || comparisons.size) return;
+  if (training.active || !playing || practice || serverQueue.requests.length || lateDrafts.size || comparisons.size) return;
   const example = nextExample();
   practice = { ...example, id: crypto.randomUUID(), local: true, deadline: Date.now() + 30_000 };
   render();
 }
 function schedulePractice() {
   clearTimeout(practiceTimer);
-  if (!training.active && playing && !practice && !serverQueue.requests.length && !comparisons.size) practiceTimer = setTimeout(dealPractice, 4000);
+  if (!training.active && playing && !practice && !serverQueue.requests.length && !lateDrafts.size && !comparisons.size) practiceTimer = setTimeout(dealPractice, 4000);
 }
 function submitPractice(item, values, compare) {
   const human = answerRequest(item.request, values);
   const saved = compare && savedExample(item.request);
-  const result = { ...item, human, late: (item.pausedAt ?? Date.now()) >= item.deadline, status: saved ? `Compared with saved Jev run · ${new Date(saved.recordedAt).toLocaleDateString()}` : compare ? 'Asking Jev via OpenRouter…' : 'Answered · comparison off' };
+  const result = { ...item, human, late: Boolean(item.late) || (item.pausedAt ?? Date.now()) >= item.deadline, status: saved ? `Compared with saved Jev run · ${new Date(saved.recordedAt).toLocaleDateString()}` : compare ? 'Asking Jev via OpenRouter…' : 'Answered · comparison off' };
   if (saved) result.jev = saved.jev;
   practiceResults.unshift(result);
   practiceResults.splice(20);
-  practice = undefined;
+  if (item.late) lateDrafts.delete(item.id); else practice = undefined;
   render();
   if (compare && !saved) void compareInBrowser(item);
   else schedulePractice();
@@ -109,7 +111,8 @@ function makeForm(item, onTrainingSubmit) {
   skip.innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 8.5l7 7m0-7l-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
   skip.addEventListener('click', () => {
     skip.disabled = true;
-    if (item.local) skipPractice(item); else send({ type: 'skip', id: item.id });
+    if (item.late) { lateDrafts.delete(item.id); render(); schedulePractice(); }
+    else if (item.local) skipPractice(item); else send({ type: 'skip', id: item.id });
   });
   if (!item.training) corner.append(skip);
   head.append(label, corner);
@@ -239,6 +242,7 @@ function makeForm(item, onTrainingSubmit) {
     if (!completed) {
       completed = true;
       actions.style.minHeight = `${actions.getBoundingClientRect().height}px`;
+      corner.style.minHeight = `${corner.getBoundingClientRect().height}px`;
       button.style.minWidth = `${button.getBoundingClientRect().width}px`;
       card.classList.add('answered');
       skip.remove();
@@ -284,11 +288,21 @@ function makeForm(item, onTrainingSubmit) {
     const label = submitted ? 'Submitted' : 'Submit answers';
     if (button.textContent !== label) button.textContent = label;
     for (const view of views.values()) view.field.disabled = submitted;
-    if (submitted) { submitting = false; skip.remove(); }
+    if (submitted) { submitting = false; corner.style.minHeight = `${corner.getBoundingClientRect().height}px`; skip.remove(); }
     hint.textContent = submitted ? `Waiting for answers · ${item.received}/${item.expected} received` : `${item.received}/${item.expected} answers received`;
     validity();
   }
-  return { card, clock, validity, finish, progress, reset() { if (!completed) { submitting = false; skip.disabled = false; validity(); } } };
+  return { card, clock, validity, finish, progress,
+    setItem(next) {
+      item = next;
+      if (next.late && !completed) {
+        submitted = submitting = false; skip.disabled = false;
+        label.textContent = 'LATE ANSWER'; hint.textContent = 'The caller has moved on. This answer stays in your tab.';
+        for (const view of views.values()) view.field.disabled = false;
+        validity();
+      }
+    },
+    reset() { if (!completed) { submitting = false; skip.disabled = false; validity(); } } };
 }
 function skipPractice(item) {
   if (practice?.id !== item.id) return;
@@ -296,15 +310,27 @@ function skipPractice(item) {
   render();
   schedulePractice();
 }
+function trimLateDrafts() {
+  const count = lateDrafts.size;
+  for (const [id, item] of lateDrafts) if (Date.now() > item.deadline + 60_000) lateDrafts.delete(id);
+  while (lateDrafts.size > 3) lateDrafts.delete(lateDrafts.keys().next().value);
+  return count !== lateDrafts.size;
+}
 function update(message) {
   offset = message.serverTime - Date.now();
+  for (const retired of message.retired || []) {
+    const previous = serverQueue.requests.find(item => item.id === retired.id);
+    if (!previous?.submitted && !lateDrafts.has(retired.id)) lateDrafts.set(retired.id, { ...retired, deadline: retired.deadline - offset, local: true });
+  }
+  // Local unfinished cards have a bounded lifetime and never reserve API slots.
+  trimLateDrafts();
   serverQueue = message;
   render();
   schedulePractice();
 }
 function render() {
-  current = [...serverQueue.requests, ...(practice ? [practice] : [])];
-  const results = [...practiceResults, ...serverQueue.results];
+  current = [...serverQueue.requests, ...lateDrafts.values(), ...(practice ? [practice] : [])];
+  const results = [...practiceResults, ...serverQueue.results.filter(result => !lateDrafts.has(result.id) && !practiceResults.some(local => local.id === result.id))];
   const ids = new Set([...current, ...results].map(item => item.id));
   const newQuestion = current.findLast(item => !forms.has(item.id));
   const newCards = [...current, ...results].some(item => !forms.has(item.id));
@@ -317,6 +343,7 @@ function render() {
     for (const item of [...results].reverse().concat(current)) {
       if (!forms.has(item.id)) { const form = makeForm(item); forms.set(item.id, form); $('#requests').prepend(form.card); }
     }
+    for (const item of current) forms.get(item.id).setItem(item);
     for (const result of results) forms.get(result.id).finish(result);
     for (const item of serverQueue.requests) forms.get(item.id).progress(item);
     // Unanswered questions stay above anything already submitted, so a waiting
@@ -337,14 +364,17 @@ function render() {
     window.scrollTo({ top, behavior: 'instant' });
   }
 }
-function tick() { for (const item of current) { const form = forms.get(item.id); const seconds = Math.max(0, (item.deadline - (item.pausedAt ?? Date.now()) - (item.local ? 0 : offset)) / 1000); form.clock.textContent = seconds > 0 ? `${seconds.toFixed(1)}s` : 'Timed out'; form.clock.classList.toggle('urgent', seconds < 10); form.validity(); } }
+function tick() {
+  if (trimLateDrafts()) { render(); schedulePractice(); return; }
+  for (const item of current) { const form = forms.get(item.id); const seconds = Math.max(0, (item.deadline - (item.pausedAt ?? Date.now()) - (item.local ? 0 : offset)) / 1000); form.clock.textContent = seconds > 0 ? `${seconds.toFixed(1)}s` : 'Timed out'; form.clock.classList.toggle('urgent', seconds < 10); form.validity(); }
+}
 async function compareInBrowser(message) {
   const connection = socket;
   const controller = new AbortController();
   comparisons.set(message.id, controller);
   const timer = setTimeout(() => controller.abort(), 30_000);
   let result;
-  try { result = $('#compare').checked ? await compareWithJev(message.request, getKey(), controller.signal) : { error: 'Comparison skipped · comparison off' }; }
+  try { result = comparisons.size > 2 ? { error: 'Comparison skipped · browser busy' } : $('#compare').checked ? await compareWithJev(message.request, getKey(), controller.signal) : { error: 'Comparison skipped · comparison off' }; }
   catch (e) { result = { error: e.name === 'AbortError' ? 'Comparison stopped or timed out' : `Comparison failed: ${e.message}` }; }
   finally { clearTimeout(timer); comparisons.delete(message.id); }
   if (message.local) {
@@ -356,9 +386,26 @@ async function compareInBrowser(message) {
 }
 function connect() {
   socket = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/ws`);
+  const connection = socket;
   socket.addEventListener('open', () => { presence(); $('#connection').textContent = 'Connected'; for (const form of forms.values()) form.reset(); });
-  socket.addEventListener('close', () => { for (const [id, controller] of comparisons) if (!practiceResults.some(result => result.id === id)) controller.abort(); $('#connection').textContent = 'Disconnected · reconnecting…'; tick(); setTimeout(connect, 1000); });
-  socket.addEventListener('message', event => { const message = JSON.parse(event.data); if (message.type === 'queue') update(message); if (message.type === 'compare') void compareInBrowser(message); if (message.type === 'error') { showError(message.message); for (const form of forms.values()) form.reset(); } });
+  socket.addEventListener('close', () => {
+    for (const [id, controller] of comparisons) if (!practiceResults.some(result => result.id === id)) controller.abort();
+    // Keep interrupted work in this tab; a reconnect receives fresh assignments.
+    for (const item of serverQueue.requests) if (!item.submitted) lateDrafts.set(item.id, { ...item, deadline: item.deadline - offset, local: true, late: true });
+    trimLateDrafts();
+    serverQueue = { requests: [], results: serverQueue.results }; render();
+    $('#connection').textContent = 'Disconnected · reconnecting…';
+    const delay = Math.min(30_000, 1000 * 2 ** Math.min(reconnectAttempt++, 5)) * (0.5 + Math.random());
+    setTimeout(connect, delay);
+  });
+  socket.addEventListener('message', event => {
+    const message = JSON.parse(event.data);
+    if (message.type === 'queue') { update(message); connection.send(JSON.stringify({ type: 'ack', version: message.version })); }
+    if (message.type === 'presence') reconnectAttempt = 0;
+    if (message.type === 'compare') void compareInBrowser(message);
+    if (message.type === 'cancel-compare') comparisons.get(message.id)?.abort();
+    if (message.type === 'error') { showError(message.message); for (const form of forms.values()) form.reset(); }
+  });
 }
 function setPlaying(value) {
   playing = value;

@@ -10,7 +10,7 @@ function connect() {
   ws.addEventListener('open', () => ws.send(JSON.stringify({ type: 'presence', active: true })));
   const messages = [];
   const waiters = new Set();
-  ws.addEventListener('message', event => { messages.push(JSON.parse(event.data)); for (const check of [...waiters]) check(); });
+  ws.addEventListener('message', event => { const message = JSON.parse(event.data); if (message.type === 'queue') ws.send(JSON.stringify({ type: 'ack', version: message.version })); messages.push(message); for (const check of [...waiters]) check(); });
   function next(predicate) {
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => { waiters.delete(check); reject(new Error('No expected WebSocket message within 40s')); }, 40_000);
@@ -64,15 +64,13 @@ try {
   const late = lateQueue.requests.find(r => r.request.state === `${marker}-late`);
   console.log('Waiting for the real 30-second API deadline…');
   assert.equal((await lateResponse).status, 504);
-  await first.next(m => m.requests?.some(r => r.id === late.id && r.timedOut));
-  const reconnected = connect();
-  await reconnected.next(m => m.type === 'presence');
-  await reconnected.next(m => m.requests?.some(r => r.id === late.id && r.timedOut));
-  first.ws.close(); second.ws.close();
-  reconnected.send({ type: 'submit', id: late.id, values });
-  const completed = await reconnected.next(m => m.results?.some(r => r.id === late.id && r.human));
-  const result = completed.results.find(r => r.id === late.id);
-  assert.equal(result.late, true);
-  assert.equal(result.human.answers.score.score, 1.5);
-  console.log('PASS: HTTP 504, retained questions, reconnect, late answer');
+  await first.next(m => m.retired?.some(r => r.id === late.id));
+  first.send({ type: 'submit', id: late.id, values });
+  assert.equal((await first.next(m => m.type === 'error')).message, 'This request is no longer waiting');
+  const recovered = post(`${marker}-recovered`);
+  const fresh = (await first.next(m => m.requests?.some(r => r.request.state === `${marker}-recovered`))).requests[0];
+  await second.next(m => m.requests?.some(r => r.id === fresh.id));
+  first.send({ type: 'submit', id: fresh.id, values }); second.send({ type: 'submit', id: fresh.id, values });
+  assert.equal((await recovered).status, 200);
+  console.log('PASS: HTTP 504, local draft transfer, rejection of late API votes, recovered capacity');
 } finally { abort.abort(); for (const ws of sockets) ws.close(); }

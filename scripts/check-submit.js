@@ -12,7 +12,7 @@ import { matchesJev } from '../public/compare.js';
 if (!process.argv[2]) throw new Error('Pass the path to an installed playwright-core/index.mjs');
 const { webkit } = await import(pathToFileURL(resolve(process.argv[2])).href);
 const browser = await webkit.launch({ headless: true });
-const app = startServer({ port: 0, timeoutMs: 100 });
+const app = startServer({ port: 0, timeoutMs: 1500 });
 try {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await page.addInitScript(() => localStorage.setItem('reverse-horse.training-completed', '1'));
@@ -88,9 +88,9 @@ try {
     const matched = matchesJev(human, jev);
     assert.equal(await card.locator('fieldset').getAttribute('class'), `question ${matched ? 'answer-match' : 'answer-miss'}`);
     assert.equal(await card.locator('.question-feedback').textContent(), matched ? 'Matched Jev' : 'Different from Jev');
-    const markers = await card.locator('.jev-marker').evaluateAll(markers => markers.map(marker => ({ hidden: marker.hidden, percent: parseFloat(marker.style.left) })));
+    const markers = await card.locator('.jev-marker').evaluateAll(markers => markers.map(marker => ({ hidden: marker.hidden, percent: parseFloat(marker.style.left || marker.style.top) })));
     const expected = question.type === 'choice' ? Object.values(choiceWeights(jev)).map(weight => weight * 100) : [question.type === 'noul' ? jev.noul * 100 : jev.score / (question.criteria.length - 1) * 100];
-    markers.forEach((marker, index) => { assert.equal(marker.hidden, false); assert.ok(Math.abs(marker.percent - expected[index]) < 0.001); });
+    markers.forEach((marker, index) => { assert.equal(marker.hidden, false); assert.ok(Math.abs(marker.percent - expected[index]) < 0.001, `${question.type} marker ${index}: ${marker.percent}, expected ${expected[index]}`); });
     assert.equal(await card.locator('input:enabled').count(), 0);
     assert.equal(await page.locator('#history').count(), 0);
     if (i < 3) await page.screenshot({ path: `/tmp/reverse-horse-inline-${i}.png` });
@@ -113,47 +113,64 @@ try {
   assert.match(await off.textContent(), /Answered · comparison off/);
   assert.equal(await off.$eval('.jev-marker', marker => marker.hidden), true);
 
-  // Deliver an actual recorded Jev response later through the real WebSocket
-  // protocol. No model is mocked and no external inference is made by this test.
-  const peer = new WebSocket(new URL('/ws', app.server.url).href.replace('http:', 'ws:'), { headers: { Origin: app.server.url.origin } });
-  await new Promise(resolve => peer.addEventListener('open', resolve, { once: true }));
-  peer.send(JSON.stringify({ type: 'presence', active: true }));
+  // The external model boundary is a recorded response. Exercise the live
+  // comparison protocol first, then a local late draft without model calls.
   const run = recordings[0];
-  let requestId;
+  const values = Object.fromEntries(Object.entries(run.jev.answers).map(([id, answer]) => [id, answer.type === 'choice' ? answer.probabilities : answer.type === 'noul' ? answer.noul : answer.score]));
+  const peer = new WebSocket(new URL('/ws', app.server.url).href.replace('http:', 'ws:'), { headers: { Origin: app.server.url.origin } });
+  const registered = new Promise(resolve => peer.addEventListener('message', event => { if (JSON.parse(event.data).type === 'presence') resolve(); }));
   const comparison = new Promise(resolve => peer.addEventListener('message', event => { const message = JSON.parse(event.data); if (message.type === 'compare') resolve(message); }));
+  const submitted = new Set();
+  peer.addEventListener('message', event => {
+    const message = JSON.parse(event.data);
+    if (message.type === 'queue') peer.send(JSON.stringify({ type: 'ack', version: message.version }));
+    for (const item of message.requests || []) if (!submitted.has(item.id)) {
+      submitted.add(item.id); peer.send(JSON.stringify({ type: 'submit', id: item.id, values, compare: true }));
+    }
+  });
+  peer.addEventListener('open', () => peer.send(JSON.stringify({ type: 'presence', active: true })));
+  await registered;
+  async function fill(card) {
+    for (const [id, question] of Object.entries(run.request.questions)) {
+      const inputs = card.locator(`fieldset[data-question="${id}"] input[type=range]`);
+      if (question.type === 'choice') for (const [index, weight] of Object.values(values[id]).entries()) await setRange(inputs.nth(index), weight);
+      else await setRange(inputs, values[id]);
+    }
+  }
   const response = fetch(new URL('/v1/systemone', app.server.url), { method: 'POST', body: JSON.stringify(run.request) });
   await active.waitFor();
-  const live = await active.elementHandle();
-  requestId = await live.getAttribute('data-id');
+  const live = await active.elementHandle(), requestId = await live.getAttribute('data-id');
   assert.equal(await page.locator('#play').getAttribute('aria-pressed'), 'false');
-  assert.equal(await live.evaluate(el => getComputedStyle(el).borderTopColor), await page.locator('#play').evaluate(el => getComputedStyle(el).color), 'Live request border uses the brand color');
-  assert.equal((await response).status, 504);
-  await page.waitForFunction(el => el.querySelector('.clock').textContent === 'Timed out', live);
-
-  const values = Object.fromEntries(Object.entries(run.jev.answers).map(([id, answer]) => [id, answer.type === 'choice' ? answer.probabilities : answer.type === 'noul' ? answer.noul : answer.score]));
-  peer.send(JSON.stringify({ type: 'submit', id: requestId, values, compare: true }));
-  await page.locator('#compare').uncheck();
-  for (const [id, question] of Object.entries(run.request.questions)) {
-    const inputs = page.locator(`form[data-id="${requestId}"] fieldset[data-question="${id}"] input[type=range]`);
-    if (question.type === 'choice') {
-      for (const [index, weight] of Object.values(values[id]).entries()) await setRange(inputs.nth(index), weight);
-    } else await setRange(inputs, values[id]);
-  }
-  await page.locator(`form[data-id="${requestId}"] button`).click({ delay: 350 });
+  const liveCard = page.locator(`form[data-id="${requestId}"]`);
+  await fill(liveCard); await liveCard.locator('button[type=submit]').click({ delay: 350 });
+  assert.equal((await response).status, 200);
   await comparison;
   await page.waitForFunction(el => el.classList.contains('answered'), live);
-  assert.equal(await live.$eval('.jev-marker', marker => marker.hidden), true);
   peer.send(JSON.stringify({ type: 'comparison', id: requestId, jev: run.jev }));
   await page.waitForFunction(el => !el.querySelector('.jev-marker').hidden, live);
-  assert.equal(await live.evaluate(el => el.isConnected), true);
   assert.equal(await live.$eval('.actions p', el => el.textContent), 'Average of 2 answers');
-  peer.close();
+  peer.close(); await new Promise(resolve => peer.addEventListener('close', resolve, { once: true }));
+
+  const lateResponse = fetch(new URL('/v1/systemone', app.server.url), { method: 'POST', body: JSON.stringify(run.request) });
+  await active.waitFor();
+  const late = await active.elementHandle(), lateId = await late.getAttribute('data-id');
+  const lateCard = page.locator(`form[data-id="${lateId}"]`);
+  await fill(lateCard);
+  assert.equal((await lateResponse).status, 504);
+  await page.waitForFunction(el => el.querySelector('.eyebrow').textContent === 'LATE ANSWER', late);
+  assert.equal(await late.evaluate(el => el.isConnected), true, 'Expiry keeps the original draft form');
+  assert.deepEqual(await lateCard.locator('input[type=range]').evaluateAll(inputs => inputs.map(input => Number(input.value))), await liveCard.locator('input[type=range]').evaluateAll(inputs => inputs.map(input => Number(input.value))), 'Expiry preserves the filled slider values');
+  await lateCard.locator('button[type=submit]').click({ delay: 350 });
+  await page.waitForFunction(el => el.classList.contains('answered'), late);
+  assert.equal(await late.$eval('.jev-marker', marker => marker.hidden), true, 'Late submission stays local with comparison off');
   await page.reload();
-  await page.waitForFunction(() => document.querySelector('form.answered .jev-marker:not([hidden])'));
-  assert.equal(await page.locator('form.answered input:enabled').count(), 0);
+  await page.waitForFunction(() => document.querySelector('#connection').textContent === 'Connected');
+  await active.waitFor();
+  assert.equal(await page.locator('form.answered').count(), 0, 'A fresh connection does not replay the global history or local late drafts');
+  assert.ok(await active.locator('input:enabled').count() > 0, 'The new practice card accepts answers');
   assert.deepEqual(errors, []);
   assert.deepEqual(externalRequests, []);
-  console.log(`WebKit: ${examples.length} shuffled rounds stayed in place with correct markers, colors, and unchanged slider positions; late comparison and comparison-off passed.`);
+  console.log(`WebKit: ${examples.length} shuffled rounds stayed in place with correct markers, colors, and unchanged slider positions; live comparison, local late drafts, and comparison-off passed.`);
 } finally {
   await browser.close();
   await app.stop();

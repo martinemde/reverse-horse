@@ -73,6 +73,7 @@ try {
   ws.addEventListener('open', () => ws.send(JSON.stringify({ type: 'presence', active: true })));
   ws.addEventListener('message', event => {
     const message = JSON.parse(event.data);
+    if (message.type === 'queue') ws.send(JSON.stringify({ type: 'ack', version: message.version }));
     for (const item of message.requests || []) {
       const values = Object.fromEntries(Object.entries(item.request.questions).map(([id, q]) => [id, q.type === 'choice' ? Object.fromEntries(Object.keys(q.criteria).map((key, i) => [key, i ? 0 : 1])) : q.type === 'noul' ? 1 : 0.5]));
       ws.send(JSON.stringify({ type: 'submit', id: item.id, values }));

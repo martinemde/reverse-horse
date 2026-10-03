@@ -7,7 +7,7 @@ import { startServer } from '../server.js';
 if (!process.argv[2]) throw new Error('Pass the path to an installed playwright-core/index.mjs');
 const { chromium } = await import(pathToFileURL(resolve(process.argv[2])).href);
 const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE });
-const app = startServer({ port: 0 });
+const app = startServer({ port: 0, timeoutMs: 5000 });
 const errors = [], externalRequests = [];
 const request = { model: 'jev-latest', state: 'Average browser replies', questions: {
   yes: { type: 'noul', instructions: 'Yes?' },
@@ -64,7 +64,7 @@ try {
   await submit(card(first), [1, 1, 0, 2]);
   await first.waitForFunction(el => el.querySelector('.actions p').textContent === 'Waiting for answers · 1/2 received', waitingCard);
   await second.getByRole('button', { name: 'Training', exact: true }).click();
-  assert.equal((await next).status, 200, 'Opening training removes an unanswered UI from the participants');
+  assert.equal((await next).status, 200, 'Saved votes return at the deadline when a panel member opens training');
   await first.waitForFunction(el => el.classList.contains('answered'), waitingCard);
   await trainee.getByRole('button', { name: 'Exit training' }).click();
   const joined = post();

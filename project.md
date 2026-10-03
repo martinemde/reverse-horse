@@ -9,9 +9,9 @@ url: https://reverse-horse.poblonko.workers.dev
 Be Jev. A Bun server or Cloudflare Worker accepts TypeSafe System One requests,
 shows them live over a WebSocket, and holds the HTTP connection while humans
 answer. Each call has 30 seconds from arrival, queue time included. The caller
-gets the average of all participating browsers' answers, the average so far at
+gets the average of an assigned panel of up to five browsers, the average so far at
 the deadline, or 504 if nobody answered. Late answers can still be saved and
-compared with Jev but never reach the caller.
+compared with Jev locally in the answering tab but never reach the caller.
 
 ## Run
 
@@ -62,7 +62,7 @@ changes never re-add it) and hides it from that browser's queue.
 storage, the callback must come from the initiating tab within ten minutes, and
 the key stays in this origin's local storage. It never reaches the server or
 other browsers. **Compare with Jev** defaults on at first connection and is
-remembered. After everyone submits, one opted-in submitter's browser posts the
+remembered. After aggregation returns to the caller, one opted-in submitter's browser posts the
 original request to `https://openrouter.ai/api/v1/systemone` on their credits and
 sends only the result back for display. Disconnect deletes the local key (it does
 not revoke it) and aborts pending lookups. A failed comparison leaves the human
@@ -84,8 +84,9 @@ curl http://127.0.0.1:3000/v1/systemone \
 
 `/v1/systemone` also works for SDK clients. No API key; binds to loopback.
 Invalid requests return 400. Callers need an HTTP timeout over 30 seconds.
-Disconnecting early removes the request. At most 100 unanswered requests,
-timed-out ones included.
+Disconnecting early removes the request. At most 100 live requests, including
+body readers; unanswered HTTP timeouts release their slots. Bodies must fit in
+64 KiB. No answering screens or full capacity returns 503 with `Retry-After: 1`.
 
 ## Answers
 
@@ -103,15 +104,51 @@ Neither confidence formula matches Jev's, which is undocumented.
 
 ## Averaging and presence
 
-The queue and latest 20 results live in memory; restarts clear them. Only
-visible answering pages outside training participate, sending
-`{type: "presence", active}`. Each connection submits once per request. Hidden or
-disconnected pages stop holding a request open, but saved replies still count.
-Noul, Score, probabilities, and confidence are arithmetic means. Choice picks
-the highest mean probability, and each person's normalized distribution weighs
-equally regardless of fullness. Score averages keep the submitted distributions
-rather than interpolating from the mean score. Drafts survive a reconnect but
-not a refresh.
+The queue lives in memory; restarts clear it. Visible answering pages outside
+training send `{type: "presence", active}`. A request targets up to five people,
+fixed when admitted. Panels use randomly chosen idle pages, one live assignment
+per page, including pages that have already voted but await the other panel
+members. New visitors fill vacancies rather than increasing the target. Skip,
+hide, or disconnect frees an unanswered assignment for another person; saved
+votes still count. Each request may invite at most twice its target, so churn
+cannot expand its audience indefinitely. Incomplete panels return their available
+votes at the original deadline, or 504 with no votes.
+
+Noul, Score, probabilities, and confidence remain arithmetic means. Choice picks
+the highest mean probability, with equal weight per normalized distribution.
+Score retains the submitted distributions instead of interpolating the mean.
+Confidence is mean respondent confidence, not agreement or a statistical error
+bound. A connection is a respondent; multiple tabs are not deduplicated identities.
+Successful HTTP replies include `X-Reverse-Horse-Answers` and
+`X-Reverse-Horse-Target` so callers can distinguish partial panels without
+changing the TypeSafe-compatible response body.
+
+Each socket receives only its assigned card and relevant results, capped at 20
+results / 128 KiB per snapshot. Room-wide history is capped at 100 results / 4 MiB.
+Updates coalesce, and only one snapshot can be unacknowledged per connection.
+Clients send `{type: "ack", version}` after rendering; missing acknowledgements
+close the socket after ten seconds. Slow connections can be replaced without
+shortening a human's 30-second request deadline. Reconnect uses exponential
+backoff with jitter. No global queue or result feed goes to idle observers.
+
+HTTP admission reserves 64 KiB before reading and allows at most 16 body readers,
+100 requests, and 2 MiB reserved/retained request bytes. The visible pool limits
+admission further to two rounds of panels. The deadline starts before body reads;
+the Worker stamps arrival before forwarding so Durable Object queue time counts.
+Timeout, abort, validation failure, and shutdown release reservations.
+Request structure is capped at 32 questions, 512 options/score levels, 16 nesting
+levels, and 2,048 values to bound rendering and parsed-object overhead. Socket
+limits are 4,096 connections, 128 KiB incoming messages, and a token bucket of
+40 messages with ten messages/second refill. Snapshots stay below 256 KiB. Bun
+also enforces transport payload and backpressure limits. Cloudflare object overload
+returns 503 without an internal retry.
+
+Expired unfinished cards transfer to the browser, releasing server capacity.
+Interrupted cards also become local late drafts; at most three survive for one
+minute past the original deadline, preserving existing slider values. Reloading
+clears them. Late votes cannot alter the caller's returned aggregate. Live Jev
+lookups are capped at 16 per room and one per connection; browser lookups are
+capped at two. Eviction, disconnect, and timeout cancel comparison work.
 
 ## Cloudflare
 
@@ -158,7 +195,8 @@ requests, and write screenshots to `/tmp/reverse-horse-*`. Set
 - `scripts/check-questions.js`: the request builder, persistence, Send, and layout.
 - `scripts/check-average.js`: two live pages and a training page averaging and changing participation.
 - `scripts/check-submit.js`: WebKit (`install webkit` first) submit regression, markers, match colors, and a late recorded Jev answer.
-- `bun scripts/check-worker.js http://127.0.0.1:8787` (or the deployed origin): two-socket averaging and a real 30-second 504 followed by a late answer.
+- `bun scripts/check-worker.js http://127.0.0.1:8787`: two-socket averaging, a real 30-second 504, draft transfer, rejected late vote, and recovered capacity. Use a local Worker for automated checks.
+- `bun scripts/check-capacity.js`: 2,000 real local sockets and a 2,000-request burst; asserts admission budgets, one assignment per page, prompt shedding, and a successful request after the burst. Optional arguments select socket/request counts. RSS includes both the test clients and server, not Durable Object memory.
 
 For live comparison, connect OpenRouter, answer an auto round, and check the
 You & Jev panel; repeat with comparison off and after disconnecting.
@@ -177,3 +215,13 @@ snapshot. An empty intermediate snapshot removes the card before the result
 lands. Trim old cards when a new one arrives, not on submit, and decorate the
 existing form rather than rebuilding it. Keep completed button sizes and marker
 space fixed so mobile scroll anchoring doesn't shift the controls.
+
+Bun 1.2.15 hangs if server-side WebSockets are closed before `server.stop(true)`.
+`room.stop()` releases coordination state; `server.stop(true)` owns transport
+shutdown. Reproduce with an upgraded local socket, `ws.close()`, then awaited
+`server.stop(true)`; avoid initiating socket closes in the room's shutdown loop.
+
+Keep the request corner's height when removing Skip on submission, as well as
+the actions' height, so WebKit's scroll anchor does not move the card. Score's
+Jev markers use vertical `style.top`; browser checks must measure that coordinate
+instead of assuming every marker uses horizontal `style.left`.
