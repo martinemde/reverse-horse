@@ -3,6 +3,8 @@ export const assetFiles = new Map([
   ...['app.js', 'training.js', 'protocol.js', 'examples.js', 'example-results.json', 'auth.js', 'compare.js', 'builder.js', 'builder-data.js', 'style.css', 'horse.svg', 'horse.LICENSE.txt', 'unfurl.png'].map(file => [`/${file}`, file]),
 ]);
 
+export const apiPaths = new Set(['/api/v1/systemone', '/v1/systemone']);
+
 export const assetHeaders = {
   'Cache-Control': 'no-store',
   'Referrer-Policy': 'no-referrer',

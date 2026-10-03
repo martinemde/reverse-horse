@@ -1,5 +1,6 @@
 import { validateRequest, answerRequest, averageResponses } from './public/protocol.js';
 import { validateJevResponse } from './public/compare.js';
+import { apiPaths } from './http.js';
 
 // Shared by Bun and the Durable Object. These are budgets, not tuning knobs.
 export const roomLimits = Object.freeze({
@@ -174,7 +175,7 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
   }
   async function request(req) {
     const url = new URL(req.url);
-    if (req.method !== 'POST' || !['/api/v1/systemone', '/v1/systemone'].includes(url.pathname)) return error('Not found', 404);
+    if (req.method !== 'POST' || !apiPaths.has(url.pathname)) return error('Not found', 404);
     if (req.headers.get('origin') && req.headers.get('origin') !== url.origin) return error('Origin not allowed', 403);
     const length = Number(req.headers.get('content-length'));
     if (length > roomLimits.requestBytes) return error('Request body exceeds 64 KiB', 413);

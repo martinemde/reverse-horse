@@ -1,6 +1,6 @@
 import { DurableObject } from 'cloudflare:workers';
 import { createRoom } from './room.js';
-import { assetFiles, assetHeaders } from './http.js';
+import { apiPaths, assetFiles, assetHeaders } from './http.js';
 
 // A single instance owns the shared queue and every WebSocket connection.
 // Standard WebSockets keep its in-memory state alive while browsers are connected.
@@ -40,7 +40,7 @@ export default {
         for (const [key, value] of Object.entries(assetHeaders)) headers.set(key, value);
         return new Response(response.body, { status: response.status, headers });
       }
-      if (request.method !== 'POST' || !['/api/v1/systemone', '/v1/systemone'].includes(url.pathname)) return new Response('Not found', { status: 404 });
+      if (request.method !== 'POST' || !apiPaths.has(url.pathname)) return new Response('Not found', { status: 404 });
     }
     const headers = new Headers(request.headers);
     headers.set('X-Reverse-Horse-Arrival', String(arrival));
