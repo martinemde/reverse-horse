@@ -57,7 +57,7 @@ try {
     await noOverflow(page);
     await page.screenshot({ path: `/tmp/reverse-horse-training-${viewport.width}-induction.png` });
     await dialog.getByRole('button', { name: '05 Score' }).click();
-    assert.match(await dialog.locator('.training-body .eyebrow').first().textContent(), /SCORE/, 'Progress steps jump to their step');
+    assert.equal(await dialog.locator('.training-guide h2').textContent(), 'score', 'Progress steps jump to their step');
     assert.equal(await dialog.getByRole('button', { name: '05 Score' }).getAttribute('aria-current'), 'step', 'Jumped step is current');
     await dialog.getByRole('button', { name: '01 Induction' }).click();
     await begin(dialog);

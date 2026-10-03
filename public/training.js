@@ -114,7 +114,7 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
       actions.append(button('Back', () => go(0), 'secondary'), button('Begin mandatory training', () => go(2)));
     } else if (step === 5) {
       heading.textContent = 'You are now a qualified AI model.';
-      body.append(node('div', 'CERTIFICATION / ENTIRELY SELF-ACCREDITED', 'eyebrow'), heading,
+      body.append(heading,
         node('p', 'Your neural network was inside you all along.', 'training-lead'),
         node('p', 'Practice rounds start on the Answer screen; Pause stops them. Live API requests have 30 seconds from arrival. Connect OpenRouter to compare live requests with JEV. Question lets you build and send your own.'),
         node('p', 'Reopen Training from the navigation anytime.', 'training-note'));
@@ -126,7 +126,7 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
       heading.textContent = lesson.title;
       const grid = node('div', undefined, 'training-grid');
       const guide = node('div', undefined, 'training-guide');
-      guide.append(node('div', `EXERCISE ${step - 1} / ${lesson.type.toUpperCase()}`, 'eyebrow'), heading, node('h2', lesson.type), node('p', lesson.concept), node('h3', 'Controls'), node('p', lesson.controls));
+      guide.append(heading, node('h2', lesson.type), node('p', lesson.concept), node('h3', 'Controls'), node('p', lesson.controls));
       if (lesson.type === 'choice') guide.append(fields([
         ['100 / 100 / 0', 'Confidence 100%, probabilities 50 / 50 / 0.'],
         ['50 / 50 / 0', 'Confidence 50%, same probabilities.'],
