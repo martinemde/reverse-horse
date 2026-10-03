@@ -99,14 +99,14 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
     const actions = node('div', undefined, 'training-actions');
     if (step === 0) {
       heading.textContent = 'Congratulations. You are the AI model.';
-      body.append(node('div', 'MODEL INDUCTION / HUMAN DIVISION', 'eyebrow'), heading,
+      body.append(heading,
         node('p', 'Requests arrive through the API. Everyone on the site sees them. You answer.', 'training-lead'));
       if (storageNotice) body.append(node('p', storageNotice, 'training-note'));
       actions.append(button('Next: System One', () => go(1)));
     } else if (step === 1) {
       heading.textContent = 'You are a System One model.';
       const warning = node('p'); warning.append(node('strong', 'Don’t let the API request time out!'));
-      body.append(node('div', 'MODEL INDUCTION / HUMAN DIVISION', 'eyebrow'), heading,
+      body.append(heading,
         node('p', 'A fast, automatic, gut reaction. (Daniel Kahneman would be proud.)', 'training-lead'),
         node('p', 'Every request has a 30-second time limit.'),
         warning,
