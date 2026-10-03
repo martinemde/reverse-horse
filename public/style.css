@@ -44,7 +44,9 @@ body.in-training{overflow:hidden}
 .training-brand{display:flex;align-items:center;gap:12px;font:13px ui-monospace,monospace;color:var(--muted)}
 .training-top button{flex-shrink:0}
 .training-progress{display:flex;gap:20px;list-style:none;margin:0;padding:24px 28px 0;font:12px ui-monospace,monospace;color:var(--muted);overflow-x:auto}
-.training-progress li{white-space:nowrap;padding-bottom:10px;border-bottom:2px solid transparent}
+.training-progress li{white-space:nowrap}
+.training-progress button{background:none;border:0;border-bottom:2px solid transparent;border-radius:0;padding:0 0 10px;font:inherit;color:inherit;cursor:pointer}
+.training-progress button:hover{color:#e5ebe7}
 .training-progress [aria-current=step]{color:var(--accent);border-color:var(--accent)}
 .training-progress .complete{color:var(--green)}
 .training-body{padding:28px}

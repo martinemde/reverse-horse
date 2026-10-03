@@ -56,6 +56,10 @@ try {
     assert.equal(await page.locator('#requests form').count(), 0, 'Training does not deal practice');
     await noOverflow(page);
     await page.screenshot({ path: `/tmp/reverse-horse-training-${viewport.width}-induction.png` });
+    await dialog.getByRole('button', { name: '05 Score' }).click();
+    assert.match(await dialog.locator('.training-body .eyebrow').first().textContent(), /SCORE/, 'Progress steps jump to their step');
+    assert.equal(await dialog.getByRole('button', { name: '05 Score' }).getAttribute('aria-current'), 'step', 'Jumped step is current');
+    await dialog.getByRole('button', { name: '01 Induction' }).click();
     await begin(dialog);
     for (const [index, id] of ['payment_needed', 'team', 'urgency'].entries()) {
       const card = dialog.locator('form');

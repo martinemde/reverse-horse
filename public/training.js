@@ -87,9 +87,11 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
     const progress = node('ol', undefined, 'training-progress');
     progress.setAttribute('aria-label', 'Training progress');
     for (const [index, label] of ['Induction', 'System One', 'Noul', 'Choice', 'Score', 'Certified'].entries()) {
-      const item = node('li', `${String(index + 1).padStart(2, '0')} ${label}`);
-      if (index === step) item.setAttribute('aria-current', 'step');
+      const item = node('li');
+      const jump = button(`${String(index + 1).padStart(2, '0')} ${label}`, () => go(index));
+      if (index === step) jump.setAttribute('aria-current', 'step');
       if (index < step) item.className = 'complete';
+      item.append(jump);
       progress.append(item);
     }
     const body = node('div', undefined, 'training-body');
