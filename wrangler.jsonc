@@ -7,5 +7,10 @@
   "routes": [{ "pattern": "reverse.horse", "custom_domain": true, "zone_name": "reverse.horse" }],
   "assets": { "directory": "./public", "binding": "ASSETS", "run_worker_first": true },
   "durable_objects": { "bindings": [{ "name": "ROOM", "class_name": "ReverseHorseRoom" }] },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ReverseHorseRoom"] }]
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ReverseHorseRoom"] }],
+  // Mirrors the dashboard so deploys don't turn logging back off.
+  "observability": {
+    "logs": { "enabled": true, "head_sampling_rate": 1, "invocation_logs": true, "persist": true },
+    "traces": { "enabled": false, "head_sampling_rate": 1, "persist": true }
+  }
 }
