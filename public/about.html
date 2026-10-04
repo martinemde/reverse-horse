@@ -48,7 +48,7 @@
       <p>Because! Reverse.horse is something between a tutorial and an art project.</p>
       <p>Reverse.horse is actually a functioning API that matches the <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev">Jev</a> <code>/v1/systemone</code> format. You could, in truth, hook this up in place of your real usage of Jev and get terrible, slow, human powered answers (if anyone is listening). The questions you ask are presented to anyone that is connected, and the results become the response from the API. Send real questions to reverse.horse and any human connected can scramble to respond before the 30 second response timeout.</p>
       <p>It’s also a tutorial intended to help you understand exactly what Jev <em>is</em> and what the <a href="/help#types">3 question types</a> mean. By using your human brain to answer in place of the model, you get an intuitive sense of what Jev is doing.</p>
-      <p>It becomes immediately apparent that you suck at this. Jev can usually answer in under 1/10th of a second, and it can do thousands of questions like this in the time it takes you to answer a single one. You may even notice that for every answer that you carefully answer correctly, Jev is within a few points of what you answered. Remarkable, isn’t it?</p>
+      <p>It becomes immediately apparent that you suck at this. Jev can usually answer in about 1/5th of a second, network and all, and it can do thousands of questions like this in the time it takes you to answer a single one. You may even notice that for every answer that you carefully answer correctly, Jev is within a few points of what you answered. Remarkable, isn’t it?</p>
     </section>
 
     <section>
@@ -61,7 +61,7 @@
       <h2>Why the 30 second timeout?</h2>
       <p>It’s kind of stressful, right? It’s there for 2 reasons:</p>
       <ol>
-        <li><p>I’m trying to make you give your gut reaction to the question. The timer makes it clear just how slow we are at this. 30 seconds is 300 times longer than Jev usually takes to respond.</p></li>
+        <li><p>I’m trying to make you give your gut reaction to the question. The timer makes it clear just how slow we are at this. 30 seconds is 150 times longer than Jev usually takes to respond.</p></li>
         <li><p>This is a real, if impractical, API. You can actually <a href="/request">send a request to it</a> with curl. 30 seconds seemed like the longest reasonable timeout for a held-open request. I’m waiting for the moment when this 30 second timeout causes the poor server to get overloaded.</p></li>
       </ol>
     </section>
