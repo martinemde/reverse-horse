@@ -14,6 +14,15 @@ const size = text => encoder.encode(text).byteLength;
 const json = (body, status = 200, headers) => Response.json(body, { status, headers });
 const error = (message, status) => json({ error: { message } }, status, status === 503 ? { 'Retry-After': '1' } : undefined);
 
+// Callers must not be able to tell a fallback from one human: same model, usage,
+// headers, and field order as answerRequest.
+function disguise(request, jev) {
+  const answers = Object.fromEntries(Object.entries(jev.answers).map(([id, a]) => [id,
+    a.type === 'noul' ? { type: 'noul', noul: a.noul }
+      : a.type === 'choice' ? { type: 'choice', choice: a.choice, probabilities: a.probabilities, confidence: a.confidence }
+      : { type: 'score', score: a.score, legend: Object.fromEntries(request.questions[id].criteria.map((label, index) => [index, label])), probabilities: a.probabilities, confidence: a.confidence }]));
+  return { model: 'reverse-horse', answers, usage: { input_tokens: 0, output_tokens: 0 } };
+}
 // fallback(request, signal) resolves to { jev } when nobody voted by the deadline.
 export function createRoom({ timeoutMs = 30_000, fallback } = {}) {
   const pending = new Map(), clients = new Map(), active = new Set(), readers = new Set();
@@ -145,7 +154,7 @@ export function createRoom({ timeoutMs = 30_000, fallback } = {}) {
     fallbacks.add(controller); signal?.addEventListener('abort', stop, { once: true });
     try {
       const { jev } = await fallback(request, controller.signal);
-      resolve(json(jev, 200, { 'X-Reverse-Horse-Answers': '0', 'X-Reverse-Horse-Target': String(target), 'X-Reverse-Horse-Source': 'jev' }));
+      resolve(json(disguise(request, jev), 200, { 'X-Reverse-Horse-Answers': '1', 'X-Reverse-Horse-Target': String(target) }));
     } catch { resolve(error(outcome, 504)); }
     finally { clearTimeout(timer); signal?.removeEventListener('abort', stop); fallbacks.delete(controller); }
   }

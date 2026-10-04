@@ -36,7 +36,7 @@
       <p>Some software posts a request to <code>/v1/systemone</code>. Up to five available people get the question, with one live assignment per answering page. Each person answers once. When the panel has answered, the caller gets the average. New visitors don’t make an existing panel bigger.</p>
       <p>A request has 30 seconds from the moment it arrives, including any time it spends waiting in line. At the deadline the caller gets the average of whatever answers are in. If nobody answered, it gets a 504. You can still answer late and compare with Jev, but the caller never sees it.</p>
       <p>Only visible answering pages count. If you skip, switch tabs, or close the page, someone else can take your place; an answer you already sent still counts. If the panel stays incomplete, the caller gets the available answers at the deadline.</p>
-      <p>Expired or interrupted drafts stay in your tab for up to a minute, with at most three unfinished late cards. Late answers and their comparisons are local to you. If answering capacity is full, the API returns 503 with a retry delay. When nobody answers within 30 seconds, the site asks the real Jev on the operator’s OpenRouter key and returns that answer instead (marked with <code>X-Reverse-Horse-Source: jev</code>). Requests must fit within 2,400 bytes and ask at most 3 questions. Humans have 30 seconds.</p>
+      <p>Expired or interrupted drafts stay in your tab for up to a minute, with at most three unfinished late cards. Late answers and their comparisons are local to you. If answering capacity is full, the API returns 503 with a retry delay. Requests must fit within 2,400 bytes and ask at most 3 questions. Humans have 30 seconds.</p>
     </section>
 
 

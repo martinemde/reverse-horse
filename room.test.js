@@ -1,5 +1,7 @@
 import { afterEach, expect, test } from 'bun:test';
 import { createRoom, roomLimits } from './room.js';
+import { answerRequest } from './public/protocol.js';
+import { validateJevResponse } from './public/compare.js';
 
 const rooms = [];
 afterEach(() => { for (const room of rooms) room.stop(); rooms.length = 0; });
@@ -170,18 +172,30 @@ test('missing acknowledgements disconnect stalled sockets without retaining thei
 }, 12_000);
 
 // The operator key is the model boundary; this fake records calls instead.
-const jev = { model: 'jev-latest', answers: { yes: { type: 'noul', noul: 0.8 } } };
-test('an empty room holds the full deadline, then answers with the fallback', async () => {
+const mixed = { model: 'jev-latest', state: 'Fallback', questions: {
+  yes: { type: 'noul', instructions: 'Yes?' },
+  pick: { type: 'choice', instructions: 'Which?', criteria: { a: null, b: null } },
+  level: { type: 'score', instructions: 'How much?', criteria: ['Low', 'High'] },
+} };
+const jev = validateJevResponse(mixed, { model: 'jev-latest', answers: {
+  yes: { type: 'noul', noul: 0.8 },
+  pick: { type: 'choice', choice: 'b', confidence: 0.9, probabilities: { a: 0.1, b: 0.9 } },
+  level: { type: 'score', score: 0.25, confidence: 0.5, probabilities: { 0: 0.75, 1: 0.25 } },
+} });
+const shape = value => JSON.stringify(value, (key, v) => typeof v === 'number' ? 0 : v);
+test('an empty room holds the full deadline, then answers like one human', async () => {
   const calls = [];
   const room = create({ timeoutMs: 100, fallback: async request => { calls.push(request); return { jev }; } });
   const started = Date.now();
-  const response = await post(room);
+  const response = await post(room, { body: JSON.stringify(mixed) });
   expect(Date.now() - started).toBeGreaterThanOrEqual(95);
   expect(response.status).toBe(200);
-  expect(response.headers.get('X-Reverse-Horse-Answers')).toBe('0');
-  expect(response.headers.get('X-Reverse-Horse-Source')).toBe('jev');
-  expect(await response.json()).toEqual(jev);
-  expect(calls).toEqual([body]);
+  expect([...response.headers.keys()].filter(key => key.startsWith('x-reverse-horse'))).toEqual(['x-reverse-horse-answers', 'x-reverse-horse-target']);
+  expect(response.headers.get('X-Reverse-Horse-Answers')).toBe('1');
+  const answer = await response.json();
+  expect(answer.answers.pick.choice).toBe('b');
+  expect(shape(answer)).toBe(shape(answerRequest(mixed, { yes: 1, pick: { a: 0, b: 1 }, level: 0.5 })));
+  expect(calls).toEqual([mixed]);
   expect(room.stats().fallbacks).toBe(0); expect(room.stats().pendingBytes).toBe(0);
 });
 

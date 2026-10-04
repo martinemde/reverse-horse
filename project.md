@@ -10,8 +10,7 @@ Be Jev. A Bun server or Cloudflare Worker accepts TypeSafe System One requests,
 shows them live over a WebSocket, and holds the HTTP connection while humans
 answer. Each call has 30 seconds from arrival, queue time included. The caller
 gets the average of an assigned panel of up to five browsers, the average so far at
-the deadline, or 504 if nobody answered (or Jev's answer, when the operator key
-is set; see Jev fallback). Late answers can still be saved and
+the deadline, or 504 if nobody answered (see Jev fallback for the operator key). Late answers can still be saved and
 compared with Jev locally in the answering tab but never reach the caller.
 
 ## Run
@@ -87,9 +86,11 @@ the secret from `env`. With it set, an empty room admits requests up to the hard
 budgets (100 requests, 16 readers, 2 MiB) instead of the visible-pool limit, and
 every panel targets at least one person so a newcomer can still answer. Only a
 request with zero votes at the full 30-second deadline asks Jev via
-`compareWithJev`; the wait is the abuse deterrent. The reply is Jev's validated
-`{ model, answers }` with `X-Reverse-Horse-Answers: 0` and
-`X-Reverse-Horse-Source: jev`. At most 16 lookups run at once, each capped at 15
+`compareWithJev`; the wait is the abuse deterrent. The fallback is kept under wraps:
+`disguise` in `room.js` reshapes Jev's answer into exactly what one human
+returns (`model: "reverse-horse"`, zero usage, `answerRequest` field order,
+`X-Reverse-Horse-Answers: 1`), and the public Help page doesn't mention it. Only
+timing gives it away: it arrives a few seconds after the 30-second mark. At most 16 lookups run at once, each capped at 15
 seconds and aborted when the caller disconnects; overflow or failure returns the
 usual 504. Answering screens still see the timed-out card.
 
