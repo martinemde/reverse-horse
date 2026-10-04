@@ -152,7 +152,6 @@ try {
   // Verify the same bars by submitting real live requests, including reload.
   const entry = await pageFor({ width: 390, height: 844 }, () => localStorage.setItem('reverse-horse.training-completed', '1'));
   await entry.page.getByRole('button', { name: 'Pause practice', exact: true }).click();
-  await entry.page.locator('#compare').uncheck();
   const request = { model: 'jev-latest', state: 'Choice confidence calibration', questions: {
     pick: { type: 'choice', instructions: 'Which option?', criteria: { a: null, b: null, c: null } },
   } };

@@ -30,6 +30,8 @@
   <header class="player-header"><a class="brand" href="/"><img src="/horse.svg" alt="" width="36" height="36">reverse.horse</a><nav aria-label="Main"><a href="/#training">Training</a><a href="/">Answer</a><a href="/request" aria-current="page">Question</a><a href="/help">Help</a><a href="/about">About</a></nav><div class="player-controls"><a id="play" href="/" aria-label="Play practice"><span id="play-icon" aria-hidden="true">▶</span> <span id="play-label">Play</span></a></div></header>
   <main>
     <div class="toolbar"><div><h1>Question</h1><p>Write it once. Ask again whenever you want.</p></div><a href="/" target="_blank" rel="noopener" class="source">Open answering screen in another tab</a></div>
+    <div class="auth-bar" id="openrouter" hidden><p id="openrouter-status" role="status">OpenRouter connected · Ask Jev too uses your key from this browser.</p><button id="disconnect" type="button" class="secondary">Disconnect OpenRouter</button></div>
+    <p id="error" role="alert" hidden></p>
     <p id="library-error" role="alert" hidden></p>
     <section id="new-question" aria-label="New question"></section>
     <section id="saved-questions" aria-label="Saved questions"></section>
@@ -54,6 +56,14 @@
     </template>
     <section id="curl-example" class="builder-panel" aria-label="Curl example"></section>
   </main>
+  <dialog id="jev-connect" aria-labelledby="jev-connect-title">
+    <form method="dialog">
+      <h2 id="jev-connect-title">Ask the real Jev too?</h2>
+      <p>Would you like to get results from the real Jev API? Connect OpenRouter and issue a key. It stays in your local browser and this site never reads it or sends it anywhere. We perform the API call in the browser and show you the results.</p>
+      <p>It costs almost nothing, and you can limit the API key to $0.01 if you want.</p>
+      <div class="question-buttons"><button value="cancel" class="secondary">Not now</button><button id="connect" value="connect" type="button">Connect OpenRouter</button></div>
+    </form>
+  </dialog>
   <footer>reverse.horse <span>One request. Human judgment.</span></footer>
 </body>
 </html>

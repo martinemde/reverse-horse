@@ -1,5 +1,7 @@
 import { buildRequest } from './builder-data.js';
 import { node } from './dom.js';
+import { migrateStorage, getKey, disconnect, loginURL, completeLogin } from './auth.js';
+import { compareWithJev, matchesJev } from './compare.js';
 
 const $ = selector => document.querySelector(selector);
 function field(label, value = '', multiline = false) {
@@ -119,8 +121,40 @@ function createEditor(fields, { onChange, onSave, onSend }) {
 }
 
 const storageKey = 'reverse-horse.questions';
+// The saved question that asked to connect, so it can ask Jev after the redirect.
+const askAfterLogin = 'reverse-horse.openrouter.ask';
+function showError(message = '') { $('#error').textContent = message; $('#error').hidden = !message; }
+function storedKey() { try { return getKey(); } catch { return undefined; } }
+function refreshAuth() { $('#openrouter').hidden = !storedKey(); }
+function percent(n) { return `${(100 * n).toFixed(1)}%`; }
+function describe(answer, question) {
+  if (answer.type === 'noul') return `${answer.noul >= 0.5 ? 'Yes' : 'No'} · ${answer.noul.toFixed(3)}`;
+  if (answer.type === 'choice') return `${answer.choice} · ${percent(answer.probabilities[answer.choice])}`;
+  return `${answer.score.toFixed(2)} · ${question.criteria[Math.round(answer.score)]}`;
+}
+const matchRules = { noul: 'Same yes/no side', choice: 'Same choice', score: 'Same nearest level' };
+function comparisonView(request, human, jev) {
+  const panel = node('section', undefined, 'builder-panel jev-comparison');
+  panel.append(node('h2', 'Compared with Jev'));
+  for (const [id, question] of Object.entries(request.questions)) {
+    const ours = human.answers[id]; const theirs = jev.answers[id];
+    const row = node('div', undefined, 'comparison');
+    const match = matchesJev(ours, theirs);
+    const verdict = node('p', match ? 'Matched Jev' : 'Different from Jev', `difference ${match ? 'match' : 'miss'}`);
+    verdict.title = `${matchRules[question.type]} counts as a match`;
+    const grid = node('div', undefined, 'compare-grid');
+    for (const [label, answer] of [['Humans', ours], ['Jev', theirs]]) {
+      const cell = node('div'); cell.append(node('span', label, 'eyebrow'), node('span', describe(answer, question), 'answer-value'));
+      grid.append(cell);
+    }
+    row.append(node('h3', `${question.type.toUpperCase()} / ${id}`), grid, verdict);
+    panel.append(row);
+  }
+  return panel;
+}
 const blank = () => ({ state: '', stateFormat: 'text', questions: [{ id: 'question_1', type: 'noul', instructions: '', no: '', yes: '', options: [{ key: '', description: '' }, { key: '', description: '' }], levels: ['', ''] }] });
 let library = { draft: blank(), questions: [] };
+const cards = new Map();
 let readable = true;
 function libraryError(message = '') { $('#library-error').textContent = message; $('#library-error').hidden = !message; }
 function validFields(fields) {
@@ -158,6 +192,7 @@ function saveNew(fields) {
   const record = { id: crypto.randomUUID(), fields };
   if (!persist({ draft: blank(), questions: [record, ...library.questions] })) return;
   const card = savedCard(record);
+  cards.set(record.id, card);
   $('#saved-questions').prepend(card.root);
   showNewEditor();
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches) card.root.animate([{ opacity: 0, transform: 'translateY(-24px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 250, easing: 'ease-out' });
@@ -177,9 +212,50 @@ function savedCard(record) {
   const response = node('section', undefined, 'builder-panel question-response'); response.hidden = true;
   const status = node('p'); status.dataset.part = 'response-status'; status.setAttribute('role', 'status');
   const body = node('pre'); body.dataset.part = 'response';
-  response.append(node('h2', 'Response'), status, body);
+  const jevControls = node('div', undefined, 'question-buttons'); jevControls.hidden = true;
+  const askJev = node('button', 'Ask Jev too', 'secondary'); askJev.type = 'button';
+  const jevStatus = node('p'); jevStatus.setAttribute('role', 'status');
+  jevControls.append(askJev);
+  response.append(node('h2', 'Response'), status, body, jevControls, jevStatus);
+  let jevPanel;
   controls.append(edit, send); heading.append(title, controls); summary.append(heading, state, details); root.append(summary, response);
   let sending = false;
+  let asking;
+  function clearJev() {
+    asking?.abort(); jevPanel?.remove(); jevPanel = undefined; jevStatus.textContent = ''; jevControls.hidden = true;
+  }
+  function showAnswer() {
+    const { status: code, answer } = record.response;
+    response.hidden = false;
+    status.textContent = `HTTP ${code} · Answer received`;
+    body.textContent = JSON.stringify(answer, null, 2);
+    jevControls.hidden = false;
+  }
+  async function compare() {
+    if (!record.response || asking) return;
+    const key = storedKey();
+    if (!key) {
+      $('#jev-connect').dataset.id = record.id;
+      $('#jev-connect').showModal();
+      return;
+    }
+    const request = record.response.request;
+    asking = new AbortController();
+    const timer = setTimeout(() => asking.abort(), 30_000);
+    askJev.disabled = true; jevPanel?.remove(); jevPanel = undefined;
+    jevStatus.textContent = 'Asking Jev via OpenRouter…';
+    try {
+      const { jev } = await compareWithJev(request, key, asking.signal);
+      // A newer send replaces the answer this lookup was comparing against.
+      if (record.response?.request !== request) return;
+      jevStatus.textContent = `Fresh answer from ${jev.model} via OpenRouter`;
+      jevPanel = comparisonView(request, record.response.answer, jev);
+      root.append(jevPanel);
+    } catch (e) {
+      jevStatus.textContent = e.name === 'AbortError' ? 'Jev lookup stopped or timed out.' : `Could not ask Jev: ${e.message}`;
+    } finally { clearTimeout(timer); asking = undefined; askJev.disabled = false; }
+  }
+  askJev.addEventListener('click', () => void compare());
   function refresh() {
     title.textContent = record.fields.questions[0]?.instructions || 'Saved question';
     state.textContent = record.fields.state;
@@ -208,7 +284,8 @@ function savedCard(record) {
     catch (e) { response.hidden = false; status.textContent = e.message; body.textContent = ''; return; }
     if (!persist()) return;
     sending = true; send.disabled = true; edit.disabled = true;
-    record.sent = true; persist();
+    record.sent = true; delete record.response; persist();
+    clearJev();
     response.hidden = false; body.textContent = '';
     const started = Date.now();
     const updateClock = () => { const remaining = Math.max(0, 30 - (Date.now() - started) / 1000); status.textContent = remaining ? `Waiting for human answers · ${remaining.toFixed(0)}s` : 'Waiting for the API response…'; };
@@ -217,17 +294,56 @@ function savedCard(record) {
       const result = await fetch('/v1/systemone', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(request), signal: AbortSignal.timeout(40_000) });
       const answer = await result.json();
       clearInterval(timer);
-      status.textContent = result.ok ? `HTTP ${result.status} · Answer received` : result.status === 504 ? 'HTTP 504 · No answer within 30 seconds. You can send this question again.' : `HTTP ${result.status} · Request failed`;
-      body.textContent = JSON.stringify(answer, null, 2);
+      if (result.ok) {
+        // Kept so the comparison survives the OpenRouter login redirect.
+        record.response = { status: result.status, request, answer }; persist();
+        showAnswer();
+        if (storedKey()) void compare();
+      } else {
+        status.textContent = result.status === 504 ? 'HTTP 504 · No answer within 30 seconds. You can send this question again.' : `HTTP ${result.status} · Request failed`;
+        body.textContent = JSON.stringify(answer, null, 2);
+      }
     } catch (e) { status.textContent = e.name === 'TimeoutError' ? 'The connection timed out before a response arrived.' : `Could not send the question: ${e.message}`; }
     finally { clearInterval(timer); sending = false; send.disabled = false; edit.disabled = false; send.textContent = 'Send again'; }
   }
   send.addEventListener('click', () => void sendRequest());
   refresh();
-  return { root, send: sendRequest };
+  if (record.response) showAnswer();
+  return { root, send: sendRequest, compare };
 }
 showNewEditor();
-for (const record of library.questions) $('#saved-questions').append(savedCard(record).root);
+for (const record of library.questions) { const card = savedCard(record); cards.set(record.id, card); $('#saved-questions').append(card.root); }
+
+$('#connect').addEventListener('click', async () => {
+  $('#connect').disabled = true;
+  try {
+    sessionStorage.setItem(askAfterLogin, $('#jev-connect').dataset.id);
+    location.assign(await loginURL(location.origin));
+  } catch (e) { $('#jev-connect').close(); showError(e.message); $('#connect').disabled = false; }
+});
+$('#disconnect').addEventListener('click', () => {
+  try { disconnect(); } catch { showError('Could not remove the OpenRouter key from browser storage.'); }
+  refreshAuth();
+});
+window.addEventListener('storage', refreshAuth);
+async function initializeAuth() {
+  try { migrateStorage(); } catch { /* Storage may be disabled; connecting reports it. */ }
+  const callback = new URL(location.href);
+  if (callback.pathname !== '/auth/openrouter/callback') { refreshAuth(); return; }
+  // Remove the authorization code from history before doing anything else.
+  history.replaceState(null, '', '/request');
+  let ask;
+  try { ask = sessionStorage.getItem(askAfterLogin); sessionStorage.removeItem(askAfterLogin); } catch { /* Nothing to resume. */ }
+  $('#openrouter-status').textContent = 'Connecting to OpenRouter…'; $('#openrouter').hidden = false;
+  try {
+    await completeLogin(callback);
+    $('#openrouter-status').textContent = 'OpenRouter connected · Ask Jev too uses your key from this browser.';
+    const card = cards.get(ask);
+    if (card) { card.root.scrollIntoView({ block: 'start' }); void card.compare(); }
+  } catch (e) { showError(e.name === 'TimeoutError' ? 'OpenRouter login timed out. Try connecting again.' : e.message); }
+  refreshAuth();
+}
+void initializeAuth();
 
 const exampleRequest = {
   "model": "jev-latest",

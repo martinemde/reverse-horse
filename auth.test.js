@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test';
-import { migrateStorage, comparisonEnabled, challenge, loginURL, completeLogin, disconnect, getKey } from './public/auth.js';
+import { migrateStorage, challenge, loginURL, completeLogin, disconnect, getKey } from './public/auth.js';
 import { compareWithJev } from './public/compare.js';
 
 // Browser storage is a boundary; these tests never contact an external service.
@@ -58,14 +58,16 @@ test('no key skips the Jev call', async () => {
   expect(await compareWithJev({}, undefined)).toEqual({ error: 'Comparison skipped · OpenRouter not connected' });
 });
 
-test('renaming preserves browser credentials and opt-out without overwriting newer keys', () => {
+test('renaming preserves browser credentials, drops the old comparison preference, without overwriting newer keys', () => {
   const local = storage(), session = storage();
   local.setItem('meat-jev.openrouter.key', 'old-local-test-key');
   local.setItem('meat-jev.openrouter.compare', 'false');
+  local.setItem('reverse-horse.openrouter.compare', 'false');
   session.setItem('meat-jev.openrouter.login', 'pending-login');
   migrateStorage(local, session);
   expect(getKey(local)).toBe('old-local-test-key');
-  expect(comparisonEnabled(local, true)).toBe(false);
+  expect(local.getItem('meat-jev.openrouter.compare')).toBeNull();
+  expect(local.getItem('reverse-horse.openrouter.compare')).toBeNull();
   expect(session.getItem('reverse-horse.openrouter.login')).toBe('pending-login');
   expect(local.getItem('meat-jev.openrouter.key')).toBeNull();
   expect(session.getItem('meat-jev.openrouter.login')).toBeNull();

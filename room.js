@@ -1,5 +1,4 @@
 import { validateRequest, answerRequest, averageResponses } from './public/protocol.js';
-import { validateJevResponse } from './public/compare.js';
 import { apiPaths } from './http.js';
 
 // Shared by Bun and the Durable Object. These are budgets, not tuning knobs.
@@ -8,7 +7,7 @@ export const roomLimits = Object.freeze({
   requestBytes: 64 * 1024, pendingBytes: 2 * 1024 * 1024,
   messageBytes: 128 * 1024, frameBytes: 256 * 1024,
   historyBytes: 4 * 1024 * 1024, clientHistoryBytes: 128 * 1024,
-  history: 100, comparisons: 16, ackMs: 10_000,
+  history: 100, ackMs: 10_000,
 });
 const encoder = new TextEncoder();
 const size = text => encoder.encode(text).byteLength;
@@ -17,7 +16,7 @@ const error = (message, status) => json({ error: { message } }, status, status =
 
 export function createRoom({ timeoutMs = 30_000 } = {}) {
   const pending = new Map(), clients = new Map(), active = new Set(), readers = new Set();
-  const history = new Map(), comparisons = new Map(), dirty = new Set();
+  const history = new Map(), dirty = new Set();
   let pendingBytes = 0, historyBytes = 0, flushTimer, stopped = false;
   const counters = { accepted: 0, rejected: 0, frames: 0, sentBytes: 0 };
 
@@ -108,8 +107,6 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
   function pruneHistory() {
     while (history.size > roomLimits.history || historyBytes > roomLimits.historyBytes) {
       const [id, record] = history.entries().next().value;
-      // An evicted result must not retain a comparison or its request body.
-      comparisons.get(id)?.finish('Comparison stopped · result expired', undefined, false);
       history.delete(id); historyBytes -= record.bytes;
       for (const state of record.audience) { state.results = state.results.filter(value => value !== id); changed(state); }
     }
@@ -120,28 +117,6 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
     for (const state of record.audience) { state.results.unshift(result.id); state.results.splice(20); changed(state); }
     pruneHistory();
     return record;
-  }
-  function compare(entry, record) {
-    const state = [...entry.answers].find(([state, answer]) => clients.has(state.ws) && answer.compare && !state.comparison)?.[0];
-    if (!state || comparisons.size >= roomLimits.comparisons || !history.has(entry.id) || stopped) return;
-    historyBytes -= record.bytes;
-    record.result.status = 'Asking Jev via OpenRouter…';
-    record.bytes = size(JSON.stringify(record.result)); historyBytes += record.bytes;
-    const comparison = { state, request: entry.request, finish(status, jev, prune = true) {
-      if (!comparisons.delete(entry.id)) return;
-      clearTimeout(comparison.timer); state.comparison = undefined;
-      historyBytes -= record.bytes;
-      record.result.status = status;
-      if (jev) record.result.jev = jev;
-      record.bytes = size(JSON.stringify(record.result)); historyBytes += record.bytes;
-      for (const viewer of record.audience) changed(viewer);
-      send(state, { type: 'cancel-compare', id: entry.id });
-      if (prune) pruneHistory();
-    } };
-    comparisons.set(entry.id, comparison); state.comparison = entry.id;
-    comparison.timer = setTimeout(() => comparison.finish('Comparison failed: Jev timed out'), 30_000);
-    pruneHistory();
-    if (comparisons.has(entry.id)) send(state, { type: 'compare', id: entry.id, request: entry.request });
   }
   function finish(entry, outcome, status = 200) {
     if (!pending.delete(entry.id)) return;
@@ -157,9 +132,8 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
         if (status === 504 && !entry.answers.has(state)) release(entry, state, true);
       }
     }
-    const record = save({ id: entry.id, request: entry.request, title: 'API request', human,
-      answerCount: entry.answers.size, late: false, status: human ? [...entry.answers.values()].some(answer => answer.compare) ? 'Answered · comparison skipped (busy)' : 'Answered · comparison off' : outcome }, entry.audience);
-    if (human) compare(entry, record);
+    save({ id: entry.id, request: entry.request, title: 'API request', human,
+      answerCount: entry.answers.size, late: false, status: human ? 'Answered' : outcome }, entry.audience);
     notify(entry); wake();
   }
   function close(ws) {
@@ -167,7 +141,6 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
     if (!state) return;
     clients.delete(ws); active.delete(state); dirty.delete(state); clearTimeout(state.ackTimer);
     if (state.job) release(state.job, state);
-    if (state.comparison) comparisons.get(state.comparison)?.finish('Comparison interrupted · browser disconnected');
     // Completed history should never keep disconnected sockets alive.
     for (const record of history.values()) record.audience.delete(state);
     state.results = []; state.retired = []; state.retiredSent = []; state.job = undefined;
@@ -197,21 +170,12 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
       else { active.delete(state); if (state.job) release(state.job, state); }
       send(state, { type: 'presence', active: message.active }); wake();
     },
-    comparison(state, message) {
-      const comparison = comparisons.get(message.id);
-      if (!comparison || comparison.state !== state) throw new Error('This comparison is no longer waiting');
-      if (message.jev) {
-        try { comparison.finish('Compared', validateJevResponse(comparison.request, message.jev)); }
-        catch { comparison.finish('Comparison failed: invalid Jev response'); }
-      } else comparison.finish(typeof message.error === 'string' ? message.error.slice(0, 200) : 'Comparison failed');
-    },
     skip(state, message) { release(assigned(state, message), state); },
     submit(state, message) {
       const entry = assigned(state, message);
-      if (message.compare !== undefined && typeof message.compare !== 'boolean') throw new Error('Invalid comparison setting');
       const response = answerRequest(entry.request, message.values);
       // Store before sending anything. Retried submissions cannot count twice.
-      entry.answers.set(state, { response, compare: message.compare === true });
+      entry.answers.set(state, { response });
       if (entry.answers.size === entry.target) finish(entry);
       else { notify(entry); arm(entry); }
     },
@@ -294,12 +258,11 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
         handlers[message.type](state, message);
       } catch (e) { send(state, { type: 'error', message: e.message }); }
     },
-    stats() { return { ...counters, pending: pending.size, readers: readers.size, pendingBytes, clients: clients.size, active: active.size, history: history.size, historyBytes, comparisons: comparisons.size }; },
+    stats() { return { ...counters, pending: pending.size, readers: readers.size, pendingBytes, clients: clients.size, active: active.size, history: history.size, historyBytes }; },
     stop() {
       stopped = true; clearTimeout(flushTimer); flushTimer = undefined;
       for (const admission of readers) admission.cancel('Server stopped', 503);
       for (const entry of [...pending.values()]) finish(entry, 'Server stopped', 503);
-      for (const comparison of [...comparisons.values()]) comparison.finish('Server stopped');
       // The transport owner stops its sockets. Closing Bun sockets here before
       // server.stop(true) makes Bun 1.2.15 wait forever for shutdown.
       for (const state of [...clients.values()]) close(state.ws);

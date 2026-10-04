@@ -87,6 +87,48 @@ try {
     assert.equal(JSON.parse(await saved.locator('[data-part="response"]').textContent()).answers.mood.score, 0.5);
   }
   assert.equal(await saved.count(), 1, 'Resending does not duplicate the saved card');
+
+  // Ask Jev too: the modal explains the key, then a mocked OpenRouter login and
+  // lookup run entirely in the browser.
+  const jevCalls = [];
+  const jev = { model: 'jev-latest', answers: {
+    question_1: { type: 'noul', noul: 0.9 },
+    route: { type: 'choice', choice: 'support', confidence: 0.8, probabilities: { shipping: 0.2, support: 0.8 } },
+    mood: { type: 'score', score: 0.4, confidence: 0.7, probabilities: { 0: 0.6, 1: 0.4 } },
+  } };
+  await context.route('https://openrouter.ai/**', route => {
+    const url = new URL(route.request().url());
+    if (url.pathname === '/auth') {
+      const callback = new URL(url.searchParams.get('callback_url')); callback.searchParams.set('code', 'test-code');
+      return route.fulfill({ status: 302, headers: { Location: callback.href } });
+    }
+    if (url.pathname === '/api/v1/auth/keys') return route.fulfill({ json: { key: 'test-openrouter-key' } });
+    if (url.pathname === '/api/v1/systemone') { jevCalls.push({ auth: route.request().headers().authorization, body: route.request().postDataJSON() }); return route.fulfill({ json: jev }); }
+    return route.abort();
+  });
+  await saved.getByRole('button', { name: 'Ask Jev too', exact: true }).click();
+  const modal = page.locator('#jev-connect');
+  assert.equal(await modal.isVisible(), true);
+  assert.match(await modal.textContent(), /stays in your local browser/);
+  await modal.getByRole('button', { name: 'Not now', exact: true }).click();
+  assert.equal(await modal.isVisible(), false);
+  assert.deepEqual(jevCalls, [], 'Nothing reaches OpenRouter without a key');
+  await saved.getByRole('button', { name: 'Ask Jev too', exact: true }).click();
+  await modal.getByRole('button', { name: 'Connect OpenRouter', exact: true }).click();
+  await page.waitForURL(url => url.pathname === '/request');
+  const comparison = saved.locator('.jev-comparison');
+  await comparison.waitFor();
+  assert.equal(await page.evaluate(() => localStorage.getItem('reverse-horse.openrouter.key')), 'test-openrouter-key');
+  assert.deepEqual(jevCalls, [{ auth: 'Bearer test-openrouter-key', body: edited }], 'The answer survives the login redirect and Jev gets the sent request');
+  assert.deepEqual(await comparison.locator('.difference').allTextContents(), ['Matched Jev', 'Different from Jev', 'Different from Jev']);
+  assert.equal(await page.locator('#openrouter').isVisible(), true);
+  await page.screenshot({ path: '/tmp/reverse-horse-questions-jev.png', fullPage: true });
+  await saved.getByRole('button', { name: 'Send again', exact: true }).click();
+  await saved.locator('[data-part="response-status"]').filter({ hasText: 'HTTP 200' }).waitFor();
+  await comparison.waitFor();
+  assert.equal(jevCalls.length, 2, 'Once connected, every answer also asks Jev');
+  await page.getByRole('button', { name: 'Disconnect OpenRouter', exact: true }).click();
+  assert.equal(await page.evaluate(() => localStorage.getItem('reverse-horse.openrouter.key')), null);
   await page.reload();
   await saved.getByRole('button', { name: 'Edit', exact: true }).click();
   assert.deepEqual(JSON.parse(await inline.getByLabel('Generated request JSON').inputValue()), edited);
@@ -116,5 +158,5 @@ try {
   assert.equal(await corruptPage.evaluate(() => localStorage.getItem('reverse-horse.questions')), '{broken');
   await corrupt.close();
   assert.deepEqual(errors, []); assert.deepEqual(external, []);
-  console.log('PASS: draft autosave, saved questions, inline edit, reload, real API send/resend, and desktop/mobile layout.');
+  console.log('PASS: draft autosave, saved questions, inline edit, reload, real API send/resend, Ask Jev too login and comparison, and desktop/mobile layout.');
 } finally { await browser.close(); await app.stop(); }

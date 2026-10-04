@@ -56,22 +56,32 @@ skips a card: an example is dropped and the next one deals as usual; a live
 request sends `skip`, which removes that browser from its participants (presence
 changes never re-add it) and hides it from that browser's queue.
 
-## OpenRouter comparison
+## Jev comparison
 
-**Connect OpenRouter** runs browser-side PKCE: verifier and state live in session
-storage, the callback must come from the initiating tab within ten minutes, and
-the key stays in this origin's local storage. It never reaches the server or
-other browsers. **Compare with Jev** defaults on at first connection and is
-remembered. After aggregation returns to the caller, one opted-in submitter's browser posts the
-original request to `https://openrouter.ai/api/v1/systemone` on their credits and
-sends only the result back for display. Disconnect deletes the local key (it does
-not revoke it) and aborts pending lookups. A failed comparison leaves the human
-answer intact. The server does not read `TYPESAFE_API_KEY`.
+The Answer page always compares with saved Jev runs and has no toggle. Practice,
+late drafts, and live results whose request matches a saved run show markers;
+anything else shows `Answered · no saved Jev run for this question`. The room
+no longer relays comparisons: submits carry no `compare` flag and there are no
+`compare`/`comparison` socket messages.
+
+Live Jev lives on the Question page. After a 200, a saved card offers **Ask Jev
+too**. Without a key it opens a modal explaining the key stays in the browser,
+then **Connect OpenRouter** runs browser-side PKCE: verifier and state live in
+session storage, the callback (`/auth/openrouter/callback`, served as
+`request.html`) must come from the initiating tab within ten minutes, and the
+key stays in this origin's local storage. The card's last 200 response is saved
+with the question so it survives the redirect, and the card that asked
+(`reverse-horse.openrouter.ask` in session storage) asks Jev on return. Once
+connected, every 200 also posts the sent request to
+`https://openrouter.ai/api/v1/systemone` and shows a per-question comparison
+using the same match rules. **Disconnect OpenRouter** deletes the local key (it
+does not revoke it). The server does not read `TYPESAFE_API_KEY`.
 
 ## Call it
 
 **Question** (`/request`) builds Noul, Choice, and Score questions over text or
-JSON state; the preview is the exact body posted. Drafts autosave to
+JSON state; the preview is the exact body posted. **Ask Jev too** is described
+under Jev comparison. Drafts autosave to
 `reverse-horse.questions`. Save, Edit, Send, and Send again work on saved cards,
 which show the real HTTP status and response. Unreadable stored data is left
 untouched and reported.
@@ -147,8 +157,7 @@ Expired unfinished cards transfer to the browser, releasing server capacity.
 Interrupted cards also become local late drafts; at most three survive for one
 minute past the original deadline, preserving existing slider values. Reloading
 clears them. Late votes cannot alter the caller's returned aggregate. Live Jev
-lookups are capped at 16 per room and one per connection; browser lookups are
-capped at two. Eviction, disconnect, and timeout cancel comparison work.
+lookups happen only on the Question page, in the asking browser.
 
 ## Cloudflare
 

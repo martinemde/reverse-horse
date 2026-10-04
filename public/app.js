@@ -1,5 +1,4 @@
-import { migrateStorage, getKey, disconnect, loginURL, completeLogin, comparisonEnabled, setComparisonEnabled } from './auth.js';
-import { compareWithJev, validateJevResponse } from './compare.js';
+import { validateJevResponse } from './compare.js';
 import { answerRequest } from './protocol.js';
 import { examples } from './examples.js';
 import { createTraining } from './training.js';
@@ -9,7 +8,6 @@ import { createCard } from './card.js';
 const $ = selector => document.querySelector(selector);
 let socket;
 let reconnectAttempt = 0;
-const comparisons = new Map();
 const lateDrafts = new Map();
 let offset = 0;
 let current = [];
@@ -41,26 +39,26 @@ function nextExample() {
   return lastExample;
 }
 function dealPractice() {
-  if (training.active || !playing || practice || serverQueue.requests.length || lateDrafts.size || comparisons.size) return;
+  if (training.active || !playing || practice || serverQueue.requests.length || lateDrafts.size) return;
   const example = nextExample();
   practice = { ...example, id: crypto.randomUUID(), local: true, deadline: Date.now() + 30_000 };
   render();
 }
 function schedulePractice() {
   clearTimeout(practiceTimer);
-  if (!training.active && playing && !practice && !serverQueue.requests.length && !lateDrafts.size && !comparisons.size) practiceTimer = setTimeout(dealPractice, 4000);
+  if (!training.active && playing && !practice && !serverQueue.requests.length && !lateDrafts.size) practiceTimer = setTimeout(dealPractice, 4000);
 }
-function submitPractice(item, values, compare) {
+function savedStatus(saved) { return saved ? `Compared with saved Jev run · ${new Date(saved.recordedAt).toLocaleDateString()}` : 'Answered · no saved Jev run for this question'; }
+function submitPractice(item, values) {
   const human = answerRequest(item.request, values);
-  const saved = compare && savedExample(item.request);
-  const result = { ...item, human, late: Boolean(item.late) || (item.pausedAt ?? Date.now()) >= item.deadline, status: saved ? `Compared with saved Jev run · ${new Date(saved.recordedAt).toLocaleDateString()}` : compare ? 'Asking Jev via OpenRouter…' : 'Answered · comparison off' };
+  const saved = savedExample(item.request);
+  const result = { ...item, human, late: Boolean(item.late) || (item.pausedAt ?? Date.now()) >= item.deadline, status: savedStatus(saved) };
   if (saved) result.jev = saved.jev;
   practiceResults.unshift(result);
   practiceResults.splice(20);
   if (item.late) lateDrafts.delete(item.id); else practice = undefined;
   render();
-  if (compare && !saved) void compareInBrowser(item);
-  else schedulePractice();
+  schedulePractice();
 }
 function emptyState(playing) {
   const empty = node('div', undefined, 'empty');
@@ -70,13 +68,6 @@ function emptyState(playing) {
 function send(message) { if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message)); }
 function presence() { send({ type: 'presence', active: document.visibilityState === 'visible' && !training.active }); }
 function showError(message) { $('#error').textContent = message; $('#error').hidden = !message; }
-function refreshAuth() {
-  const connected = Boolean(getKey());
-  $('#auth').textContent = connected ? 'Disconnect' : 'Connect OpenRouter';
-  $('#auth-status').textContent = (savedExamples.length ? 'Practice uses saved Jev answers. ' : '') + (connected ? 'OpenRouter connected · live comparisons use your credits.' : 'Connect OpenRouter to compare live requests.');
-  $('#compare').disabled = !connected && !savedExamples.length;
-  $('#compare').checked = comparisonEnabled(localStorage, savedExamples.length > 0);
-}
 function makeForm(item, onTrainingSubmit) {
   return createCard(item, {
     connected: () => socket?.readyState === WebSocket.OPEN,
@@ -87,10 +78,9 @@ function makeForm(item, onTrainingSubmit) {
     },
     onSubmit(item, values) {
       if (onTrainingSubmit) { onTrainingSubmit(answerRequest(item.request, values)); return; }
-      const compare = $('#compare').checked && Boolean((item.local && savedExample(item.request)) || getKey());
       showError('');
-      if (item.local) submitPractice(item, values, compare);
-      else send({ type: 'submit', id: item.id, values, compare });
+      if (item.local) submitPractice(item, values);
+      else send({ type: 'submit', id: item.id, values });
     },
   });
 }
@@ -118,9 +108,14 @@ function update(message) {
   render();
   schedulePractice();
 }
+// Live requests compare too when someone sends a question with a saved Jev run.
+function withSavedJev(result) {
+  const saved = result.human && savedExample(result.request);
+  return { ...result, status: result.human ? savedStatus(saved) : result.status, ...(saved && { jev: saved.jev }) };
+}
 function render() {
   current = [...serverQueue.requests, ...lateDrafts.values(), ...(practice ? [practice] : [])];
-  const results = [...practiceResults, ...serverQueue.results.filter(result => !lateDrafts.has(result.id) && !practiceResults.some(local => local.id === result.id))];
+  const results = [...practiceResults, ...serverQueue.results.filter(result => !lateDrafts.has(result.id) && !practiceResults.some(local => local.id === result.id)).map(withSavedJev)];
   const ids = new Set([...current, ...results].map(item => item.id));
   const newQuestion = current.findLast(item => !forms.has(item.id));
   const newCards = [...current, ...results].some(item => !forms.has(item.id));
@@ -158,28 +153,11 @@ function tick() {
   if (trimLateDrafts()) { render(); schedulePractice(); return; }
   for (const item of current) { const form = forms.get(item.id); const seconds = Math.max(0, (item.deadline - (item.pausedAt ?? Date.now()) - (item.local ? 0 : offset)) / 1000); form.clock.textContent = seconds > 0 ? `${seconds.toFixed(1)}s` : 'Timed out'; form.clock.classList.toggle('urgent', seconds < 10); form.validity(); }
 }
-async function compareInBrowser(message) {
-  const connection = socket;
-  const controller = new AbortController();
-  comparisons.set(message.id, controller);
-  const timer = setTimeout(() => controller.abort(), 30_000);
-  let result;
-  try { result = comparisons.size > 2 ? { error: 'Comparison skipped · browser busy' } : $('#compare').checked ? await compareWithJev(message.request, getKey(), controller.signal) : { error: 'Comparison skipped · comparison off' }; }
-  catch (e) { result = { error: e.name === 'AbortError' ? 'Comparison stopped or timed out' : `Comparison failed: ${e.message}` }; }
-  finally { clearTimeout(timer); comparisons.delete(message.id); }
-  if (message.local) {
-    const saved = practiceResults.find(result => result.id === message.id);
-    if (saved) { saved.status = result.jev ? 'Compared' : result.error; if (result.jev) saved.jev = result.jev; }
-    render();
-  } else if (connection?.readyState === WebSocket.OPEN) connection.send(JSON.stringify({ type: 'comparison', id: message.id, ...result }));
-  schedulePractice();
-}
 function connect() {
   socket = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/ws`);
   const connection = socket;
   socket.addEventListener('open', () => { presence(); $('#connection').textContent = 'Connected'; for (const form of forms.values()) form.reset(); });
   socket.addEventListener('close', () => {
-    for (const [id, controller] of comparisons) if (!practiceResults.some(result => result.id === id)) controller.abort();
     // Keep interrupted work in this tab; a reconnect receives fresh assignments.
     for (const item of serverQueue.requests) if (!item.submitted) lateDrafts.set(item.id, { ...item, deadline: item.deadline - offset, local: true, late: true });
     trimLateDrafts();
@@ -192,8 +170,6 @@ function connect() {
     const message = JSON.parse(event.data);
     if (message.type === 'queue') { update(message); connection.send(JSON.stringify({ type: 'ack', version: message.version })); }
     if (message.type === 'presence') reconnectAttempt = 0;
-    if (message.type === 'compare') void compareInBrowser(message);
-    if (message.type === 'cancel-compare') comparisons.get(message.id)?.abort();
     if (message.type === 'error') { showError(message.message); for (const form of forms.values()) form.reset(); }
   });
 }
@@ -225,34 +201,8 @@ $('#train').addEventListener('click', () => training.open());
 // Other pages link Training to /#training.
 if (location.hash === '#training') { history.replaceState(null, '', location.pathname + location.search); training.open(); }
 else training.start();
-$('#auth').addEventListener('click', async () => {
-  $('#auth').disabled = true;
-  try {
-    showError('');
-    if (getKey()) { disconnect(); for (const controller of comparisons.values()) controller.abort(); refreshAuth(); }
-    else location.assign(await loginURL(location.origin));
-  } catch (e) { showError(e.message); }
-  finally { $('#auth').disabled = false; }
-});
-$('#compare').addEventListener('change', () => {
-  if (!$('#compare').checked) for (const controller of comparisons.values()) controller.abort();
-  try { setComparisonEnabled($('#compare').checked); }
-  catch { showError('Could not save your comparison preference in browser storage.'); }
-});
-window.addEventListener('storage', () => { try { refreshAuth(); if (!$('#compare').checked) for (const controller of comparisons.values()) controller.abort(); } catch { /* Storage may be disabled. */ } });
 document.addEventListener('visibilitychange', presence);
 async function initialize() {
-  try { migrateStorage(); } catch { showError("Could not migrate browser storage. Allow site storage to connect OpenRouter."); }
-  const callback = new URL(location.href);
-  if (callback.pathname === '/auth/openrouter/callback') {
-    // Remove the authorization code from history before loading any other state.
-    history.replaceState(null, '', '/');
-    $('#auth').disabled = true;
-    $('#auth-status').textContent = 'Connecting to OpenRouter…';
-    try { await completeLogin(callback); }
-    catch (e) { showError(e.name === 'TimeoutError' ? 'OpenRouter login timed out. Try connecting again.' : e.message); }
-    finally { $('#auth').disabled = false; }
-  }
   try {
     const response = await fetch('/example-results.json');
     if (!response.ok) throw new Error('Saved examples unavailable');
@@ -260,7 +210,6 @@ async function initialize() {
     savedExamples = runs.map(run => ({ ...run, jev: validateJevResponse(run.request, run.jev) }));
   } catch { showError('Saved Jev answers could not be loaded. Refresh to try again.'); }
   training.refresh();
-  try { refreshAuth(); } catch { showError('Browser storage is unavailable. Allow site storage to connect OpenRouter.'); }
   connect();
   dealPractice();
 }

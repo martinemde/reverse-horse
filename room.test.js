@@ -143,38 +143,18 @@ test('connections, inbound message sizes, and message rates have hard limits', a
   expect(peers[2].ws.closed).toBe(1013);
 });
 
-test('comparison concurrency is bounded independently of request completion', async () => {
-  const room = create(); const peers = Array.from({ length: 90 }, () => peer(room)); await tick();
-  // Admit in two batches so this tests comparison concurrency, not reader limits.
-  const calls = Array.from({ length: 9 }, () => post(room)); await tick();
-  calls.push(...Array.from({ length: 9 }, () => post(room))); await tick();
-  const assigned = peers.filter(p => p.item);
-  expect(assigned).toHaveLength(90);
-  for (const p of assigned) p.send({ type: 'submit', id: p.item.id, values: { yes: 1 }, compare: true });
-  expect((await Promise.all(calls)).every(r => r.status === 200)).toBe(true);
-  expect(room.stats().comparisons).toBe(16);
-  expect(peers.flatMap(p => p.messages).filter(m => m.type === 'compare')).toHaveLength(16);
-  for (const p of peers) {
-    const comparison = p.messages.find(m => m.type === 'compare');
-    if (comparison) p.send({ type: 'comparison', id: comparison.id, error: 'Offline boundary' });
-  }
-  expect(room.stats().comparisons).toBe(0); expect(room.stats().pendingBytes).toBe(0);
-});
-
-test('history byte eviction cancels lookups and keeps every snapshot within its budget', async () => {
+test('history byte eviction keeps every snapshot within its budget', async () => {
   const room = create(); const peers = Array.from({ length: 300 }, () => peer(room)); await tick();
   const large = { ...body, state: 'x'.repeat(60 * 1024) };
   for (let i = 0; i < 75; i++) {
     const call = post(room, { body: JSON.stringify(large) }); await tick();
     const panel = peers.filter(p => p.item && !p.item.submitted);
     expect(panel).toHaveLength(5);
-    for (const p of panel) p.send({ type: 'submit', id: p.item.id, values: { yes: 1 }, compare: true });
+    for (const p of panel) p.send({ type: 'submit', id: p.item.id, values: { yes: 1 } });
     expect((await call).status).toBe(200); await tick();
     expect(room.stats().historyBytes).toBeLessThanOrEqual(roomLimits.historyBytes);
-    expect(room.stats().comparisons).toBeLessThanOrEqual(roomLimits.comparisons);
   }
   expect(room.stats().history).toBeLessThan(75);
-  expect(peers.some(p => p.messages.some(m => m.type === 'cancel-compare'))).toBe(true);
   for (const p of peers) for (const message of p.messages) expect(new TextEncoder().encode(JSON.stringify(message)).byteLength).toBeLessThanOrEqual(roomLimits.frameBytes);
 });
 

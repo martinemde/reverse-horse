@@ -26,7 +26,7 @@ async function pageFor(trained = true) {
   page.on('pageerror', error => errors.push(error.message));
   await page.goto(app.server.url.href);
   await page.waitForFunction(() => document.querySelector('#connection').textContent === 'Connected');
-  if (trained) { await page.getByRole('button', { name: 'Pause practice', exact: true }).click(); await page.locator('#compare').uncheck(); }
+  if (trained) { await page.getByRole('button', { name: 'Pause practice', exact: true }).click(); }
   return page;
 }
 const post = () => fetch(new URL('/v1/systemone', app.server.url), { method: 'POST', body: JSON.stringify(request) });
@@ -55,7 +55,7 @@ try {
   assert.equal(human.answers.score.score, 1);
   await first.waitForFunction(el => el.classList.contains('answered'), firstCard);
   assert.deepEqual(await firstCard.$$eval('input[type=range]', inputs => inputs.map(input => Number(input.value))), [0.5, 0.75, 0.75, 1]);
-  assert.equal(await firstCard.$eval('.actions p', el => el.textContent), 'Average of 2 answers · Answered · comparison off');
+  assert.equal(await firstCard.$eval('.actions p', el => el.textContent), 'Average of 2 answers · Answered · no saved Jev run for this question');
   await first.screenshot({ path: '/tmp/reverse-horse-average.png' });
 
   const next = post();

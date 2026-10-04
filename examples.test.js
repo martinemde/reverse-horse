@@ -3,7 +3,6 @@ import { examples } from './public/examples.js';
 import results from './public/example-results.json';
 import { validateRequest } from './public/protocol.js';
 import { validateJevResponse, matchesJev } from './public/compare.js';
-import { comparisonEnabled, setComparisonEnabled } from './public/auth.js';
 
 test('every built-in example has a matching, valid recorded Jev run', () => {
   expect(results).toHaveLength(examples.length);
@@ -16,15 +15,6 @@ test('every built-in example has a matching, valid recorded Jev run', () => {
     expect(Number.isFinite(Date.parse(run.recordedAt))).toBe(true);
     expect(validateJevResponse(example.request, run.jev)).toEqual(run.jev);
   }
-});
-
-test('saved comparisons work without a key and respect the off preference', () => {
-  const values = new Map();
-  const storage = { getItem: key => values.get(key), setItem: (key, value) => values.set(key, value) };
-  expect(comparisonEnabled(storage)).toBe(false);
-  expect(comparisonEnabled(storage, true)).toBe(true);
-  setComparisonEnabled(false, storage);
-  expect(comparisonEnabled(storage, true)).toBe(false);
 });
 
 test('match feedback compares human answers against the recorded Jev answers', () => {

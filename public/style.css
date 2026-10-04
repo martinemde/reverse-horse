@@ -133,6 +133,15 @@ select:focus-visible{outline:2px solid white;outline-offset:4px}
 .saved-question h2{overflow-wrap:anywhere;min-width:0}
 .saved-state{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.5 ui-sans-serif,system-ui;margin:20px 0}
 .question-response{margin:24px 0 0}
+.question-response .question-buttons{margin-top:16px}
+.jev-comparison{margin:24px 0 0;padding:0}
+.jev-comparison>h2,.jev-comparison>p{padding:20px 24px 0}
+.comparison .match{color:var(--green)}
+.comparison .miss{color:var(--pink)}
+#jev-connect{width:min(560px,calc(100% - 32px));padding:28px;border:1px solid var(--line);border-radius:16px;background:#1b2121;color:#f2f4ef}
+#jev-connect::backdrop{background:#090d0de8}
+#jev-connect p{margin:16px 0;line-height:1.5}
+#jev-connect .question-buttons{justify-content:flex-end;margin-top:24px}
 .saved-question-summary[hidden]{display:none}
 @media(max-width:800px){
   .question-buttons{width:100%}

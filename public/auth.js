@@ -1,10 +1,11 @@
 const KEY = 'reverse-horse.openrouter.key';
 const LOGIN = 'reverse-horse.openrouter.login';
-const COMPARISON = 'reverse-horse.openrouter.compare';
 const CALLBACK = '/auth/openrouter/callback';
-// Move existing credentials and preferences only within this browser origin.
+// Move existing credentials only within this browser origin. The comparison
+// preference is gone: saved runs always compare and live Jev is asked per question.
 export function migrateStorage(storage = localStorage, session = sessionStorage) {
-  for (const [store, suffix] of [[storage, 'key'], [storage, 'compare'], [session, 'login']]) {
+  for (const key of ['meat-jev.openrouter.compare', 'reverse-horse.openrouter.compare']) storage.removeItem(key);
+  for (const [store, suffix] of [[storage, 'key'], [session, 'login']]) {
     const old = `meat-jev.openrouter.${suffix}`;
     const key = `reverse-horse.openrouter.${suffix}`;
     const value = store.getItem(old);
@@ -23,14 +24,6 @@ export async function challenge(verifier) {
 }
 
 export function getKey(storage = localStorage) { return storage.getItem(KEY) || undefined; }
-
-export function comparisonEnabled(storage = localStorage, savedAvailable = false) {
-  return (savedAvailable || Boolean(getKey(storage))) && storage.getItem(COMPARISON) !== 'false';
-}
-
-export function setComparisonEnabled(enabled, storage = localStorage) {
-  storage.setItem(COMPARISON, String(enabled));
-}
 
 export function disconnect(storage = localStorage, session = sessionStorage) {
   storage.removeItem(KEY);

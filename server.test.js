@@ -129,7 +129,7 @@ test('saved replies count after disconnect and the deadline averages available a
   expect(completed.results[0].late).toBe(false);
 });
 
-test('holds the API connection, accepts all primitives, and skips Jev without credentials', async () => {
+test('holds the API connection and accepts all primitives', async () => {
   const base = app(); const client = connect(base);
   expect((await client.next(m => m.type === 'queue')).requests).toEqual([]);
   let settled = false;
@@ -156,7 +156,7 @@ test('holds the API connection, accepts all primitives, and skips Jev without cr
   // would remove the original browser card before the result arrives.
   const completed = await client.next(m => m.type === 'queue');
   expect(completed.results[0]?.human).toBeDefined();
-  expect(completed.results[0].status).toBe('Answered · comparison off');
+  expect(completed.results[0].status).toBe('Answered');
   expect(completed.results[0].jev).toBeUndefined();
   expect(completed.requests).toEqual([]);
   reconnected.send({ type: 'submit', id: item.id, values: {} });
@@ -199,7 +199,7 @@ test('expiry releases API capacity and transfers unfinished cards to their assig
   expect(expired.retired[0]).toEqual({ id: item.id, request, deadline: item.deadline, late: true });
   const reconnected = connect(base, { active: false });
   expect((await reconnected.next(m => m.type === 'queue')).requests).toEqual([]);
-  client.send({ type: 'submit', id: item.id, compare: true, values: { urgent: 0.75, department: { billing: 1, support: 0 }, mood: 1.5 } });
+  client.send({ type: 'submit', id: item.id, values: { urgent: 0.75, department: { billing: 1, support: 0 }, mood: 1.5 } });
   expect((await client.next(m => m.type === 'error')).message).toBe('This request is no longer waiting');
   const next = post(base);
   await client.next(m => m.requests?.[0]?.id !== item.id && m.requests?.length);
@@ -232,25 +232,6 @@ test('serves the page and assets and blocks cross-origin requests', async () => 
   for (const path of ['/', '/request', '/help', '/about', '/builder.js', '/builder-data.js', '/auth/openrouter/callback?code=example', '/app.js', '/training.js', '/examples.js', '/example-results.json', '/protocol.js', '/auth.js', '/compare.js', '/style.css']) expect((await fetch(new URL(path, base))).status).toBe(200);
   expect((await fetch(new URL('/ws', base), { headers: { Origin: 'https://elsewhere.example' } })).status).toBe(403);
   expect((await fetch(new URL('/v1/systemone', base), { method: 'POST', headers: { Origin: 'https://elsewhere.example', 'Content-Type': 'application/json' }, body: JSON.stringify(request) })).status).toBe(403);
-});
-
-test('one opted-in browser compares the aggregate after answering the caller', async () => {
-  const base = app(); const client = connect(base); const observer = connect(base);
-  await client.next(m => m.type === 'queue'); await observer.next(m => m.type === 'queue');
-  const response = post(base);
-  const item = (await client.next(m => m.requests?.length)).requests[0];
-  client.send({ type: 'submit', id: item.id, compare: true, values: { urgent: 1, department: { billing: 1, support: 0 }, mood: 1 } });
-  await client.next(m => m.requests?.[0]?.received === 1);
-  observer.send({ type: 'submit', id: item.id, compare: false, values: { urgent: 0, department: { billing: 0, support: 1 }, mood: 1 } });
-  expect((await response).status).toBe(200);
-  const comparison = await client.next(m => m.type === 'compare');
-  expect(comparison).toEqual({ type: 'compare', id: item.id, request });
-  observer.send({ type: 'comparison', id: item.id, error: 'Must not overwrite another browser’s result' });
-  expect((await observer.next(m => m.type === 'error')).message).toBe('This comparison is no longer waiting');
-  client.send({ type: 'comparison', id: item.id, error: 'Comparison stopped or timed out' });
-  const finished = await client.next(m => m.results?.[0]?.status === 'Comparison stopped or timed out');
-  expect(finished.results[0].human.answers.urgent.noul).toBe(0.5);
-  expect(finished.results[0].jev).toBeUndefined();
 });
 
 test('concurrent requests remain isolated and disconnecting a caller removes its request', async () => {

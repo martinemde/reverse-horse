@@ -21,7 +21,6 @@ try {
   page.on('pageerror', error => errors.push(error.message));
   await page.goto(app.server.url.href);
   await page.waitForFunction(() => document.querySelector('#connection').textContent === 'Connected');
-  assert.equal(await page.locator('#compare').isChecked(), true);
   const active = page.locator('form.request:not(.answered)');
   const setRange = (input, value) => input.evaluate((el, value) => { el.value = String(value); el.dispatchEvent(new Event('input', { bubbles: true })); }, value);
   assert.equal(await page.locator('#play').getAttribute('aria-pressed'), 'true');
@@ -101,31 +100,29 @@ try {
   assert.equal(await active.count(), 0, 'Paused practice does not deal another question');
   assert.equal(await page.locator('header').evaluate(el => el.getBoundingClientRect().top), 0);
   // A second deck must not immediately repeat the last question.
-  await page.locator('#compare').uncheck();
   await page.getByRole('button', { name: 'Play practice', exact: true }).click();
   await page.getByRole('button', { name: 'Pause practice', exact: true }).click();
   const nextState = await active.locator('.state pre').textContent(), nextId = await active.locator('fieldset').getAttribute('data-question');
   const next = recordings.find(run => run.request.state === nextState && Object.hasOwn(run.request.questions, nextId));
   assert.notEqual(JSON.stringify(next.request), dealt.at(-1));
   await setRange(active.locator('input[type=range]').first(), 0.5);
-  const off = await active.elementHandle();
+  const saved = await active.elementHandle();
   await active.locator('button[type=submit]').click({ delay: 350 });
-  assert.match(await off.textContent(), /Answered · comparison off/);
-  assert.equal(await off.$eval('.jev-marker', marker => marker.hidden), true);
+  assert.match(await saved.textContent(), /Matched Jev|Different from Jev/);
+  assert.equal(await saved.$eval('.jev-marker', marker => marker.hidden), false, 'Practice always compares with the saved run');
 
-  // The external model boundary is a recorded response. Exercise the live
-  // comparison protocol first, then a local late draft without model calls.
+  // A live request matching a saved run compares against it, and so does a
+  // local late draft. Neither calls a model.
   const run = recordings[0];
   const values = Object.fromEntries(Object.entries(run.jev.answers).map(([id, answer]) => [id, answer.type === 'choice' ? answer.probabilities : answer.type === 'noul' ? answer.noul : answer.score]));
   const peer = new WebSocket(new URL('/ws', app.server.url).href.replace('http:', 'ws:'), { headers: { Origin: app.server.url.origin } });
   const registered = new Promise(resolve => peer.addEventListener('message', event => { if (JSON.parse(event.data).type === 'presence') resolve(); }));
-  const comparison = new Promise(resolve => peer.addEventListener('message', event => { const message = JSON.parse(event.data); if (message.type === 'compare') resolve(message); }));
   const submitted = new Set();
   peer.addEventListener('message', event => {
     const message = JSON.parse(event.data);
     if (message.type === 'queue') peer.send(JSON.stringify({ type: 'ack', version: message.version }));
     for (const item of message.requests || []) if (!submitted.has(item.id)) {
-      submitted.add(item.id); peer.send(JSON.stringify({ type: 'submit', id: item.id, values, compare: true }));
+      submitted.add(item.id); peer.send(JSON.stringify({ type: 'submit', id: item.id, values }));
     }
   });
   peer.addEventListener('open', () => peer.send(JSON.stringify({ type: 'presence', active: true })));
@@ -144,9 +141,7 @@ try {
   const liveCard = page.locator(`form[data-id="${requestId}"]`);
   await fill(liveCard); await liveCard.locator('button[type=submit]').click({ delay: 350 });
   assert.equal((await response).status, 200);
-  await comparison;
   await page.waitForFunction(el => el.classList.contains('answered'), live);
-  peer.send(JSON.stringify({ type: 'comparison', id: requestId, jev: run.jev }));
   await page.waitForFunction(el => !el.querySelector('.jev-marker').hidden, live);
   assert.equal(await live.$eval('.actions p', el => el.textContent), 'Average of 2 answers');
   peer.close(); await new Promise(resolve => peer.addEventListener('close', resolve, { once: true }));
@@ -162,7 +157,7 @@ try {
   assert.deepEqual(await lateCard.locator('input[type=range]').evaluateAll(inputs => inputs.map(input => Number(input.value))), await liveCard.locator('input[type=range]').evaluateAll(inputs => inputs.map(input => Number(input.value))), 'Expiry preserves the filled slider values');
   await lateCard.locator('button[type=submit]').click({ delay: 350 });
   await page.waitForFunction(el => el.classList.contains('answered'), late);
-  assert.equal(await late.$eval('.jev-marker', marker => marker.hidden), true, 'Late submission stays local with comparison off');
+  assert.equal(await late.$eval('.jev-marker', marker => marker.hidden), false, 'Late submission compares with the saved run');
   await page.reload();
   await page.waitForFunction(() => document.querySelector('#connection').textContent === 'Connected');
   await active.waitFor();
@@ -170,7 +165,7 @@ try {
   assert.ok(await active.locator('input:enabled').count() > 0, 'The new practice card accepts answers');
   assert.deepEqual(errors, []);
   assert.deepEqual(externalRequests, []);
-  console.log(`WebKit: ${examples.length} shuffled rounds stayed in place with correct markers, colors, and unchanged slider positions; live comparison, local late drafts, and comparison-off passed.`);
+  console.log(`WebKit: ${examples.length} shuffled rounds stayed in place with correct markers, colors, and unchanged slider positions; saved-run comparison on practice, live, and late drafts passed.`);
 } finally {
   await browser.close();
   await app.stop();

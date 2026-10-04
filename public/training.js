@@ -111,7 +111,7 @@ export function createTraining({ dialog, makeForm, getSavedExample, onOpen, onCl
       heading.textContent = 'You are now a qualified AI model.';
       body.append(heading,
         node('p', 'Your neural network was inside you all along.', 'training-lead'),
-        node('p', 'Practice rounds start on the Answer screen; Pause stops them. Live API requests have 30 seconds from arrival. Connect OpenRouter to compare live requests with Jev. Question lets you build and send your own.'),
+        node('p', 'Practice rounds start on the Answer screen; Pause stops them. Live API requests have 30 seconds from arrival. Question lets you build and send your own, then Ask Jev too for a fresh answer from the real Jev.'),
         node('p', 'Reopen Training from the navigation anytime.', 'training-note'));
       actions.append(button('Back', () => go(4), 'secondary'), button('Enter the site', () => close(true)));
     } else {
