@@ -34,9 +34,11 @@ input[type=range]{width:100%;height:30px;margin:4px 0;accent-color:var(--accent)
 .ends{display:flex;justify-content:space-between;gap:20px;font-size:14px;color:var(--muted)}
 .ends>span{max-width:46%;white-space:pre-wrap;overflow-wrap:anywhere}
 .ends>span:last-child{text-align:right}
-.choice{padding:4px 0}
-.choice-line{margin:0}
-.choice-line .slider-track{flex:1;min-width:0;height:30px}
+.choice{padding:4px 0;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:16px}
+.choice-name{flex:1 1 auto}
+.choice-line{display:contents}
+.choice-line .range-values{margin-left:auto;flex-wrap:wrap;justify-content:flex-end;row-gap:0}
+.choice-line .slider-track{order:1;flex-basis:100%;height:30px}
 .choice-line .slider-track input[type=range]{margin:0}
 .choice-line .jev-marker{top:2px}
 .choice .choice-line output.choice-probability{font-size:13px;color:var(--muted);min-width:13ch}
@@ -207,10 +209,8 @@ a#play{display:inline-flex;align-items:center;justify-content:center;border-radi
   .player-header{padding:14px 16px}
 }
 .request.live-request{border-color:var(--accent)}
-.choice-probabilities{display:flex;align-items:center;justify-content:space-between;gap:12px;font:13px ui-monospace,monospace;color:var(--muted)}
 .choice-confidence{display:block;font:14px ui-monospace,monospace;color:var(--accent)}
 .choice-summary{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
-.choice-summary p{font-size:13px}
 .human-picked .choice-name{color:var(--accent)}
 nav #train{background:transparent;color:var(--muted);padding:0;font:inherit;border-radius:0}
 body.in-training{overflow:hidden}
@@ -276,11 +276,7 @@ body.in-training{overflow:hidden}
 .skip:hover{background:#2a2423}
 .skip:disabled{opacity:.45}
 @media(max-width:600px){
-  .choice{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:8px}
-  .choice-name{flex:1 1 auto}
-  .choice-line{display:contents}
-  .choice-line .range-values{margin-left:auto;flex-wrap:wrap;justify-content:flex-end;row-gap:0}
-  .choice-line .slider-track{flex-basis:100%}
+  .choice{column-gap:8px}
   .choice-line .range-values output{min-width:0;font-size:13px}
   .choice-line .jev-value{min-width:0}
   .choice-line .jev-value.pending{display:none}

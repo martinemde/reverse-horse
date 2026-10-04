@@ -108,7 +108,7 @@ const questionTypes = {
       option.append(label, line); field.append(option);
     }
     const summary = node('div', undefined, 'choice-summary');
-    summary.append(certainty, node('p', 'Fill any bars from 0–100%. The tallest bar sets confidence; their relative fullness sets the chances.'));
+    summary.append(certainty);
     field.append(summary);
     queueMicrotask(refresh);
     return {
