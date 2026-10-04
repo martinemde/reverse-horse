@@ -31,22 +31,30 @@
     <div class="toolbar"><div><h1>What is this?</h1></div></div>
 
     <section>
-      <p>Reverse.horse is something between a tutorial and an art project.</p>
-      <p>It is a functioning API that matches the <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev">Jev</a> <code>/v1/systemone</code> format. It presents the questions asked on the API to anyone that is connected, and their results become the answer to the API.</p>
-      <p>It’s also a tutorial intended to help you understand exactly what Jev is and what the <a href="/help#types">3 question types</a> do. By using your human brain to answer in place of the model, you get an intuitive sense of what Jev is doing.</p>
+      <p>Reverse.horse is my newest project, an attempt to understand and explain the new AI model <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev">Jev</a>, <em>by using your feeble human brain as the model</em>. Place yourself in-request and respond as best as you can to incoming questions.</p>
+      <p>Instead of reading this whole thing, I suggest you go <a href="/">try it</a>. Hit Play and it will run you through the process and types of responses so you can get a feel for what this model does directly.</p>
+    </section>
+
+    <section>
+      <h2>What is Jev?</h2>
+      <p><a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev">Jev</a> is a new AI model that has taken the internet by storm in recent weeks. The concept is based on the idea that if we make “good enough” intelligence <em>cheap</em> and <em>fast</em>, it will explode in usefulness, expanding the use of intelligence into more places than we ever thought practical.</p>
+      <p>Jev is a different direction than most LLMs have taken. ChatGPT and Claude try to be ever bigger and smarter to take over for your brain, while Jev asks only for ever-more-decomposed questions. I picked this model to clone because it impressed me. It opened up new ideas for working with intelligence, and, like all great ideas, it seems so simple.</p>
+      <p>The API route <code>systemone</code> (that’s “System One”) implies the behavior of the model. System One comes from Daniel Kahneman’s <a href="https://en.wikipedia.org/wiki/Thinking,_Fast_and_Slow"><em>Thinking, Fast and Slow</em></a>, which defines it as quick, gut-reaction thinking. System Two is what almost all modern LLMs are doing: <em>Reasoning…</em></p>
+      <p>The name “Jev” comes from Jevons Paradox, which has been a buzzy term for a little-known behavior of demand elasticity: when you make consumption of a resource more efficient, sometimes you use more of that resource than you did before. Cheaper electricity makes people apply electricity in places where it was previously too expensive to do so.</p>
+    </section>
+
+    <section>
+      <h2>Why?</h2>
+      <p>Because! Reverse.horse is something between a tutorial and an art project.</p>
+      <p>It is a functioning API that matches the <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev">Jev</a> <code>/v1/systemone</code> format. It presents the questions asked on the API to anyone that is connected, and the results become the response from the API. Send real questions to reverse.horse and any human connected can scramble to respond before the 30 second response timeout.</p>
+      <p>It’s also a tutorial intended to help you understand exactly what Jev <em>is</em> and what the <a href="/help#types">3 question types</a> mean. By using your human brain to answer in place of the model, you get an intuitive sense of what Jev is doing.</p>
       <p>It becomes immediately apparent that you suck at this. Jev can usually answer in under 1/10th of a second, and it can do thousands of questions like this in the time it takes you to answer a single one. You may even notice that for every answer that you carefully answer correctly, Jev is within a few points of what you answered. Remarkable, isn’t it?</p>
     </section>
 
     <section>
       <h2>Why “Reverse Horse”?</h2>
       <p>The name comes from Cory Doctorow’s <a href="https://pluralistic.net/2022/04/17/revenge-of-the-chickenized-reverse-centaurs/">reverse centaur</a>, a situation created by AI that places the human in the position of being a meat body that does what the AI tells it. Instead of a good centaur, a human brain controlling a powerful horse body, you have the opposite: an “unthinking” horse brain controlling the feeble human body.</p>
-      <p>The irony here is that I’ve inverted it. By using your feeble human brain to answer as the “unthinking” AI, I’m pointing out just how slow you are at it, and how impressively fast an accurate Jev is. When I started the project, the example questions were actually too complex to answer within a reasonable timeout, so I had to break them down.</p>
-    </section>
-
-    <section>
-      <h2>Why Jev?</h2>
-      <p><a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev">Jev</a> is based on the idea that if we make “good enough” intelligence <em>cheap</em> and <em>fast</em>, it will explode in usefulness, expanding the use of intelligence into more places than we ever thought practical. It’s a different direction than most LLMs have taken. ChatGPT and Claude try to be ever bigger and smarter to take over for your brain, while Jev asks only for ever-more-decomposed questions.</p>
-      <p>The API route <code>systemone</code> and the name show its two influences. System One comes from Daniel Kahneman’s <a href="https://en.wikipedia.org/wiki/Thinking,_Fast_and_Slow"><em>Thinking, Fast and Slow</em></a>, which defines it as quick, gut-reaction thinking. System Two is what almost all modern LLMs are doing: <em>Reasoning…</em></p>
+      <p>The irony here is that I’ve inverted it. By using your feeble human brain to answer as the “unthinking” AI, I’m pointing out just how slow you are at it, and how impressively fast and accurate Jev is. When I started the project, the example questions were actually too complex to answer within a reasonable timeout, so I had to break them down. Feeble human brain!</p>
     </section>
 
     <section>
@@ -59,12 +67,18 @@
     </section>
 
     <section>
-      <h2>How does it work?</h2>
-      <p>In theory, everyone answering questions is connected to a websocket and will be asked live the questions that arrive at the API. Their answers are assembled into the response. That’s the goal, and it works across a small group, but it’s almost certainly bound to break if too many people visit. I look forward to finding out the strange new ways this can break.</p>
+      <h2>How does reverse.horse work?</h2>
+      <p>In theory, everyone answering questions is connected to a web socket and will be asked live the questions that arrive at the API. Their answers are assembled into the response. That’s the goal, and it works across a small group, but it’s almost certainly bound to break if too many people visit. I look forward to finding out the strange new ways this can break.</p>
     </section>
 
     <section>
-      <p>Please <a href="https://github.com/martinemde/reverse-horse/issues">let me know</a> what you think,<br>
+      <h2>How did I not know about the <code>.horse</code> TLD!?</h2>
+      <p>Welcome to a whole new world of domain ideas! The domain reverse.horse is me stupidly spending $25 on a joke. Secretly, I’ve been chomping at the bit to have a good reason to buy a <code>.horse</code> domain for years. Every new idea I have gets a run through “could this be a .horse domain?” I already have another project planned that may end up on <code>.horse</code>. It’s my favorite silly TLD because it begs so many questions: Why horse? Why aren’t there other animal TLDs? Where’s the demand for this TLD coming from? How has this not created a new economic boom in horse related websites?</p>
+    </section>
+
+    <section>
+      <h2>Enough silliness!</h2>
+      <p>Please go <a href="/">try it out</a> and <a href="https://github.com/martinemde/reverse-horse/discussions/2">let me know what you think</a>.<br>
       <a href="https://martinemde.com">Martin Emde</a></p>
     </section>
   </main>
