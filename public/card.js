@@ -1,5 +1,5 @@
 import { choiceWeights } from './protocol.js';
-import { matchesJev, hourlyPay } from './compare.js';
+import { matchesJev, hourlyPay, slowdown } from './compare.js';
 import { node } from './dom.js';
 
 const text = value => typeof value === 'string' ? value : JSON.stringify(value, null, 2);
@@ -138,7 +138,7 @@ export function createCard(item, { onSubmit, onSkip, onError, connected, elapsed
   let outcomeSignature = '';
   // Paid at Jev's rate for the time it took you. Untimed cards count from creation.
   const shownAt = Date.now();
-  let pay;
+  let pay, slower;
   const card = node('form', undefined, 'request');
   card.dataset.id = item.id;
   card.classList.toggle('live-request', !item.local);
@@ -182,7 +182,8 @@ export function createCard(item, { onSubmit, onSkip, onError, connected, elapsed
     event.preventDefault(); validity(); if (button.disabled) return;
     try {
       // Training answers finish the card immediately; there is nothing to wait for.
-      pay = hourlyPay(item.request, elapsed?.(item) ?? (Date.now() - shownAt) / 1000);
+      const seconds = elapsed?.(item) ?? (Date.now() - shownAt) / 1000;
+      pay = hourlyPay(item.request, seconds); slower = slowdown(seconds);
       if (!item.training) { submitting = true; validity(); }
       onSubmit(item, values);
     } catch (error) { submitting = false; validity(); onError(error); }
@@ -198,8 +199,8 @@ export function createCard(item, { onSubmit, onSkip, onError, connected, elapsed
       button.style.minWidth = `${button.getBoundingClientRect().width}px`;
       card.classList.add('answered');
       skip.remove();
-      clock.style.width = `${clock.getBoundingClientRect().width}px`;
-      clock.textContent = 'Done'; clock.classList.remove('urgent'); clock.setAttribute('aria-label', 'Answered');
+      clock.style.minWidth = `${clock.getBoundingClientRect().width}px`;
+      clock.textContent = slower ?? 'Done'; clock.classList.remove('urgent'); clock.setAttribute('aria-label', 'Answered');
       button.disabled = true; button.textContent = pay ?? 'Submitted';
       for (const [id, view] of views) {
         view.field.disabled = true;

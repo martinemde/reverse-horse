@@ -111,6 +111,7 @@ try {
   assert.match(await saved.textContent(), /Matched Jev|Different from Jev/);
   assert.equal(await saved.$eval('.jev-marker', marker => marker.hidden), false, 'Practice always compares with the saved run');
   assert.match(await saved.$eval('button[type=submit]', el => el.textContent), /^Hourly Pay: \$[\d.]+\/hr$/);
+  assert.match(await saved.$eval('.clock', el => el.textContent), /^[\d,]+x Slower$/);
 
   // A live request matching a saved run compares against it, and so does a
   // local late draft. Neither calls a model.

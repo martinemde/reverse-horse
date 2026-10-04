@@ -48,6 +48,11 @@ export const jevInputPrice = 0.042 / 1e6;
 export function jevCost(request) {
   return Math.ceil(JSON.stringify({ state: request.state, questions: request.questions }).length / 4) * jevInputPrice;
 }
+// Median measured round trip from scripts/time-jev.js.
+export const jevSeconds = 0.5;
+export function slowdown(seconds) {
+  return `${Math.max(1, Math.round(seconds / jevSeconds)).toLocaleString('en-US')}x Slower`;
+}
 export function hourlyPay(request, seconds) {
   return `Hourly Pay: $${(jevCost(request) * 3600 / Math.max(seconds, 0.1)).toPrecision(2)}/hr`;
 }
