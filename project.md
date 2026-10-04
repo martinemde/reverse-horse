@@ -35,6 +35,8 @@ the first visit again. **Training** in the nav reopens it. **Help** (`/help`, st
 JSON, each type's fields, averaging, and Jev matching. Keep its examples in step
 with `answerRequest`. **About** (`/about`, static `public/about.html`) is
 Martin's explanation of the project, in his words.
+**Privacy** (`/privacy`, static `public/privacy.html`) is linked from the
+Answer footer.
 
 ## Practice
 

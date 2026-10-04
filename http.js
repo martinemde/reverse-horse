@@ -1,5 +1,5 @@
 export const assetFiles = new Map([
-  ['/', 'index.html'], ['/auth/openrouter/callback', 'request.html'], ['/request', 'request.html'], ['/help', 'help.html'], ['/about', 'about.html'],
+  ['/', 'index.html'], ['/auth/openrouter/callback', 'request.html'], ['/request', 'request.html'], ['/help', 'help.html'], ['/about', 'about.html'], ['/privacy', 'privacy.html'],
   ...['app.js', 'training.js', 'protocol.js', 'examples.js', 'example-results.json', 'auth.js', 'compare.js', 'builder.js', 'builder-data.js', 'card.js', 'dom.js', 'style.css', 'horse.svg', 'horse.LICENSE.txt', 'unfurl.png'].map(file => [`/${file}`, file]),
 ]);
 
