@@ -1,3 +1,5 @@
+import { requestLimits } from './protocol.js';
+
 export function buildRequest({ state, stateFormat, questions }) {
   if (!state.trim()) throw new Error('Add the state you want evaluated.');
   let parsedState = state;
@@ -6,6 +8,7 @@ export function buildRequest({ state, stateFormat, questions }) {
     if (parsedState === null || !['string', 'object'].includes(typeof parsedState)) throw new Error('JSON state must be a string, object, or array.');
   }
   if (!questions.length) throw new Error('Add at least one question.');
+  if (questions.length > requestLimits.questions) throw new Error(`Ask at most ${requestLimits.questions} questions. Humans have 30 seconds.`);
   const ids = new Set();
   const entries = questions.map(q => {
     const id = q.id.trim();
@@ -32,5 +35,8 @@ export function buildRequest({ state, stateFormat, questions }) {
     } else throw new Error('Choose a supported question type.');
     return [id, question];
   });
-  return { model: 'jev-latest', state: parsedState, questions: Object.fromEntries(entries) };
+  const request = { model: 'jev-latest', state: parsedState, questions: Object.fromEntries(entries) };
+  const bytes = new TextEncoder().encode(JSON.stringify(request)).byteLength;
+  if (bytes > requestLimits.bytes) throw new Error(`This request is ${bytes} bytes; keep it under ${requestLimits.bytes} so a human can read it in time.`);
+  return request;
 }

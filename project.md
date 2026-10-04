@@ -116,7 +116,10 @@ curl http://127.0.0.1:3000/v1/systemone \
 Invalid requests return 400. Callers need an HTTP timeout over 30 seconds.
 Disconnecting early removes the request. At most 100 live requests, including
 body readers; unanswered HTTP timeouts release their slots. Bodies must fit in
-64 KiB. No answering screens or full capacity returns 503 with `Retry-After: 1`
+2,400 bytes with at most 3 questions (`requestLimits` in `protocol.js`: three
+times the largest built-in example, 802 bytes pretty-printed). Humans have 30
+seconds, and small requests make the operator key dull to abuse. The Question
+builder enforces the same limits and disables Add question at three. No answering screens or full capacity returns 503 with `Retry-After: 1`
 (without the operator key; see Jev fallback).
 
 ## Answers
@@ -162,13 +165,13 @@ close the socket after ten seconds. Slow connections can be replaced without
 shortening a human's 30-second request deadline. Reconnect uses exponential
 backoff with jitter. No global queue or result feed goes to idle observers.
 
-HTTP admission reserves 64 KiB before reading and allows at most 16 body readers,
+HTTP admission reserves 2,400 bytes before reading and allows at most 16 body readers,
 100 requests, and 2 MiB reserved/retained request bytes. The visible pool limits
 admission further to two rounds of panels. The deadline starts before body reads;
 the Worker stamps arrival before forwarding so Durable Object queue time counts.
 Timeout, abort, validation failure, and shutdown release reservations.
-Request structure is capped at 32 questions, 512 options/score levels, 16 nesting
-levels, and 2,048 values to bound rendering and parsed-object overhead. Socket
+Request structure is capped at 3 questions, 512 options/score levels, 16 nesting
+levels, and 2,048 values (the byte cap usually trips first) to bound rendering and parsed-object overhead. Socket
 limits are 4,096 connections, 128 KiB incoming messages, and a token bucket of
 40 messages with ten messages/second refill. Snapshots stay below 256 KiB. Bun
 also enforces transport payload and backpressure limits. Cloudflare object overload

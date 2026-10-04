@@ -126,7 +126,8 @@ test('oversized and deeply nested requests cannot consume a panel', async () => 
   expect((await post(room, { body: JSON.stringify({ ...body, state: 'x'.repeat(roomLimits.requestBytes) }) })).status).toBe(413);
   let state = 'deep'; for (let i = 0; i < 20; i++) state = { state };
   expect((await post(room, { body: JSON.stringify({ ...body, state }) })).status).toBe(400);
-  expect((await post(room, { body: JSON.stringify({ ...body, state: Array.from({ length: 3000 }, () => ({})) }) })).status).toBe(400);
+  // The byte cap now trips before the 2,048-value structure cap can.
+  expect((await post(room, { body: JSON.stringify({ ...body, state: Array.from({ length: 3000 }, () => ({})) }) })).status).toBe(413);
   expect(room.stats().accepted).toBe(0); expect(room.stats().pendingBytes).toBe(0);
 });
 
@@ -143,10 +144,11 @@ test('connections, inbound message sizes, and message rates have hard limits', a
   expect(peers[2].ws.closed).toBe(1013);
 });
 
-test('history byte eviction keeps every snapshot within its budget', async () => {
+test('history eviction keeps every snapshot within its budget', async () => {
   const room = create(); const peers = Array.from({ length: 300 }, () => peer(room)); await tick();
-  const large = { ...body, state: 'x'.repeat(60 * 1024) };
-  for (let i = 0; i < 75; i++) {
+  const large = { ...body, state: 'x'.repeat(roomLimits.requestBytes - JSON.stringify(body).length) };
+  expect(JSON.stringify(large).length).toBeLessThanOrEqual(roomLimits.requestBytes);
+  for (let i = 0; i < roomLimits.history + 20; i++) {
     const call = post(room, { body: JSON.stringify(large) }); await tick();
     const panel = peers.filter(p => p.item && !p.item.submitted);
     expect(panel).toHaveLength(5);
@@ -154,7 +156,7 @@ test('history byte eviction keeps every snapshot within its budget', async () =>
     expect((await call).status).toBe(200); await tick();
     expect(room.stats().historyBytes).toBeLessThanOrEqual(roomLimits.historyBytes);
   }
-  expect(room.stats().history).toBeLessThan(75);
+  expect(room.stats().history).toBe(roomLimits.history);
   for (const p of peers) for (const message of p.messages) expect(new TextEncoder().encode(JSON.stringify(message)).byteLength).toBeLessThanOrEqual(roomLimits.frameBytes);
 });
 

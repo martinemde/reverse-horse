@@ -1,4 +1,5 @@
 import { buildRequest } from './builder-data.js';
+import { requestLimits } from './protocol.js';
 import { node } from './dom.js';
 import { migrateStorage, getKey, disconnect, loginURL, completeLogin } from './auth.js';
 import { compareWithJev, matchesJev } from './compare.js';
@@ -29,6 +30,7 @@ function createEditor(fields, { onChange, onSave, onSend }) {
   }
   function preview() {
     $('#copy-status').textContent = '';
+    $('#add-question').disabled = cards.length >= requestLimits.questions;
     try {
       $('#preview').value = JSON.stringify(draft(), null, 2);
       $('#builder-error').hidden = true;

@@ -209,7 +209,7 @@ test('expiry releases API capacity and transfers unfinished cards to their assig
 test('invalid requests and invalid answers do not consume a waiting request', async () => {
   const base = app(); const client = connect(base);
   await client.next(m => m.type === 'queue');
-  for (const body of [{}, { ...request, questions: {} }, { ...request, questions: { x: { type: 'score', instructions: 'Rating?', criteria: ['One'] } } }]) expect((await post(base, body)).status).toBe(400);
+  for (const body of [{}, { ...request, questions: {} }, { ...request, questions: { x: { type: 'score', instructions: 'Rating?', criteria: ['One'] } } }, { ...request, questions: Object.fromEntries(['a', 'b', 'c', 'd'].map(id => [id, { type: 'noul', instructions: 'Yes?' }])) }]) expect((await post(base, body)).status).toBe(400);
   const response = post(base);
   const item = (await client.next(m => m.requests?.length)).requests[0];
   client.send({ type: 'submit', id: item.id, values: { urgent: 0, department: { billing: 0, support: 0 }, mood: 1 } });
@@ -269,10 +269,12 @@ test('a request built from form fields travels through the API and returns all t
   expect(result.answers.mood.score).toBe(1.2);
 });
 
-test('builder rejects malformed JSON, duplicate IDs and incomplete criteria before sending', () => {
+test('builder rejects malformed JSON, duplicate IDs, incomplete criteria, and oversized requests before sending', () => {
   const q = { id: 'q', type: 'noul', instructions: 'Question?' };
   expect(() => buildRequest({ state: '{', stateFormat: 'json', questions: [q] })).toThrow('State must be valid JSON');
   expect(() => buildRequest({ state: 'text', questions: [q, q] })).toThrow('used more than once');
   expect(() => buildRequest({ state: 'text', questions: [{ ...q, type: 'choice', options: [{ key: 'a', description: '' }, { key: 'a', description: '' }] }] })).toThrow('unique key');
   expect(() => buildRequest({ state: 'text', questions: [{ ...q, type: 'score', levels: ['Only one'] }] })).toThrow('2–10');
+  expect(() => buildRequest({ state: 'text', questions: ['a', 'b', 'c', 'd'].map(id => ({ ...q, id })) })).toThrow('at most 3 questions');
+  expect(() => buildRequest({ state: 'x'.repeat(2400), questions: [q] })).toThrow('keep it under 2400');
 });

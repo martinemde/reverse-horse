@@ -1,13 +1,16 @@
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const description = value => typeof value === 'string' || (value !== null && typeof value === 'object');
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
+// Humans answer in 30 seconds, so requests stay small. The largest built-in
+// example is 802 bytes pretty-printed; three times that, rounded down.
+export const requestLimits = Object.freeze({ questions: 3, bytes: 2400 });
 
 export function validateRequest(body) {
   assert(object(body), 'Request must be an object');
   assert(description(body.state), 'state must be a string, object, or array');
   assert(typeof body.model === 'string' && body.model.length > 0, 'model is required');
   assert(object(body.questions) && Object.keys(body.questions).length > 0, 'questions must be a nonempty map');
-  assert(Object.keys(body.questions).length <= 32, 'At most 32 questions are allowed');
+  assert(Object.keys(body.questions).length <= requestLimits.questions, `At most ${requestLimits.questions} questions are allowed`);
   // JSON.parse accepts nesting that JSON.stringify and browser rendering cannot.
   const stack = [[body, 0]];
   let nodes = 1;

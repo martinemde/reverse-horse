@@ -1,10 +1,10 @@
-import { validateRequest, answerRequest, averageResponses } from './public/protocol.js';
+import { validateRequest, answerRequest, averageResponses, requestLimits } from './public/protocol.js';
 import { apiPaths } from './http.js';
 
 // Shared by Bun and the Durable Object. These are budgets, not tuning knobs.
 export const roomLimits = Object.freeze({
   panel: 5, requests: 100, readers: 16, clients: 4096,
-  requestBytes: 64 * 1024, pendingBytes: 2 * 1024 * 1024,
+  requestBytes: requestLimits.bytes, pendingBytes: 2 * 1024 * 1024,
   messageBytes: 128 * 1024, frameBytes: 256 * 1024,
   historyBytes: 4 * 1024 * 1024, clientHistoryBytes: 128 * 1024,
   history: 100, ackMs: 10_000, fallbacks: 16, fallbackMs: 15_000,
@@ -198,7 +198,7 @@ export function createRoom({ timeoutMs = 30_000, fallback } = {}) {
     if (req.method !== 'POST' || !apiPaths.has(url.pathname)) return error('Not found', 404);
     if (req.headers.get('origin') && req.headers.get('origin') !== url.origin) return error('Origin not allowed', 403);
     const length = Number(req.headers.get('content-length'));
-    if (length > roomLimits.requestBytes) return error('Request body exceeds 64 KiB', 413);
+    if (length > roomLimits.requestBytes) return error(`Request body exceeds ${roomLimits.requestBytes} bytes`, 413);
     // Allow at most two rounds of work for the visible human pool. Reading bodies
     // reserves both a request slot and the maximum bytes before any await.
     // With a fallback, an empty room still admits up to the hard request budget.
@@ -225,7 +225,7 @@ export function createRoom({ timeoutMs = 30_000, fallback } = {}) {
         const { done, value } = await Promise.race([reader.read(), cancelled]);
         if (done) break;
         bytes += value.byteLength;
-        if (bytes > roomLimits.requestBytes) { void reader.cancel().catch(() => {}); throw Object.assign(new Error('Request body exceeds 64 KiB'), { status: 413 }); }
+        if (bytes > roomLimits.requestBytes) { void reader.cancel().catch(() => {}); throw Object.assign(new Error(`Request body exceeds ${roomLimits.requestBytes} bytes`), { status: 413 }); }
         text += decoder.decode(value, { stream: true });
       }
       body = validateRequest(JSON.parse(text + decoder.decode()));
