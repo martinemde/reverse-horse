@@ -166,3 +166,38 @@ test('missing acknowledgements disconnect stalled sockets without retaining thei
   await Bun.sleep(roomLimits.ackMs + 25);
   expect(stalled.ws.closed).toBe(1013); expect(room.stats().clients).toBe(0);
 }, 12_000);
+
+// The operator key is the model boundary; this fake records calls instead.
+const jev = { model: 'jev-latest', answers: { yes: { type: 'noul', noul: 0.8 } } };
+test('an empty room holds the full deadline, then answers with the fallback', async () => {
+  const calls = [];
+  const room = create({ timeoutMs: 100, fallback: async request => { calls.push(request); return { jev }; } });
+  const started = Date.now();
+  const response = await post(room);
+  expect(Date.now() - started).toBeGreaterThanOrEqual(95);
+  expect(response.status).toBe(200);
+  expect(response.headers.get('X-Reverse-Horse-Answers')).toBe('0');
+  expect(response.headers.get('X-Reverse-Horse-Source')).toBe('jev');
+  expect(await response.json()).toEqual(jev);
+  expect(calls).toEqual([body]);
+  expect(room.stats().fallbacks).toBe(0); expect(room.stats().pendingBytes).toBe(0);
+});
+
+test('human votes and failures never reach the fallback answer', async () => {
+  const calls = [];
+  const room = create({ timeoutMs: 100, fallback: async () => { calls.push(1); throw new Error('OpenRouter down'); } });
+  const late = peer(room); await tick();
+  const answered = post(room); await tick();
+  late.send({ type: 'submit', id: late.item.id, values: { yes: 1 } });
+  const human = await answered;
+  expect(human.headers.get('X-Reverse-Horse-Source')).toBeNull();
+  expect((await human.json()).answers.yes.noul).toBe(1);
+  expect(calls).toEqual([]);
+  // A newcomer could have answered; nobody did, and the failed fallback is a plain 504.
+  expect((await post(room)).status).toBe(504);
+  expect(calls).toEqual([1]);
+});
+
+test('without a fallback an empty room still rejects immediately', async () => {
+  expect((await post(create())).status).toBe(503);
+});

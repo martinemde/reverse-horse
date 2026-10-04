@@ -7,16 +7,17 @@ export const roomLimits = Object.freeze({
   requestBytes: 64 * 1024, pendingBytes: 2 * 1024 * 1024,
   messageBytes: 128 * 1024, frameBytes: 256 * 1024,
   historyBytes: 4 * 1024 * 1024, clientHistoryBytes: 128 * 1024,
-  history: 100, ackMs: 10_000,
+  history: 100, ackMs: 10_000, fallbacks: 16, fallbackMs: 15_000,
 });
 const encoder = new TextEncoder();
 const size = text => encoder.encode(text).byteLength;
 const json = (body, status = 200, headers) => Response.json(body, { status, headers });
 const error = (message, status) => json({ error: { message } }, status, status === 503 ? { 'Retry-After': '1' } : undefined);
 
-export function createRoom({ timeoutMs = 30_000 } = {}) {
+// fallback(request, signal) resolves to { jev } when nobody voted by the deadline.
+export function createRoom({ timeoutMs = 30_000, fallback } = {}) {
   const pending = new Map(), clients = new Map(), active = new Set(), readers = new Set();
-  const history = new Map(), dirty = new Set();
+  const history = new Map(), dirty = new Set(), fallbacks = new Set();
   let pendingBytes = 0, historyBytes = 0, flushTimer, stopped = false;
   const counters = { accepted: 0, rejected: 0, frames: 0, sentBytes: 0 };
 
@@ -124,7 +125,8 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
     pendingBytes -= entry.bytes;
     const human = status !== 499 && status !== 503 && entry.answers.size ? averageResponses([...entry.answers.values()].map(answer => answer.response)) : undefined;
     // Resolve before websocket delivery: a stalled browser cannot hold HTTP open.
-    entry.resolve(human ? json(human, 200, { 'X-Reverse-Horse-Answers': String(entry.answers.size), 'X-Reverse-Horse-Target': String(entry.target) }) : error(outcome, status));
+    if (!human && status === 504 && fallback && !stopped && fallbacks.size < roomLimits.fallbacks) void answerWithJev(entry, outcome);
+    else entry.resolve(human ? json(human, 200, { 'X-Reverse-Horse-Answers': String(entry.answers.size), 'X-Reverse-Horse-Target': String(entry.target) }) : error(outcome, status));
     entry.resolve = entry.signal = entry.abort = undefined;
     for (const state of entry.audience) {
       if (state.job === entry) {
@@ -135,6 +137,17 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
     save({ id: entry.id, request: entry.request, title: 'API request', human,
       answerCount: entry.answers.size, late: false, status: human ? 'Answered' : outcome }, entry.audience);
     notify(entry); wake();
+  }
+  // Only after the full deadline passes with no votes, so the operator's key is slow to abuse.
+  async function answerWithJev({ resolve, request, signal, target }, outcome) {
+    const controller = new AbortController(), stop = () => controller.abort();
+    const timer = setTimeout(stop, roomLimits.fallbackMs);
+    fallbacks.add(controller); signal?.addEventListener('abort', stop, { once: true });
+    try {
+      const { jev } = await fallback(request, controller.signal);
+      resolve(json(jev, 200, { 'X-Reverse-Horse-Answers': '0', 'X-Reverse-Horse-Target': String(target), 'X-Reverse-Horse-Source': 'jev' }));
+    } catch { resolve(error(outcome, 504)); }
+    finally { clearTimeout(timer); signal?.removeEventListener('abort', stop); fallbacks.delete(controller); }
   }
   function close(ws) {
     const state = clients.get(ws);
@@ -188,8 +201,9 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
     if (length > roomLimits.requestBytes) return error('Request body exceeds 64 KiB', 413);
     // Allow at most two rounds of work for the visible human pool. Reading bodies
     // reserves both a request slot and the maximum bytes before any await.
-    const capacity = Math.min(roomLimits.requests, 2 * Math.ceil(active.size / Math.min(roomLimits.panel, active.size || 1)));
-    if (stopped || !active.size || readers.size >= roomLimits.readers || pending.size + readers.size >= capacity || pendingBytes + roomLimits.requestBytes > roomLimits.pendingBytes) {
+    // With a fallback, an empty room still admits up to the hard request budget.
+    const capacity = fallback ? roomLimits.requests : Math.min(roomLimits.requests, 2 * Math.ceil(active.size / Math.min(roomLimits.panel, active.size || 1)));
+    if (stopped || (!active.size && !fallback) || readers.size >= roomLimits.readers || pending.size + readers.size >= capacity || pendingBytes + roomLimits.requestBytes > roomLimits.pendingBytes) {
       counters.rejected++; return error('Answering capacity is full', 503);
     }
     const arrival = Number(req.headers.get('X-Reverse-Horse-Arrival'));
@@ -223,7 +237,7 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
     }
     return new Promise(resolve => {
       const entry = { id: crypto.randomUUID(), request: body, createdAt, deadline, bytes,
-        target: Math.min(roomLimits.panel, active.size), participants: new Set(), audience: new Set(), answers: new Map(), resolve, signal: req.signal };
+        target: Math.min(roomLimits.panel, fallback ? Math.max(1, active.size) : active.size), participants: new Set(), audience: new Set(), answers: new Map(), resolve, signal: req.signal };
       // Presence can change while reading. Never admit a zero-vote panel.
       if (stopped || !entry.target) { resolve(error('No answering screens available', 503)); return; }
       entry.abort = () => finish(entry, 'Caller disconnected', 499);
@@ -258,11 +272,12 @@ export function createRoom({ timeoutMs = 30_000 } = {}) {
         handlers[message.type](state, message);
       } catch (e) { send(state, { type: 'error', message: e.message }); }
     },
-    stats() { return { ...counters, pending: pending.size, readers: readers.size, pendingBytes, clients: clients.size, active: active.size, history: history.size, historyBytes }; },
+    stats() { return { ...counters, pending: pending.size, readers: readers.size, pendingBytes, clients: clients.size, active: active.size, history: history.size, historyBytes, fallbacks: fallbacks.size }; },
     stop() {
       stopped = true; clearTimeout(flushTimer); flushTimer = undefined;
       for (const admission of readers) admission.cancel('Server stopped', 503);
       for (const entry of [...pending.values()]) finish(entry, 'Server stopped', 503);
+      for (const controller of fallbacks) controller.abort();
       // The transport owner stops its sockets. Closing Bun sockets here before
       // server.stop(true) makes Bun 1.2.15 wait forever for shutdown.
       for (const state of [...clients.values()]) close(state.ws);

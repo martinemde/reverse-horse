@@ -10,7 +10,8 @@ Be Jev. A Bun server or Cloudflare Worker accepts TypeSafe System One requests,
 shows them live over a WebSocket, and holds the HTTP connection while humans
 answer. Each call has 30 seconds from arrival, queue time included. The caller
 gets the average of an assigned panel of up to five browsers, the average so far at
-the deadline, or 504 if nobody answered. Late answers can still be saved and
+the deadline, or 504 if nobody answered (or Jev's answer, when the operator key
+is set; see Jev fallback). Late answers can still be saved and
 compared with Jev locally in the answering tab but never reach the caller.
 
 ## Run
@@ -77,6 +78,25 @@ connected, every 200 also posts the sent request to
 using the same match rules. **Disconnect OpenRouter** deletes the local key (it
 does not revoke it). The server does not read `TYPESAFE_API_KEY`.
 
+## Jev fallback
+
+`OPENROUTER_API_KEY` (operator's key, capped at $0.10/day on OpenRouter) makes
+the API always answer. Bun reads it only in the `bun start` entry point, never in
+`startServer`, so tests and browser checks can't reach a model; the Worker reads
+the secret from `env`. With it set, an empty room admits requests up to the hard
+budgets (100 requests, 16 readers, 2 MiB) instead of the visible-pool limit, and
+every panel targets at least one person so a newcomer can still answer. Only a
+request with zero votes at the full 30-second deadline asks Jev via
+`compareWithJev`; the wait is the abuse deterrent. The reply is Jev's validated
+`{ model, answers }` with `X-Reverse-Horse-Answers: 0` and
+`X-Reverse-Horse-Source: jev`. At most 16 lookups run at once, each capped at 15
+seconds and aborted when the caller disconnects; overflow or failure returns the
+usual 504. Answering screens still see the timed-out card.
+
+Set it with `wrangler secret put OPENROUTER_API_KEY` for Cloudflare, or
+`OPENROUTER_API_KEY=... bun start` locally (`.dev.vars` for `wrangler dev`, already
+gitignored).
+
 ## Call it
 
 **Question** (`/request`) builds Noul, Choice, and Score questions over text or
@@ -96,7 +116,8 @@ curl http://127.0.0.1:3000/v1/systemone \
 Invalid requests return 400. Callers need an HTTP timeout over 30 seconds.
 Disconnecting early removes the request. At most 100 live requests, including
 body readers; unanswered HTTP timeouts release their slots. Bodies must fit in
-64 KiB. No answering screens or full capacity returns 503 with `Retry-After: 1`.
+64 KiB. No answering screens or full capacity returns 503 with `Retry-After: 1`
+(without the operator key; see Jev fallback).
 
 ## Answers
 

@@ -1,8 +1,9 @@
 import { createRoom, roomLimits } from './room.js';
 import { assetFiles, assetHeaders } from './http.js';
+import { compareWithJev } from './public/compare.js';
 
-export function startServer({ port = Number(process.env.PORT || 3000), hostname = '127.0.0.1', timeoutMs = 30_000 } = {}) {
-  const room = createRoom({ timeoutMs });
+export function startServer({ port = Number(process.env.PORT || 3000), hostname = '127.0.0.1', timeoutMs = 30_000, fallback } = {}) {
+  const room = createRoom({ timeoutMs, fallback });
   const server = Bun.serve({
     hostname, port, idleTimeout: 0, maxRequestBodySize: roomLimits.requestBytes,
     fetch(req, server) {
@@ -22,7 +23,10 @@ export function startServer({ port = Number(process.env.PORT || 3000), hostname 
 }
 
 if (import.meta.main) {
-  const app = startServer();
+  // Only the CLI reads the key, so tests and browser checks never call a model.
+  const key = process.env.OPENROUTER_API_KEY;
+  const app = startServer({ fallback: key ? (request, signal) => compareWithJev(request, key, signal) : undefined });
+  if (key) console.log('OPENROUTER_API_KEY set · unanswered requests ask Jev after the deadline');
   console.log(`Reverse Horse listening at ${app.server.url}`);
   for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, async () => { await app.stop(); process.exit(0); });
 }

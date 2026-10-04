@@ -1,13 +1,15 @@
 import { DurableObject } from 'cloudflare:workers';
 import { createRoom } from './room.js';
 import { apiPaths, assetFiles, assetHeaders } from './http.js';
+import { compareWithJev } from './public/compare.js';
 
 // A single instance owns the shared queue and every WebSocket connection.
 // Standard WebSockets keep its in-memory state alive while browsers are connected.
 export class ReverseHorseRoom extends DurableObject {
   constructor(ctx, env) {
     super(ctx, env);
-    this.room = createRoom();
+    const key = env.OPENROUTER_API_KEY;
+    this.room = createRoom({ fallback: key ? (request, signal) => compareWithJev(request, key, signal) : undefined });
   }
 
   fetch(request) {
