@@ -3801,18 +3801,19 @@
   },
   {
     "title": "Brock's gym · Pokémon",
-    "recordedAt": "2026-10-04T06:16:56.400Z",
+    "recordedAt": "2026-10-04T06:19:37.038Z",
     "request": {
       "model": "jev-latest",
       "state": "You are about to enter the Pewter City gym to face Brock, who uses Rock-type Pokémon.",
       "questions": {
-        "starter": {
+        "pokemon": {
           "type": "choice",
-          "instructions": "Which starter Pokémon is best to face off against this gym?",
+          "instructions": "Which Pokémon is best to face off against this gym?",
           "criteria": {
             "Bulbasaur": null,
             "Charmander": null,
-            "Squirtle": null
+            "Squirtle": null,
+            "Pikachu": null
           }
         }
       }
@@ -3820,13 +3821,14 @@
     "jev": {
       "model": "typesafe/jev-1.13-20260917",
       "answers": {
-        "starter": {
+        "pokemon": {
           "type": "choice",
-          "confidence": 0.1,
+          "confidence": 0.12,
           "probabilities": {
-            "Bulbasaur": 0.3,
-            "Charmander": 0.29,
-            "Squirtle": 0.41000000000000003
+            "Bulbasaur": 0.29,
+            "Charmander": 0.2,
+            "Squirtle": 0.34,
+            "Pikachu": 0.17
           },
           "choice": "Squirtle"
         }
@@ -3835,18 +3837,19 @@
   },
   {
     "title": "Misty's gym · Pokémon",
-    "recordedAt": "2026-10-04T06:16:56.603Z",
+    "recordedAt": "2026-10-04T06:19:37.266Z",
     "request": {
       "model": "jev-latest",
       "state": "You are about to enter the Cerulean City gym to face Misty, who uses Water-type Pokémon.",
       "questions": {
-        "starter": {
+        "pokemon": {
           "type": "choice",
-          "instructions": "Which starter Pokémon is best to face off against this gym?",
+          "instructions": "Which Pokémon is best to face off against this gym?",
           "criteria": {
             "Bulbasaur": null,
             "Charmander": null,
-            "Squirtle": null
+            "Squirtle": null,
+            "Pikachu": null
           }
         }
       }
@@ -3854,33 +3857,35 @@
     "jev": {
       "model": "typesafe/jev-1.13-20260917",
       "answers": {
-        "starter": {
+        "pokemon": {
           "type": "choice",
-          "confidence": 0.13,
+          "confidence": 0.3,
           "probabilities": {
-            "Bulbasaur": 0.42,
-            "Charmander": 0.4,
-            "Squirtle": 0.18
+            "Bulbasaur": 0.22,
+            "Charmander": 0.22,
+            "Squirtle": 0.08,
+            "Pikachu": 0.48
           },
-          "choice": "Bulbasaur"
+          "choice": "Pikachu"
         }
       }
     }
   },
   {
     "title": "Lt. Surge's gym · Pokémon",
-    "recordedAt": "2026-10-04T06:16:56.800Z",
+    "recordedAt": "2026-10-04T06:19:37.437Z",
     "request": {
       "model": "jev-latest",
       "state": "You are about to enter the Vermilion City gym to face Lt. Surge, who uses Electric-type Pokémon.",
       "questions": {
-        "starter": {
+        "pokemon": {
           "type": "choice",
-          "instructions": "Which starter Pokémon is best to face off against this gym?",
+          "instructions": "Which Pokémon is best to face off against this gym?",
           "criteria": {
             "Bulbasaur": null,
             "Charmander": null,
-            "Squirtle": null
+            "Squirtle": null,
+            "Pikachu": null
           }
         }
       }
@@ -3888,33 +3893,35 @@
     "jev": {
       "model": "typesafe/jev-1.13-20260917",
       "answers": {
-        "starter": {
+        "pokemon": {
           "type": "choice",
-          "confidence": 0.05,
+          "confidence": 0.07,
           "probabilities": {
-            "Bulbasaur": 0.36,
-            "Charmander": 0.31,
-            "Squirtle": 0.33
+            "Bulbasaur": 0.28,
+            "Charmander": 0.27,
+            "Squirtle": 0.3,
+            "Pikachu": 0.15
           },
-          "choice": "Bulbasaur"
+          "choice": "Squirtle"
         }
       }
     }
   },
   {
     "title": "Erika's gym · Pokémon",
-    "recordedAt": "2026-10-04T06:16:56.971Z",
+    "recordedAt": "2026-10-04T06:19:37.646Z",
     "request": {
       "model": "jev-latest",
       "state": "You are about to enter the Celadon City gym to face Erika, who uses Grass-type Pokémon.",
       "questions": {
-        "starter": {
+        "pokemon": {
           "type": "choice",
-          "instructions": "Which starter Pokémon is best to face off against this gym?",
+          "instructions": "Which Pokémon is best to face off against this gym?",
           "criteria": {
             "Bulbasaur": null,
             "Charmander": null,
-            "Squirtle": null
+            "Squirtle": null,
+            "Pikachu": null
           }
         }
       }
@@ -3922,13 +3929,14 @@
     "jev": {
       "model": "typesafe/jev-1.13-20260917",
       "answers": {
-        "starter": {
+        "pokemon": {
           "type": "choice",
-          "confidence": 0.55,
+          "confidence": 0.57,
           "probabilities": {
-            "Bulbasaur": 0.18,
-            "Charmander": 0.7,
-            "Squirtle": 0.12
+            "Bulbasaur": 0.13,
+            "Charmander": 0.6900000000000001,
+            "Squirtle": 0.06,
+            "Pikachu": 0.12
           },
           "choice": "Charmander"
         }
@@ -3937,18 +3945,19 @@
   },
   {
     "title": "Koga's gym · Pokémon",
-    "recordedAt": "2026-10-04T06:16:57.139Z",
+    "recordedAt": "2026-10-04T06:19:37.823Z",
     "request": {
       "model": "jev-latest",
       "state": "You are about to enter the Fuchsia City gym to face Koga, who uses Poison-type Pokémon.",
       "questions": {
-        "starter": {
+        "pokemon": {
           "type": "choice",
-          "instructions": "Which starter Pokémon is best to face off against this gym?",
+          "instructions": "Which Pokémon is best to face off against this gym?",
           "criteria": {
             "Bulbasaur": null,
             "Charmander": null,
-            "Squirtle": null
+            "Squirtle": null,
+            "Pikachu": null
           }
         }
       }
@@ -3956,13 +3965,14 @@
     "jev": {
       "model": "typesafe/jev-1.13-20260917",
       "answers": {
-        "starter": {
+        "pokemon": {
           "type": "choice",
-          "confidence": 0.71,
+          "confidence": 0.63,
           "probabilities": {
-            "Bulbasaur": 0.8,
-            "Charmander": 0.15,
-            "Squirtle": 0.05
+            "Bulbasaur": 0.72,
+            "Charmander": 0.1,
+            "Squirtle": 0.02,
+            "Pikachu": 0.16
           },
           "choice": "Bulbasaur"
         }
@@ -3971,18 +3981,19 @@
   },
   {
     "title": "Sabrina's gym · Pokémon",
-    "recordedAt": "2026-10-04T06:16:58.063Z",
+    "recordedAt": "2026-10-04T06:19:38.095Z",
     "request": {
       "model": "jev-latest",
       "state": "You are about to enter the Saffron City gym to face Sabrina, who uses Psychic-type Pokémon.",
       "questions": {
-        "starter": {
+        "pokemon": {
           "type": "choice",
-          "instructions": "Which starter Pokémon is best to face off against this gym?",
+          "instructions": "Which Pokémon is best to face off against this gym?",
           "criteria": {
             "Bulbasaur": null,
             "Charmander": null,
-            "Squirtle": null
+            "Squirtle": null,
+            "Pikachu": null
           }
         }
       }
@@ -3990,33 +4001,35 @@
     "jev": {
       "model": "typesafe/jev-1.13-20260917",
       "answers": {
-        "starter": {
+        "pokemon": {
           "type": "choice",
-          "confidence": 0.16,
+          "confidence": 0.17,
           "probabilities": {
-            "Bulbasaur": 0.44,
-            "Charmander": 0.39,
-            "Squirtle": 0.17
+            "Bulbasaur": 0.24,
+            "Charmander": 0.29,
+            "Squirtle": 0.08,
+            "Pikachu": 0.39
           },
-          "choice": "Bulbasaur"
+          "choice": "Pikachu"
         }
       }
     }
   },
   {
     "title": "Blaine's gym · Pokémon",
-    "recordedAt": "2026-10-04T06:16:58.233Z",
+    "recordedAt": "2026-10-04T06:19:38.272Z",
     "request": {
       "model": "jev-latest",
       "state": "You are about to enter the Cinnabar Island gym to face Blaine, who uses Fire-type Pokémon.",
       "questions": {
-        "starter": {
+        "pokemon": {
           "type": "choice",
-          "instructions": "Which starter Pokémon is best to face off against this gym?",
+          "instructions": "Which Pokémon is best to face off against this gym?",
           "criteria": {
             "Bulbasaur": null,
             "Charmander": null,
-            "Squirtle": null
+            "Squirtle": null,
+            "Pikachu": null
           }
         }
       }
@@ -4024,13 +4037,14 @@
     "jev": {
       "model": "typesafe/jev-1.13-20260917",
       "answers": {
-        "starter": {
+        "pokemon": {
           "type": "choice",
-          "confidence": 0.52,
+          "confidence": 0.49,
           "probabilities": {
-            "Bulbasaur": 0.3,
-            "Charmander": 0.02,
-            "Squirtle": 0.68
+            "Bulbasaur": 0.25,
+            "Charmander": 0.01,
+            "Squirtle": 0.63,
+            "Pikachu": 0.11
           },
           "choice": "Squirtle"
         }
@@ -4039,18 +4053,19 @@
   },
   {
     "title": "Giovanni's gym · Pokémon",
-    "recordedAt": "2026-10-04T06:16:58.428Z",
+    "recordedAt": "2026-10-04T06:19:38.451Z",
     "request": {
       "model": "jev-latest",
       "state": "You are about to enter the Viridian City gym to face Giovanni, who uses Ground-type Pokémon.",
       "questions": {
-        "starter": {
+        "pokemon": {
           "type": "choice",
-          "instructions": "Which starter Pokémon is best to face off against this gym?",
+          "instructions": "Which Pokémon is best to face off against this gym?",
           "criteria": {
             "Bulbasaur": null,
             "Charmander": null,
-            "Squirtle": null
+            "Squirtle": null,
+            "Pikachu": null
           }
         }
       }
@@ -4058,15 +4073,16 @@
     "jev": {
       "model": "typesafe/jev-1.13-20260917",
       "answers": {
-        "starter": {
+        "pokemon": {
           "type": "choice",
-          "confidence": 0.62,
+          "confidence": 0.52,
           "probabilities": {
-            "Bulbasaur": 0.75,
-            "Charmander": 0.11,
-            "Squirtle": 0.14
+            "Bulbasaur": 0.26,
+            "Charmander": 0.05,
+            "Squirtle": 0.05,
+            "Pikachu": 0.64
           },
-          "choice": "Bulbasaur"
+          "choice": "Pikachu"
         }
       }
     }

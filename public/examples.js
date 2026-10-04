@@ -94,10 +94,10 @@ const etiquetteScenarios = [
   ask('iPhone · five paragraphs', 'iphone_signature', 'Subject: Re: Budget\nThanks for the detailed breakdown. I have gone through each line item and have notes in three areas: headcount, tooling, and travel. On headcount, I think we should phase the two hires across Q1 and Q2 rather than front-loading them. On tooling, the observability contract renews in March and we should renegotiate before then. On travel, I would cap offsites at two per year. Happy to walk through any of this live.\n\nSent from my iPhone'),
 ];
 const pokemonSource = 'https://bulbapedia.bulbagarden.net/wiki/Gym';
-const starter = { type: 'choice', instructions: 'Which starter Pokémon is best to face off against this gym?', criteria: { Bulbasaur: null, Charmander: null, Squirtle: null } };
+const pokemon = { type: 'choice', instructions: 'Which Pokémon is best to face off against this gym?', criteria: { Bulbasaur: null, Charmander: null, Squirtle: null, Pikachu: null } };
 const pokemonGym = (leader, place, type) => ({
   title: `${leader}'s gym · Pokémon`, source: pokemonSource,
-  request: { model: 'jev-latest', state: `You are about to enter the ${place} gym to face ${leader}, who uses ${type}-type Pokémon.`, questions: { starter } },
+  request: { model: 'jev-latest', state: `You are about to enter the ${place} gym to face ${leader}, who uses ${type}-type Pokémon.`, questions: { pokemon } },
 });
 // Credit card statements: price questions offer every amount in the email, date questions
 // offer every date in the email, so the distractors come from the email itself.
