@@ -95,9 +95,9 @@ const etiquetteScenarios = [
 ];
 const pokemonSource = 'https://bulbapedia.bulbagarden.net/wiki/Gym';
 const starter = { type: 'choice', instructions: 'Which starter Pokémon is best to face off against this gym?', criteria: { Bulbasaur: null, Charmander: null, Squirtle: null } };
-const pokemonGym = (leader, place) => ({
+const pokemonGym = (leader, place, type) => ({
   title: `${leader}'s gym · Pokémon`, source: pokemonSource,
-  request: { model: 'jev-latest', state: `You are about to enter the ${place} gym to face ${leader}.`, questions: { starter } },
+  request: { model: 'jev-latest', state: `You are about to enter the ${place} gym to face ${leader}, who uses ${type}-type Pokémon.`, questions: { starter } },
 });
 // Credit card statements: price questions offer every amount in the email, date questions
 // offer every date in the email, so the distractors come from the email itself.
@@ -212,14 +212,14 @@ const scenarios = [
       healing: { type: 'score', instructions: 'How urgently should Link heal?', criteria: ['No hurry', 'Soon', 'Right now'] },
     } },
   },
-  pokemonGym('Brock', 'Pewter City'),
-  pokemonGym('Misty', 'Cerulean City'),
-  pokemonGym('Lt. Surge', 'Vermilion City'),
-  pokemonGym('Erika', 'Celadon City'),
-  pokemonGym('Koga', 'Fuchsia City'),
-  pokemonGym('Sabrina', 'Saffron City'),
-  pokemonGym('Blaine', 'Cinnabar Island'),
-  pokemonGym('Giovanni', 'Viridian City'),
+  pokemonGym('Brock', 'Pewter City', 'Rock'),
+  pokemonGym('Misty', 'Cerulean City', 'Water'),
+  pokemonGym('Lt. Surge', 'Vermilion City', 'Electric'),
+  pokemonGym('Erika', 'Celadon City', 'Grass'),
+  pokemonGym('Koga', 'Fuchsia City', 'Poison'),
+  pokemonGym('Sabrina', 'Saffron City', 'Psychic'),
+  pokemonGym('Blaine', 'Cinnabar Island', 'Fire'),
+  pokemonGym('Giovanni', 'Viridian City', 'Ground'),
   {
     title: 'That hissing sound · Minecraft', source: 'https://www.minecraft.net/en-us/article/minecraft-mobs',
     request: { model: 'jev-latest', state: 'A creeper beside you is hissing and about to explode. There is open space behind you.', questions: {
