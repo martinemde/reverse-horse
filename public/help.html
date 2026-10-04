@@ -113,6 +113,20 @@
       <p>Pink markers show what Jev answered on the same control. Your answer turns green when it matches and pink when it doesn’t. A match means the same choice, the same side of 0.5 for Noul, or the same nearest level for Score (halfway rounds up).</p>
       <p>The Answer page always compares against saved Jev answers, for practice rounds and for any live request that matches one. To ask the real Jev, use Ask Jev too on the Question page after your answer comes back. It connects your OpenRouter key, which stays in your browser, and calls Jev from your browser on your credits.</p>
     </section>
+
+    <section>
+      <h2 id="pay">Your pay stub</h2>
+      <p>After you submit, the button tells you your hourly pay. Don’t get excited. You’re paid exactly what Jev would have charged to answer the same request, stretched over the time it took you.</p>
+      <p>Jev on OpenRouter costs $0.042 per million input tokens, and output is free. Every request carries about 233 tokens of overhead, plus roughly one token for every three characters of state and questions. A typical practice round comes to around 350 tokens, or about $0.000015. That’s a thousandth and a half of a cent. Take 10 seconds to answer it and you’re earning about half a cent an hour. Take the full 30 and you’d better not have rent due.</p>
+      <p>The token count is an estimate. TypeSafe doesn’t publish Jev’s tokenizer, so I sent every practice round to the real Jev, read back the <code>usage</code> it reported, and fit a line through it. The estimate lands within about 65 tokens of the real bill. Close enough to ruin your day.</p>
+    </section>
+
+    <section>
+      <h2 id="speed">How much slower you are</h2>
+      <p>Where the clock was, a finished card tells you how many times slower than Jev you were. It’s gray because it isn’t a scolding. It’s just the math.</p>
+      <p>I measured it the boring way: I timed real requests for all 119 practice rounds from my laptop through OpenRouter, twice. The median round trip was 190 to 199 milliseconds, network and all, so the horse uses 0.2 seconds. The slowest single call took 740 milliseconds, which is still faster than you can read the question. Answer in 10 seconds and you were 50x slower. Use the whole 30 and it’s 150x.</p>
+      <p>Your time starts when the request arrives and stops when you hit submit. Paused practice doesn’t count against you. Training has no clock, so there it starts when the card appears.</p>
+    </section>
   </main>
   <footer>reverse.horse <span>Read the manual. Then don’t think.</span></footer>
 </body>
