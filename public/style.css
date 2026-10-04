@@ -7,7 +7,7 @@ a{color:inherit}
 .brand{text-decoration:none;font-size:24px;font-weight:800;letter-spacing:-1px}
 .brand span{color:var(--accent);font:11px ui-monospace,monospace;letter-spacing:1.5px;margin-left:18px}
 #connection{font-size:14px;color:var(--muted)}
-main{max-width:1000px;padding:44px 32px;margin:auto;min-height:80vh}
+main{max-width:1000px;padding:24px 32px;margin:auto;min-height:80vh}
 .toolbar{display:flex;justify-content:space-between;align-items:center;gap:24px;margin-bottom:32px}
 h1{font-size:32px;letter-spacing:-1px;margin:0 0 8px}
 p{line-height:1.5;margin:8px 0;color:var(--muted)}
@@ -16,25 +16,32 @@ p{line-height:1.5;margin:8px 0;color:var(--muted)}
 .empty code{display:inline-block;margin-top:20px;color:var(--muted);font-size:14px}
 .waiting-mark{font:36px ui-monospace,monospace;color:var(--accent)}
 .request,.result{border:1px solid var(--line);border-radius:16px;margin-bottom:24px;overflow:hidden;background:#1b2121}
-.request-head,.result-head{padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;border-bottom:1px solid var(--line)}
+.request-head,.result-head{padding:12px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;border-bottom:1px solid var(--line)}
 .eyebrow{font:13px ui-monospace,monospace;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
 h2,h3{margin:8px 0;font-size:20px}
 .clock{font:28px ui-monospace,monospace;color:var(--accent);white-space:nowrap}
 .clock.urgent{color:#ffad99}
-.state{padding:24px;background:#222b29;border-bottom:1px solid var(--line)}
-.state pre{font:16px/1.55 ui-sans-serif,system-ui,sans-serif;margin:12px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;color:#e5ebe7}
+.state{padding:16px 24px;background:#222b29;border-bottom:1px solid var(--line)}
+.state pre{font:16px/1.45 ui-sans-serif,system-ui,sans-serif;margin:6px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;color:#e5ebe7}
 .questions{padding:0 24px}
-.question{padding:25px 0;border:0;border-bottom:1px solid var(--line);margin:0;min-width:0}
+.question{padding:16px 0;border:0;border-bottom:1px solid var(--line);margin:0;min-width:0}
 .question:last-child{border-bottom:0}
-.question legend{float:left;width:100%;font:13px ui-monospace,monospace;color:var(--muted);margin-bottom:12px;overflow-wrap:anywhere}
-.instructions{clear:both;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5;margin-bottom:20px}
+.question legend{float:left;width:100%;font:13px ui-monospace,monospace;color:var(--muted);margin-bottom:6px;overflow-wrap:anywhere}
+.instructions{clear:both;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.45;margin-bottom:10px}
 .range-row{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:12px 0}
 .range-row output{font:16px ui-monospace,monospace;color:var(--accent)}
 input[type=range]{width:100%;height:30px;margin:4px 0;accent-color:var(--accent);cursor:pointer}
 .ends{display:flex;justify-content:space-between;gap:20px;font-size:14px;color:var(--muted)}
 .ends>span{max-width:46%;white-space:pre-wrap;overflow-wrap:anywhere}
 .ends>span:last-child{text-align:right}
-.choice{padding:10px 0}
+.choice{padding:4px 0}
+.choice-line{margin:0}
+.choice-line .slider-track{flex:1;min-width:0;height:30px}
+.choice-line .slider-track input[type=range]{margin:0}
+.choice-line .jev-marker{top:2px}
+.choice .choice-line output.choice-probability{font-size:13px;color:var(--muted);min-width:13ch}
+.choice-line .range-values output:first-child{min-width:10ch}
+.choice-line .jev-value{min-width:17ch}
 .choice-name{min-width:0;overflow-wrap:anywhere}
 .choice-description{color:var(--muted);font-size:14px}
 .actions{padding:20px 24px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:16px}
@@ -60,7 +67,7 @@ footer span{font-size:13px}
 details{padding:16px 24px}
 summary{cursor:pointer;color:var(--muted);font-size:14px}
 details pre{white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.5 ui-monospace,monospace}
-.auth-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.auth-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
 .auth-bar p{font-size:14px;flex:1 1 240px}
 .secondary{background:transparent;border:1px solid var(--line);color:var(--accent);padding:10px 16px;font-size:14px}
 .compare-toggle{display:flex;align-items:center;gap:8px;font-size:14px}
@@ -156,7 +163,7 @@ select:focus-visible{outline:2px solid white;outline-offset:4px}
 .jev-value{min-width:10ch;text-align:right}
 .jev-value.pending{visibility:hidden}
 .jev-value{font:13px ui-monospace,monospace;color:var(--pink)}
-.question-feedback{min-height:1.5em;font-size:14px;margin:14px 0 0}
+.question-feedback{min-height:1.5em;font-size:14px;margin:8px 0 0}
 .answer-match .question-feedback,.answer-match .range-row output{color:var(--green)}
 .answer-miss .question-feedback,.answer-miss .range-row output{color:var(--pink)}
 .answer-match .slider-track input{--answer-color:var(--green)}
@@ -202,7 +209,7 @@ a#play{display:inline-flex;align-items:center;justify-content:center;border-radi
 .request.live-request{border-color:var(--accent)}
 .choice-probabilities{display:flex;align-items:center;justify-content:space-between;gap:12px;font:13px ui-monospace,monospace;color:var(--muted)}
 .choice-confidence{display:block;font:14px ui-monospace,monospace;color:var(--accent)}
-.choice-summary{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.choice-summary{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
 .choice-summary p{font-size:13px}
 .human-picked .choice-name{color:var(--accent)}
 nav #train{background:transparent;color:var(--muted);padding:0;font:inherit;border-radius:0}
@@ -268,3 +275,13 @@ body.in-training{overflow:hidden}
 .skip{display:grid;place-items:center;background:none;border:0;border-radius:50%;padding:0;width:32px;height:32px;color:#ffad99;cursor:pointer}
 .skip:hover{background:#2a2423}
 .skip:disabled{opacity:.45}
+@media(max-width:600px){
+  .choice{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:8px}
+  .choice-name{flex:1 1 auto}
+  .choice-line{display:contents}
+  .choice-line .range-values{margin-left:auto;flex-wrap:wrap;justify-content:flex-end;row-gap:0}
+  .choice-line .slider-track{flex-basis:100%}
+  .choice-line .range-values output{min-width:0;font-size:13px}
+  .choice-line .jev-value{min-width:0}
+  .choice-line .jev-value.pending{display:none}
+}

@@ -91,22 +91,21 @@ const questionTypes = {
     };
     for (const key of keys) {
       const option = node('div', undefined, 'choice');
-      const row = node('div', undefined, 'range-row');
-      const label = node('span', key, 'choice-name');
+      const label = node('div', key, 'choice-name');
       if (q.criteria[key] !== null) label.append(node('span', `: ${text(q.criteria[key])}`, 'choice-description'));
       const fullness = node('output');
       const output = node('output', undefined, 'choice-probability');
       const jev = node('span', 'Jev', 'jev-value pending');
-      const numbers = node('div', undefined, 'range-values'); numbers.append(fullness);
+      const numbers = node('div', undefined, 'range-values'); numbers.append(fullness, output, jev);
       const slider = range(`${id}: ${key}`, 1, 0, value => {
         values[id][key] = value;
         refresh();
       });
       const scale = track(slider);
-      const probabilities = node('div', undefined, 'choice-probabilities'); probabilities.append(output, jev);
+      // Slider and its numbers share one line so long choice lists stay on screen.
+      const line = node('div', undefined, 'range-row choice-line'); line.append(scale.wrapper, numbers);
       controls.push({ key, slider, fullness, output, jev, option, marker: scale.marker });
-      row.append(label, numbers); option.append(row);
-      option.append(scale.wrapper, probabilities); field.append(option);
+      option.append(label, line); field.append(option);
     }
     const summary = node('div', undefined, 'choice-summary');
     summary.append(certainty, node('p', 'Fill any bars from 0–100%. The tallest bar sets confidence; their relative fullness sets the chances.'));
