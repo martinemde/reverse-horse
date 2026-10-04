@@ -31,10 +31,10 @@ test('match feedback compares human answers against the recorded Jev answers', (
 
 test('hourly pay is the Jev cost of the request over the time spent', () => {
   const request = { model: 'jev-latest', state: 'x'.repeat(373), questions: {} };
-  // {"state":"xxx…","questions":{}} is 400 characters, so 100 tokens.
-  expect(jevCost(request)).toBeCloseTo(100 * 0.042 / 1e6, 15);
-  expect(hourlyPay(request, 10)).toBe('Hourly Pay: $0.0015/hr');
-  expect(hourlyPay(request, 0)).toBe('Hourly Pay: $0.15/hr');
+  // {"state":"xxx…","questions":{}} is 400 characters: 233 + 400 / 2.87 → 373 tokens.
+  expect(jevCost(request)).toBeCloseTo(373 * 0.042 / 1e6, 15);
+  expect(hourlyPay(request, 10)).toBe('Hourly Pay: $0.0056/hr');
+  expect(hourlyPay(request, 0)).toBe('Hourly Pay: $0.56/hr');
 });
 
 test('slowdown compares answer time with the measured Jev round trip', () => {

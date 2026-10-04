@@ -43,13 +43,14 @@ export function matchesJev(human, jev) {
 }
 
 // Jev 1.13 on OpenRouter: $0.042 per million input tokens, output free. The
-// tokenizer is unpublished, so estimate four characters per token.
+// tokenizer is unpublished; scripts/time-jev.js fit real usage (2026-10-04) to
+// 233 fixed tokens plus one per 2.87 characters of state and questions.
 export const jevInputPrice = 0.042 / 1e6;
 export function jevCost(request) {
-  return Math.ceil(JSON.stringify({ state: request.state, questions: request.questions }).length / 4) * jevInputPrice;
+  return Math.ceil(233 + JSON.stringify({ state: request.state, questions: request.questions }).length / 2.87) * jevInputPrice;
 }
-// Median measured round trip from scripts/time-jev.js.
-export const jevSeconds = 0.5;
+// Median round trip measured by scripts/time-jev.js (190–199 ms, 2026-10-04).
+export const jevSeconds = 0.2;
 export function slowdown(seconds) {
   return `${Math.max(1, Math.round(seconds / jevSeconds)).toLocaleString('en-US')}x Slower`;
 }

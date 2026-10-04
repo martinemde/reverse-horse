@@ -48,7 +48,8 @@ complete request, so edited questions never reuse an old answer.
 
 Submitted cards lock in place. The button then reads `Hourly Pay: $X/hr`: Jev's
 cost for the request (`jevCost` in `compare.js`: $0.042 per million input tokens,
-output free, estimated at four characters per token of `state` + `questions`;
+output free, estimated as 233 + chars / 2.87 tokens of `state` + `questions`, fit
+by `scripts/time-jev.js` against real usage;
 price from `openrouter.ai/api/v1/models/typesafe/jev-1.13/endpoints`) times
 3600 over the seconds you took. Timed cards count from arrival by their deadline
 (practice pauses excluded); training counts from when the card appeared. Expect
