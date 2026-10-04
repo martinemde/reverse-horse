@@ -93,10 +93,10 @@ const questionTypes = {
       const option = node('div', undefined, 'choice');
       const label = node('div', key, 'choice-name');
       if (q.criteria[key] !== null) label.append(node('span', `: ${text(q.criteria[key])}`, 'choice-description'));
-      const fullness = node('output');
+      const fullness = node('output', undefined, 'choice-fullness');
       const output = node('output', undefined, 'choice-probability');
       const jev = node('span', 'Jev', 'jev-value pending');
-      const numbers = node('div', undefined, 'range-values'); numbers.append(fullness, output, jev);
+      const numbers = node('div', undefined, 'range-values'); numbers.append(output, jev, fullness);
       const slider = range(`${id}: ${key}`, 1, 0, value => {
         values[id][key] = value;
         refresh();

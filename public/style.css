@@ -42,7 +42,7 @@ input[type=range]{width:100%;height:30px;margin:4px 0;accent-color:var(--accent)
 .choice-line .slider-track input[type=range]{margin:0}
 .choice-line .jev-marker{top:2px}
 .choice .choice-line output.choice-probability{font-size:13px;color:var(--muted);min-width:13ch}
-.choice-line .range-values output:first-child{min-width:10ch}
+.choice-line .range-values output.choice-fullness{min-width:10ch}
 .choice-line .jev-value{min-width:17ch}
 .choice-name{min-width:0;overflow-wrap:anywhere}
 .choice-description{color:var(--muted);font-size:14px}
