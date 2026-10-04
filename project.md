@@ -203,7 +203,7 @@ You & Jev panel; repeat with comparison off and after disconnecting.
 
 To record practice answers, put `OPENROUTER_API_KEY` in the ignored `.env` and
 run `bun scripts/save-example-results.js`. It calls Jev once per missing request
-and saves each result immediately so retries are free. Remove the key afterward.
+and saves each result immediately so retries are free.
 
 ## Gotchas
 
