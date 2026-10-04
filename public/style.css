@@ -211,7 +211,7 @@ a#play{display:inline-flex;align-items:center;justify-content:center;border-radi
   .player-controls :is(button,a){min-width:96px;padding:12px}
   .player-header{padding:14px 16px}
 }
-.request.live-request{border-color:var(--accent)}
+.request.live-request{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .choice-confidence{display:block;font:14px ui-monospace,monospace;color:var(--accent)}
 .choice-summary{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
 .human-picked .choice-name{color:var(--accent)}
