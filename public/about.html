@@ -32,13 +32,13 @@
 
     <section>
       <p>Reverse.horse is my newest project, an attempt to understand and explain the new AI model <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev">Jev</a>, <em>by using your feeble human brain as the model</em>. Place yourself in-request and respond as best as you can to incoming questions.</p>
-      <p>Instead of reading this whole thing, I suggest you go <a href="/">try it</a>. Hit Play and it will run you through the process and types of responses so you can get a feel for what this model does directly.</p>
+      <p>If you want to jump right in, go <a href="/">try it</a>. The horse will put you through your training on how to be the AI model and then cut you loose to do the job of the AI model. You may come back with a new appreciation of what these models are doing.</p>
     </section>
 
     <section>
       <h2>What is Jev?</h2>
       <p><a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev">Jev</a> is a new AI model that has taken the internet by storm in recent weeks. The concept is based on the idea that if we make “good enough” intelligence <em>cheap</em> and <em>fast</em>, it will explode in usefulness, expanding the use of intelligence into more places than we ever thought practical.</p>
-      <p>Jev is a different direction than most LLMs have taken. ChatGPT and Claude try to be ever bigger and smarter to take over for your brain, while Jev asks only for ever-more-decomposed questions. I picked this model to clone because it impressed me. It opened up new ideas for working with intelligence, and, like all great ideas, it seems so simple.</p>
+      <p>Jev is a different direction than most LLMs have taken. ChatGPT and Claude try to be ever bigger and smarter to take over for your brain, while Jev asks only for ever-more-decomposed questions. You send Jev state and questions and you get the answers to those questions very quickly and cheaply. I picked this model to clone because it impressed me. It opened up new ideas for working with intelligence, and, like many great ideas, it seems so simple after the fact.</p>
       <p>The API route <code>systemone</code> (that’s “System One”) implies the behavior of the model. System One comes from Daniel Kahneman’s <a href="https://en.wikipedia.org/wiki/Thinking,_Fast_and_Slow"><em>Thinking, Fast and Slow</em></a>, which defines it as quick, gut-reaction thinking. System Two is what almost all modern LLMs are doing: <em>Reasoning…</em></p>
       <p>The name “Jev” comes from Jevons Paradox, which has been a buzzy term for a little-known behavior of demand elasticity: when you make consumption of a resource more efficient, sometimes you use more of that resource than you did before. Cheaper electricity makes people apply electricity in places where it was previously too expensive to do so.</p>
     </section>
@@ -46,7 +46,7 @@
     <section>
       <h2>Why?</h2>
       <p>Because! Reverse.horse is something between a tutorial and an art project.</p>
-      <p>It is a functioning API that matches the <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev">Jev</a> <code>/v1/systemone</code> format. It presents the questions asked on the API to anyone that is connected, and the results become the response from the API. Send real questions to reverse.horse and any human connected can scramble to respond before the 30 second response timeout.</p>
+      <p>Reverse.horse is actually a functioning API that matches the <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev">Jev</a> <code>/v1/systemone</code> format. You could, in truth, hook this up in place of your real usage of Jev and get terrible, slow, human powered answers (if anyone is listening). The questions you ask are presented to anyone that is connected, and the results become the response from the API. Send real questions to reverse.horse and any human connected can scramble to respond before the 30 second response timeout.</p>
       <p>It’s also a tutorial intended to help you understand exactly what Jev <em>is</em> and what the <a href="/help#types">3 question types</a> mean. By using your human brain to answer in place of the model, you get an intuitive sense of what Jev is doing.</p>
       <p>It becomes immediately apparent that you suck at this. Jev can usually answer in under 1/10th of a second, and it can do thousands of questions like this in the time it takes you to answer a single one. You may even notice that for every answer that you carefully answer correctly, Jev is within a few points of what you answered. Remarkable, isn’t it?</p>
     </section>
