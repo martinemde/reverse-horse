@@ -275,9 +275,14 @@ body.in-training{overflow:hidden}
 .skip{display:grid;place-items:center;background:none;border:0;border-radius:50%;padding:0;width:32px;height:32px;color:#ffad99;cursor:pointer}
 .skip:hover{background:#2a2423}
 .skip:disabled{opacity:.45}
-@media(max-width:600px){
+.questions{container-type:inline-size}
+/* Narrow cards (phones, the training dialog) give the numbers their own line: chance left, fullness right. */
+@container (max-width:640px){
   .choice{column-gap:8px}
+  .choice-name{flex-basis:100%}
+  .choice-line .range-values{width:100%;margin-left:0;justify-content:space-between}
   .choice-line .range-values output{min-width:0;font-size:13px}
+  .choice .choice-line output.choice-probability{min-width:0;text-align:left}
   .choice-line .jev-value{min-width:0}
   .choice-line .jev-value.pending{display:none}
 }

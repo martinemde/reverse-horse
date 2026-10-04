@@ -34,7 +34,7 @@ function scale(id, values, max, caption, vertical) {
   const row = node('div', undefined, 'range-row');
   const output = node('output', values[id].toFixed(3));
   const jev = node('span', 'Jev', 'jev-value pending');
-  const numbers = node('div', undefined, 'range-values'); numbers.append(output, jev);
+  const numbers = node('div', undefined, 'range-values'); numbers.append(jev, output);
   row.append(node('span', caption), numbers);
   const slider = range(id, max, values[id], value => { values[id] = value; output.textContent = value.toFixed(3); });
   const { wrapper, marker } = track(slider);
