@@ -110,6 +110,7 @@ try {
   await active.locator('button[type=submit]').click({ delay: 350 });
   assert.match(await saved.textContent(), /Matched Jev|Different from Jev/);
   assert.equal(await saved.$eval('.jev-marker', marker => marker.hidden), false, 'Practice always compares with the saved run');
+  assert.match(await saved.$eval('button[type=submit]', el => el.textContent), /^Hourly Pay: \$[\d.]+\/hr$/);
 
   // A live request matching a saved run compares against it, and so does a
   // local late draft. Neither calls a model.
@@ -144,6 +145,7 @@ try {
   await page.waitForFunction(el => el.classList.contains('answered'), live);
   await page.waitForFunction(el => !el.querySelector('.jev-marker').hidden, live);
   assert.equal(await live.$eval('.actions p', el => el.textContent), 'Average of 2 answers');
+  assert.match(await live.$eval('button[type=submit]', el => el.textContent), /^Hourly Pay: \$[\d.]+\/hr$/, 'Live answers show pay too');
   peer.close(); await new Promise(resolve => peer.addEventListener('close', resolve, { once: true }));
 
   const lateResponse = fetch(new URL('/v1/systemone', app.server.url), { method: 'POST', body: JSON.stringify(run.request) });

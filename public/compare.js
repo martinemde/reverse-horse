@@ -41,3 +41,13 @@ export function matchesJev(human, jev) {
   if (human.type === 'noul') return (human.noul >= 0.5) === (jev.noul >= 0.5);
   return Math.round(human.score) === Math.round(jev.score);
 }
+
+// Jev 1.13 on OpenRouter: $0.042 per million input tokens, output free. The
+// tokenizer is unpublished, so estimate four characters per token.
+export const jevInputPrice = 0.042 / 1e6;
+export function jevCost(request) {
+  return Math.ceil(JSON.stringify({ state: request.state, questions: request.questions }).length / 4) * jevInputPrice;
+}
+export function hourlyPay(request, seconds) {
+  return `Hourly Pay: $${(jevCost(request) * 3600 / Math.max(seconds, 0.1)).toPrecision(2)}/hr`;
+}

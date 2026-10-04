@@ -1,5 +1,5 @@
 import { choiceWeights } from './protocol.js';
-import { matchesJev } from './compare.js';
+import { matchesJev, hourlyPay } from './compare.js';
 import { node } from './dom.js';
 
 const text = value => typeof value === 'string' ? value : JSON.stringify(value, null, 2);
@@ -129,13 +129,16 @@ const questionTypes = {
 
 // A card answers one request. The page decides what submit and skip mean;
 // onSubmit may throw to put the card back in an editable state.
-export function createCard(item, { onSubmit, onSkip, onError, connected }) {
+export function createCard(item, { onSubmit, onSkip, onError, connected, elapsed }) {
   const values = Object.create(null);
   const views = new Map();
   let submitting = false;
   let completed = false;
   let submitted = false;
   let outcomeSignature = '';
+  // Paid at Jev's rate for the time it took you. Untimed cards count from creation.
+  const shownAt = Date.now();
+  let pay;
   const card = node('form', undefined, 'request');
   card.dataset.id = item.id;
   card.classList.toggle('live-request', !item.local);
@@ -179,6 +182,7 @@ export function createCard(item, { onSubmit, onSkip, onError, connected }) {
     event.preventDefault(); validity(); if (button.disabled) return;
     try {
       // Training answers finish the card immediately; there is nothing to wait for.
+      pay = hourlyPay(item.request, elapsed?.(item) ?? (Date.now() - shownAt) / 1000);
       if (!item.training) { submitting = true; validity(); }
       onSubmit(item, values);
     } catch (error) { submitting = false; validity(); onError(error); }
@@ -196,7 +200,7 @@ export function createCard(item, { onSubmit, onSkip, onError, connected }) {
       skip.remove();
       clock.style.width = `${clock.getBoundingClientRect().width}px`;
       clock.textContent = 'Done'; clock.classList.remove('urgent'); clock.setAttribute('aria-label', 'Answered');
-      button.disabled = true; button.textContent = 'Submitted';
+      button.disabled = true; button.textContent = pay ?? 'Submitted';
       for (const [id, view] of views) {
         view.field.disabled = true;
         const human = result.human?.answers[id];
@@ -218,7 +222,7 @@ export function createCard(item, { onSubmit, onSkip, onError, connected }) {
   }
   function progress(item) {
     submitted = Boolean(item.submitted);
-    const label = submitted ? 'Submitted' : 'Submit answers';
+    const label = submitted ? pay ?? 'Submitted' : 'Submit answers';
     if (button.textContent !== label) button.textContent = label;
     for (const view of views.values()) view.field.disabled = submitted;
     if (submitted) { submitting = false; corner.style.minHeight = `${corner.getBoundingClientRect().height}px`; skip.remove(); }

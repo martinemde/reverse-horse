@@ -46,7 +46,13 @@ Practice pauses while live requests or comparisons are active and stays in the
 current tab. Comparisons come from `public/example-results.json`, matched on the
 complete request, so edited questions never reuse an old answer.
 
-Submitted cards lock in place. Pink markers show Jev on the same control; green
+Submitted cards lock in place. The button then reads `Hourly Pay: $X/hr`: Jev's
+cost for the request (`jevCost` in `compare.js`: $0.042 per million input tokens,
+output free, estimated at four characters per token of `state` + `questions`;
+price from `openrouter.ai/api/v1/models/typesafe/jev-1.13/endpoints`) times
+3600 over the seconds you took. Timed cards count from arrival by their deadline
+(practice pauses excluded); training counts from when the card appeared. Expect
+fractions of a cent. Pink markers show Jev on the same control; green
 means a match, pink a mismatch. Matching uses the same choice, the same yes/no
 side (0.5 is yes), or the nearest score level (halfway rounds up). New rounds
 appear above completed cards. Unanswered cards always sit above submitted ones:

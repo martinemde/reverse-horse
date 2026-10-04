@@ -71,6 +71,8 @@ function showError(message) { $('#error').textContent = message; $('#error').hid
 function makeForm(item, onTrainingSubmit) {
   return createCard(item, {
     connected: () => socket?.readyState === WebSocket.OPEN,
+    // Seconds of the 30 spent; practice deadlines already exclude pauses.
+    elapsed: item.training ? undefined : item => 30 - (item.deadline - (item.pausedAt ?? Date.now()) - (item.local ? 0 : offset)) / 1000,
     onError: error => showError(error.message),
     onSkip(item) {
       if (item.late) { lateDrafts.delete(item.id); render(); schedulePractice(); }
